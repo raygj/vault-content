@@ -1,0 +1,1 @@
+SELECT sum("count") FROM "autogen"."vault.core.handle_request" WHERE ("host" =~ /^$host$/) AND $timeFilter GROUP BY time($__interval) fill(none)

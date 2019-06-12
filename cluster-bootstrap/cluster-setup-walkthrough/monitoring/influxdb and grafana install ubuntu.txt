@@ -1,0 +1,72 @@
+https://computingforgeeks.com/install-influxdb-on-ubuntu-18-04-and-debian-9/
+
+echo "deb https://repos.influxdata.com/ubuntu bionic stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+sudo curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install -y influxdb
+sudo systemctl enable --now influxdb
+sudo systemctl is-enabled influxdb
+
+systemctl status influxdb
+
+Create InfluxDB user
+influx
+CREATE USER "telegraf" WITH PASSWORD 'metrics' WITH ALL PRIVILEGES
+show users
+exit
+
+# this did not work
+https://www.howtoforge.com/tutorial/ubuntu-grafana-monitoring/
+sudo nano /etc/apt/sources.list
+deb https://packagecloud.io/grafana/stable/debian/ stretch main <save>
+sudo curl https://packagecloud.io/gpg.key | sudo apt-key add -
+
+# this did work
+https://packagecloud.io/grafana/stable/install
+curl -s https://packagecloud.io/install/repositories/grafana/stable/script.deb.sh | sudo bash
+
+sudo apt-get update -y
+sudo apt-get install grafana -y
+
+sudo systemctl daemon-reload
+sudo systemctl enable grafana-server
+sudo systemctl start grafana-server
+sudo systemctl status grafana-server
+
+Telegraf for Ubuntu
+https://computingforgeeks.com/how-to-install-and-configure-telegraf-on-ubuntu-18-04-debian-9/
+
+Telegraf for CentOS7
+https://www.digitalocean.com/community/tutorials/how-to-monitor-system-metrics-with-the-tick-stack-on-centos-7
+https://docs.influxdata.com/telegraf/v1.9/introduction/installation/
+
+nano /etc/yum.repos.d/influxdata.repo
+
+[influxdb]
+name = InfluxDB Repository - RHEL \$releasever
+baseurl = https://repos.influxdata.com/rhel/\$releasever/\$basearch/stable
+enabled = 1
+gpgcheck = 1
+gpgkey = https://repos.influxdata.com/influxdb.key
+
+yum install telegraf
+nano /etc/telegraf/telegraf.conf
+
+
+  ## HTTP Basic Auth # username in InfluxDB with admin rights
+   username = "telegraf"
+   password = "metrics"
+      
+systemctl start telegraf
+systemctl status telegraf
+
+
+Check InfluxDB for Data Being Sent From Telegraf
+influx -username 'sammy' -password 'sammy_admin'
+show databases
+use telegraf
+show measurements
+exit
+
+
+You can view usage instructions for each input plugin by running telegraf -usage plugin-name in a terminal window.

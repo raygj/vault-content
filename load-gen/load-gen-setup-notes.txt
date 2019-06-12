@@ -1,0 +1,47 @@
+VAULT_TOKEN="<vault token>" ./prepare.py  --host="http://192.168.1.231:8200"
+
+VAULT_TOKEN="<vault token>" ./prepare.py  --host="http://<IP or DNS name of Vault Cluster:8200"
+
+
+
+Traceback (most recent call last):
+  File "./prepare.py", line 4, in <module>
+    import common
+  File "/home/jray/githome/vault-load-testing/common.py", line 3, in <module>
+    from locust.clients import HttpSession
+ModuleNotFoundError: No module named 'locust'
+
+
+# added this env var pointing to packages
+# https://askubuntu.com/questions/250929/pythonpath-environment-variable
+export PYTHONPATH="$PYTHONPATH/home/jray/githome/vault-load-testing"
+
+
+
+locust -H http://192.168.1.231:8200 -c 25 -r 5 --no-web
+
+
+/usr/local/bin/locust --version
+
+# can't find locust
+
+find | grep "locust"
+
+should be: locustio in ./.local/lib/python3.6/site-packages
+
+
+echo $PATH
+
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
+/usr/bin/python3.6
+
+
+
+cd /home/jray//githome/vault-load-testing
+
+sudo /home/jray/consul/consul agent -data-dir="/tmp/consul" -bind=192.168.1.172 -client=192.168.1.172 >> /home/jray/consul/log/output.log &
+
+sudo /home/jray/consul/consul join -http-addr=192.168.1.169:8500 192.168.1.231
+
+sudo /home/jray/consul/consul agent -data-dir="/tmp/consul" -bind=192.168.1.169 -client=192.168.1.169 >> /home/jray/consul/log/output.log &

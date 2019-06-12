@@ -1,0 +1,61 @@
+problem: consul telemetry config is pushing metrics to dogstatsd on localhost
+
+dogstatsd is Data Dog Agent and must be installed and configured for this to work
+
+Data Dog Agent requires Go, which has another set of requirements to get install correctly
+
+	alternative is using StatsD, but the risk is that the Grafana dashboards may not be setup to visualize the metrics
+	since StatsD does not support tagging and it is assumed that tags are used in the graphs
+
+
+
+invoke deps error:
+
+can't load package: package github.com/DataDog/datadog-agent/cmd/agent: cannot find package "github.com/DataDog/datadog-agent/cmd/agent" in any of:
+	/usr/lib/golang/src/github.com/DataDog/datadog-agent/cmd/agent (from $GOROOT)
+	/root/go/src/github.com/DataDog/datadog-agent/cmd/agent (from $GOPATH)
+
+
+
+
+FIX is to set GOPATH - need to figure out how to add these for root
+
+
+export GOBIN="/usr/local/go/bin"
+export GOPATH="/usr/local/go/src"
+
+This is where Go is installed:
+
+/usr/local/go/bin
+
+other examples had:
+
+export GOBIN="$HOME/usr/local/go/bin"
+export GOPATH="$HOME/usr/local/go/src"
+export PATH=$PATH:/usr/local/go/bin:$GOBIN
+
+next step
+
+invoke deps
+
+invoke agent.build --build-exclude=snmp,systemd
+
+
+Create systemd service
+
+cat << EOF > /etc/systemd/system/dogstatsd.service
+[Unit]
+Description=DogStatsD Agent
+
+[Service]
+Restart=on-failure
+PermissionsStartOnly=true
+ExecStartPre=/sbin/setcap 'cap_ipc_lock=+ep' /usr/local/go/src/src/github.com/DataDog/datadog-agent/bin/agent
+ExecStart=/usr/local/go/src/src/github.com/DataDog/datadog-agent/bin/agent start 
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+User=vault
+Group=vault
+[Install]
+WantedBy=multi-user.target
+EOF

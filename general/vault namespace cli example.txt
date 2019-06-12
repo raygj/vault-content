@@ -1,0 +1,8 @@
+vault secrets enable -path=lob3acct -namespace=LOB-Team-3 aws 
+
+vault write -namespace=LOB-Team-3 lob3acct/config/root \
+    access_key=$AWS_ACCESS_KEY \
+    secret_key=$AWS_SECRET_KEY \
+    region=us-east-1
+
+vault command <arguments...> path

@@ -1,0 +1,51 @@
+VAULT_TOKEN="<vault token>" ./prepare.py --num-secrets=1000000 --host="http://192.168.1.231:8200"
+
+
+/home/jray/consul/consul join -http-addr=192.168.1.232:8500
+
+/home/jray/consul/consul agent -data-dir=/tmp/consul -node=loadgen -datacenter=dc1
+
+
+/home/jray/consul/consul agent -retry-join=["192.168.1.232", "192.168.1.231", "192.168.1.159"]
+
+
+{
+  "bootstrap": false,
+  "bootstrap_expect": 3,
+  "server": true,
+  "retry_join": ["192.168.1.232", "192.168.1.232", "192.168.1.159"]
+}
+
+
+# start consul client agent
+# https://github.com/smartdevicelink/manticore/wiki/Start-the-client-agents
+# orig CLI: sudo consul agent -data-dir="/tmp/consul" -bind=<ip> -client=<ip> >> /var/log/consul/output.log &
+#
+# CLI notes
+# consul agent starts the agent in client mode. Remember that adding -server starts the agent in server mode
+# -data-dir is here for the same reason we need it for the consul server agent
+# -bind=<ip> also will attach the agent to the ip specified. This is required if there are multiple IPs found. 
+# Use the IP of the host machine this agent is on.
+# -client=<ip> is the key in making our Manticore system work. It functions the same way as -bind, 
+# only now ALL interactions with the agent must now be made on the IP address specified instead of local host (127.0.0.1). Use the same IP as in the -bind flag.
+# /var/log/consul/output.log is a recommended location to print the log stream. Make sure the directory exists first
+# & Run the agent in the background
+#
+# setup log dir
+mkdir /home/jray/consul/log/
+touch /home/jray/consul/log/output.log
+#
+# start consul, running in background
+sudo /home/jray/consul/consul agent -data-dir="/tmp/consul" -bind=192.168.1.169 -client=192.168.1.169 >> /home/jray/consul/log/output.log &
+#
+# check log for startup result
+tail -20 /home/jray/consul/log/output.log
+#
+# join agent client to existing server cluster
+# orig CLI: consul join -http-addr=<ip of this machine>:8500 <ip of the consul server agent>
+/home/jray/consul/consul join -http-addr=192.168.1.169:8500 192.168.1.232
+#
+# verify join on consul cluster
+consul members
+# validate consul DNS from client
+dig @192.168.1.169 -p 8600 vault.service.dc1.consul. ANY

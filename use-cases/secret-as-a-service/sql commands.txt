@@ -1,0 +1,7 @@
+psql jray
+
+SELECT version ();
+
+SELECT current_database ();
+
+\password jray

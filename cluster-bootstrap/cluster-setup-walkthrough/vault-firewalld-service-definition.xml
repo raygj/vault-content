@@ -1,0 +1,10 @@
+// service definition for Vault connectivity
+// nano /etc/firewalld/services/vault.xml
+//
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>Vault</short>
+  <description>TCP connectivity required for HashiCorp Vault cluster communication.</description>
+  <port protocol="tcp" port="8200"/>
+  <port protocol="tcp" port="8201"/>
+</service>

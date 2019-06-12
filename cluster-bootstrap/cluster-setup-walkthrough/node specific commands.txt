@@ -1,0 +1,18 @@
+./setup.sh 192.168.1.231 192.168.1.232 192.168.1.159
+
+./setup.sh 192.168.1.232 192.168.1.231 192.168.1.159
+
+./setup.sh 192.168.1.159 192.168.1.231 192.168.1.232
+
+
+scp /Users/jray/Downloads/*.hclic root@192.168.1.231:/tmp
+
+scp /Users/jray/Downloads/*.hclic root@192.168.1.232:/tmp
+
+scp /Users/jray/Downloads/*.hclic root@192.168.1.159:/tmp
+
+
+consul license put c22ee442-6dd6-cc44-9987-f0c47afb8a1c.hclic
+
+vault license put 845b2551-b54f-ca79-5631-4338e3353c6a.hclic
+

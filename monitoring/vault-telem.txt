@@ -1,0 +1,6 @@
+# add this stanza to the existing vault config file
+
+telemetry {
+  dogstatsd_addr   = "localhost:8125"
+  disable_hostname = true
+}

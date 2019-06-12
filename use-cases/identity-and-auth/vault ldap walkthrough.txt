@@ -1,0 +1,19 @@
+vault auth enable ldap 
+
+vault auth disable ldap
+
+
+vault write auth/ldap/config binddn=${USERNAME} bindpass=${PASSWORD} url="ldaps://vault-ad-test.vault-ad-test.net:636" userdn=${USERDN}  userattr="cn" certificate=@vault-ad-test.cer groupfilter="(&(objectClass=group)(member:1.2.840.113556.1.4.1941:={{.UserDN}}))" groupdn=${USERDN} groupattr="cn"
+
+
+ldapsearch -H ldaps://vault-ad-test.vault-ad-test.net:636 -D "vault-admin@vault-ad-test.net" -w "Test12345678" -b "CN=Users,DC=vault-ad-test,DC=net" "(&(objectClass=group)(memberOf:1.2.840.113556.1.4.1941:=CN=vault-ad-test,CN=Users,DC=vault-ad-test,DC=net))"
+
+
+vault login -method=ldap username=vault-ad-test
+
+vault write auth/ldap/groups/"Domain Admins" name="Domain Admins" policies=foo,bar
+
+curl \
+    --header "X-Vault-Token:${VAULT_TOKEN}" \
+    --request LIST \
+    http://127.0.0.1:8200/v1/auth/ldap/groups

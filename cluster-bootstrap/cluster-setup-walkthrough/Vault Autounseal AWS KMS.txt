@@ -1,0 +1,44 @@
+Vault Autounseal AWS KMS
+
+https://www.vaultproject.io/docs/configuration/seal/awskms.html
+https://www.vaultproject.io/docs/concepts/seal.html#seal-migration
+
+
+seal "awskms" {
+  region     = "us-east-1"
+  access_key = "<access key or env var>"
+  secret_key = "<secret key or env var>"
+  kms_key_id = "<key created with provider KMS>"
+}
+
+
+Before:
+
+Key                Value
+---                -----
+Seal Type          shamir
+Initialized        true
+Sealed             true
+Total Shares       5
+Threshold          3
+Unseal Progress    0/3
+Unseal Nonce       n/a
+Version            1.0.2+ent
+HA Enabled         true
+
+After:
+
+Key                      Value
+---                      -----
+Recovery Seal Type       shamir
+Initialized              true
+Sealed                   false
+Total Recovery Shares    5
+Threshold                3
+Version                  1.0.2+ent
+Cluster Name             vault-cluster-252bbfb6
+Cluster ID               34e5db68-af7b-1400-1b28-5c99e1554e83
+HA Enabled               true
+HA Cluster               https://192.168.1.231:8201
+HA Mode                  active
+Last WAL                 19

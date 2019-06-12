@@ -1,0 +1,11 @@
+# Dev servers can create and update non-prod, read QA
+# paths:
+path "/secret/data/non-prod/*" {
+  capabilities = ["create", "update"]
+}
+
+path "/secret/data/qa*" {
+  capabilities = ["read"]
+}
+
+

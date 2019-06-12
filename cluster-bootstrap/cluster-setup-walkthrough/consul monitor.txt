@@ -1,0 +1,59 @@
+[root@vaultnodeb tmp]# consul monitor
+2019/02/25 16:40:17 [WARN] agent: Node name "vaultnodeb.lab.org" will not be discoverable via DNS due to invalid characters. Valid characters include all alpha-numerics and dashes.
+2019/02/25 16:40:17 [INFO] raft: Initial configuration (index=340): [{Suffrage:Voter ID:ce9cd9ef-19dd-7528-e212-c4bb1917c66d Address:192.168.1.232:8300}]
+2019/02/25 16:40:17 [INFO] raft: Node at 192.168.1.232:8300 [Follower] entering Follower state (Leader: "")
+2019/02/25 16:40:17 [INFO] serf: EventMemberJoin: vaultnodeb.lab.org.dc1 192.168.1.232
+2019/02/25 16:40:17 [INFO] serf: EventMemberJoin: vaultnodeb.lab.org 192.168.1.232
+2019/02/25 16:40:17 [INFO] consul: Adding LAN server vaultnodeb.lab.org (Addr: tcp/192.168.1.232:8300) (DC: dc1)
+2019/02/25 16:40:17 [INFO] consul: Raft data found, disabling bootstrap mode
+2019/02/25 16:40:17 [INFO] consul: Handled member-join event for server "vaultnodeb.lab.org.dc1" in area "wan"
+2019/02/25 16:40:17 [INFO] agent: Started DNS server 0.0.0.0:8600 (udp)
+2019/02/25 16:40:17 [INFO] agent: Started DNS server 0.0.0.0:8600 (tcp)
+2019/02/25 16:40:17 [INFO] agent: Started HTTP server on [::]:8500 (tcp)
+2019/02/25 16:40:17 [INFO] agent: started state syncer
+2019/02/25 16:40:17 [INFO] agent: Retry join LAN is supported for: aliyun aws azure digitalocean gce k8s os packet scaleway softlayer triton vsphere
+2019/02/25 16:40:17 [INFO] agent: Joining LAN cluster...
+2019/02/25 16:40:17 [INFO] agent: (LAN) joining: [192.168.1.231 192.168.1.159]
+2019/02/25 16:40:17 [INFO] serf: EventMemberJoin: vaultnodea.lab.org 192.168.1.231
+2019/02/25 16:40:17 [INFO] consul: Adding LAN server vaultnodea.lab.org (Addr: tcp/192.168.1.231:8300) (DC: dc1)
+2019/02/25 16:40:17 [INFO] agent: (LAN) joined: 1 Err: <nil>
+2019/02/25 16:40:17 [INFO] agent: Join LAN completed. Synced with 1 initial agents
+2019/02/25 16:40:17 [INFO] serf: EventMemberJoin: vaultnodea.lab.org.dc1 192.168.1.231
+2019/02/25 16:40:17 [INFO] consul: Handled member-join event for server "vaultnodea.lab.org.dc1" in area "wan"
+2019/02/25 16:40:20 [INFO] serf: EventMemberJoin: vaultnodec.lab.org.dc1 192.168.1.159
+2019/02/25 16:40:20 [INFO] consul: Handled member-join event for server "vaultnodec.lab.org.dc1" in area "wan"
+2019/02/25 16:40:20 [INFO] serf: EventMemberJoin: vaultnodec.lab.org 192.168.1.159
+2019/02/25 16:40:20 [INFO] consul: Adding LAN server vaultnodec.lab.org (Addr: tcp/192.168.1.159:8300) (DC: dc1)
+2019/02/25 16:40:21 [INFO] raft: Duplicate RequestVote for same term: 95
+2019/02/25 16:40:23 [WARN] agent: Check "vault:192.168.1.232:8200:vault-sealed-check" missed TTL, is now critical
+2019/02/25 16:40:24 [ERR] agent: failed to sync remote state: No cluster leader
+2019/02/25 16:40:25 [ERR] http: Request GET /v1/catalog/service/vault?stale=, error: No cluster leader from=127.0.0.1:49228
+2019/02/25 16:40:25 [WARN] agent: Syncing service "vault:192.168.1.232:8200" failed. No cluster leader
+2019/02/25 16:40:25 [ERR] agent: failed to sync changes: No cluster leader
+2019/02/25 16:40:26 [WARN] raft: Heartbeat timeout from "" reached, starting election
+2019/02/25 16:40:26 [INFO] raft: Node at 192.168.1.232:8300 [Candidate] entering Candidate state in term 96
+2019/02/25 16:40:26 [INFO] raft: Election won. Tally: 1
+2019/02/25 16:40:26 [INFO] raft: Node at 192.168.1.232:8300 [Leader] entering Leader state
+2019/02/25 16:40:26 [INFO] consul: cluster leadership acquired
+2019/02/25 16:40:26 [INFO] consul: New leader elected: vaultnodeb.lab.org
+2019/02/25 16:40:26 [INFO] raft: Updating configuration with AddNonvoter (97f8b455-aa93-bf19-c9a4-e9297d611181, 192.168.1.231:8300) to [{Suffrage:Voter ID:ce9cd9ef-19dd-7528-e212-c4bb1917c66d Address:192.168.1.232:8300} {Suffrage:Nonvoter ID:97f8b455-aa93-bf19-c9a4-e9297d611181 Address:192.168.1.231:8300}]
+2019/02/25 16:40:26 [INFO] raft: Added peer 97f8b455-aa93-bf19-c9a4-e9297d611181, starting replication
+2019/02/25 16:40:26 [INFO] consul: member 'vaultnodea.lab.org' joined, marking health alive
+2019/02/25 16:40:26 [INFO] raft: Updating configuration with AddNonvoter (1a7820f1-7518-edc5-3c51-c4975bff7a25, 192.168.1.159:8300) to [{Suffrage:Voter ID:ce9cd9ef-19dd-7528-e212-c4bb1917c66d Address:192.168.1.232:8300} {Suffrage:Nonvoter ID:97f8b455-aa93-bf19-c9a4-e9297d611181 Address:192.168.1.231:8300} {Suffrage:Nonvoter ID:1a7820f1-7518-edc5-3c51-c4975bff7a25 Address:192.168.1.159:8300}]
+2019/02/25 16:40:26 [WARN] raft: AppendEntries to {Nonvoter 97f8b455-aa93-bf19-c9a4-e9297d611181 192.168.1.231:8300} rejected, sending older logs (next: 335)
+2019/02/25 16:40:26 [INFO] raft: Added peer 1a7820f1-7518-edc5-3c51-c4975bff7a25, starting replication
+2019/02/25 16:40:26 [INFO] consul: member 'vaultnodec.lab.org' joined, marking health alive
+2019/02/25 16:40:26 [WARN] raft: AppendEntries to {Nonvoter 1a7820f1-7518-edc5-3c51-c4975bff7a25 192.168.1.159:8300} rejected, sending older logs (next: 341)
+2019/02/25 16:40:26 [INFO] raft: pipelining replication to peer {Nonvoter 1a7820f1-7518-edc5-3c51-c4975bff7a25 192.168.1.159:8300}
+2019/02/25 16:40:26 [INFO] raft: pipelining replication to peer {Nonvoter 97f8b455-aa93-bf19-c9a4-e9297d611181 192.168.1.231:8300}
+2019/02/25 16:40:26 [INFO] agent: Synced service "vault:192.168.1.232:8200"
+2019/02/25 16:40:26 [INFO] agent: Synced check "vault:192.168.1.232:8200:vault-sealed-check"
+2019/02/25 16:40:46 [INFO] autopilot: Promoting Server (ID: "97f8b455-aa93-bf19-c9a4-e9297d611181" Address: "192.168.1.231:8300") to voter
+2019/02/25 16:40:46 [INFO] raft: Updating configuration with AddStaging (97f8b455-aa93-bf19-c9a4-e9297d611181, 192.168.1.231:8300) to [{Suffrage:Voter ID:ce9cd9ef-19dd-7528-e212-c4bb1917c66d Address:192.168.1.232:8300} {Suffrage:Voter ID:97f8b455-aa93-bf19-c9a4-e9297d611181 Address:192.168.1.231:8300} {Suffrage:Nonvoter ID:1a7820f1-7518-edc5-3c51-c4975bff7a25 Address:192.168.1.159:8300}]
+2019/02/25 16:40:46 [INFO] autopilot: Promoting Server (ID: "1a7820f1-7518-edc5-3c51-c4975bff7a25" Address: "192.168.1.159:8300") to voter
+2019/02/25 16:40:46 [INFO] raft: Updating configuration with AddStaging (1a7820f1-7518-edc5-3c51-c4975bff7a25, 192.168.1.159:8300) to [{Suffrage:Voter ID:ce9cd9ef-19dd-7528-e212-c4bb1917c66d Address:192.168.1.232:8300} {Suffrage:Voter ID:97f8b455-aa93-bf19-c9a4-e9297d611181 Address:192.168.1.231:8300} {Suffrage:Voter ID:1a7820f1-7518-edc5-3c51-c4975bff7a25 Address:192.168.1.159:8300}]
+2019/02/25 16:41:17 [INFO] license: Consul license updated
+2019/02/25 16:43:09 [INFO] agent: Synced check "vault:192.168.1.232:8200:vault-sealed-check"
+2019/02/25 16:47:05 [INFO] agent: Synced check "vault:192.168.1.232:8200:vault-sealed-check"
+2019/02/25 23:27:13 [INFO] serf: EventMemberLeave: vaultnodea.lab.org.dc1 192.168.1.231
+2019/02/25 23:27:13 [INFO] consul: Handled member-leave event for server "vaultnodea.lab.org.dc1" in area "wan"

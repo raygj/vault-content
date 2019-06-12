@@ -1,0 +1,36 @@
+PS C:\Users\Administrator\Desktop> certreq -submit -attrib "CertificateTemplate:Subordinate Certifcation Authority" vaul
+tCSR.txt
+Active Directory Enrollment Policy
+  {8E272E6E-86FC-4408-BF05-35103366E826}
+  ldap:
+RequestId: 6
+RequestId: "6"
+Certificate not issued (Denied) Denied by Policy Module  0x80094800, The request was for a certificate template that is
+not supported by the Active Directory Certificate Services policy: Subordinate Certifcation Authority.
+ The requested certificate template is not supported by this CA. 0x80094800 (-2146875392 CERTSRV_E_UNSUPPORTED_CERT_TYPE
+)
+Certificate Request Processor: The requested certificate template is not supported by this CA. 0x80094800 (-2146875392 C
+ERTSRV_E_UNSUPPORTED_CERT_TYPE)
+Denied by Policy Module  0x80094800, The request was for a certificate template that is not supported by the Active Dire
+ctory Certificate Services policy: Subordinate Certifcation Authority.
+
+PS C:\Users\Administrator\Desktop> certutil -getreg ca\catype
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CertSvc\Configuration\adwinca\CAType:
+
+  CAType REG_DWORD = 0
+    ENUM_ENTERPRISE_ROOTCA -- 0
+CertUtil: -getreg command completed successfully.
+PS C:\Users\Administrator\Desktop> certutil -catemplates
+DirectoryEmailReplication: Directory Email Replication -- Auto-Enroll: Access is denied.
+DomainControllerAuthentication: Domain Controller Authentication -- Auto-Enroll: Access is denied.
+KerberosAuthentication: Kerberos Authentication -- Auto-Enroll: Access is denied.
+EFSRecovery: EFS Recovery Agent -- Auto-Enroll: Access is denied.
+EFS: Basic EFS -- Auto-Enroll: Access is denied.
+DomainController: Domain Controller -- Auto-Enroll: Access is denied.
+WebServer: Web Server -- Auto-Enroll: Access is denied.
+Machine: Computer -- Auto-Enroll: Access is denied.
+User: User -- Auto-Enroll: Access is denied.
+SubCA: Subordinate Certification Authority -- Auto-Enroll: Access is denied.
+Administrator: Administrator -- Auto-Enroll: Access is denied.
+CertUtil: -CATemplates command completed successfully.
+PS C:\Users\Administrator\Desktop>

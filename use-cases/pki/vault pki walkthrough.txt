@@ -213,11 +213,16 @@ sudo nano /etc/hosts
 192.168.1.231   active.vault.service.consul
 
 # create service definition
+- create vault token env var
+export VAULT_TOKEN= < vault token using role created earlier >
+
+- create consul agent config
+
 sudo nano /etc/consul-template.d/pki-demo.hcl
 
 vault {
   address = "http://active.vault.service.consul:8200"
-  token = "$VAULT_TOKEN" // set with export VAULT_TOKEN=<token with appropriate acess>
+  token = "$VAULT_TOKEN" // set with export VAULT_TOKEN=
   grace = "1s"
   unwrap_token = false
   renew_token = true

@@ -49,6 +49,8 @@ sudo apt install unzip -y
 
 ### Consul DNS Setup
 https://learn.hashicorp.com/consul/security-networking/forwarding
+https://www.consul.io/docs/agent/dns.html
+
 
 - install consul
 ```
@@ -90,6 +92,12 @@ touch ~/consul/log/output.log
 
 - validate consul DNS from client
 `dig @192.168.1.188 -p 8600 active.vault.service.consul. A`
+
+### troubleshooting DNS
+- use tcpdmp to monitor queries to 53 and 8600
+
+`sudo tcpdump -nt -i ens160 udp port 53`
+`sudo tcpdump -nt -i ens160 udp port 8600'
 
 
 - option 1: dnsmasq utility

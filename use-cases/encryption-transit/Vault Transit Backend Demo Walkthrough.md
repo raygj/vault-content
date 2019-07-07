@@ -37,7 +37,6 @@ transit-demo	Ubuntu 18.4		MySQL/Go app
 - Ubuntu host
 ```
 sudo apt install jq -y
-sudo apt install docker -y
 sudo apt install unzip -y
 
 ```
@@ -47,12 +46,12 @@ sudo apt install unzip -y
 `mkdir ~/demo-app; cd ~/demo-app`
 `git clone https://github.com/norhe/vault-transit-datakey-example.git`
 
-### Consul DNS Setup
-https://learn.hashicorp.com/consul/security-networking/forwarding
-https://www.consul.io/docs/agent/dns.html
+## Use Consul DNS to Find Active Vault Node
+[learn.hashicorp](https://learn.hashicorp.com/consul/security-networking/forwarding)
+[consul dns info](https://www.consul.io/docs/agent/dns.html)
 
+### Install and Configure Consul
 
-- install consul
 ```
 mkdir ~/consul; cd ~/consul
 
@@ -62,6 +61,7 @@ unzip consul_1.5.1_linux_amd64.zip
 ```
 
 - add consul to path
+
 ```
 # consul
 
@@ -91,47 +91,29 @@ touch ~/consul/log/output.log
 `curl http://192.168.1.188:8500/v1/agent/members?segment=_all | jq`
 
 - validate consul DNS from client
-`dig @192.168.1.188 -p 8600 active.vault.service.consul. A`
+`dig @127.0.0.1 -p 8600 active.vault.service.consul. A`
 
-### troubleshooting DNS
-- use tcpdmp to monitor queries to 53 and 8600
+### Resolving Consul DNS from host
 
-`sudo tcpdump -nt -i ens160 udp port 53`
-`sudo tcpdump -nt -i ens160 udp port 8600'
+- there are several options there:
 
+1 BIND server setup to forward _consul_ domain queries to Consul cluster
+2 Windows server setup as primary DNS server, using _conditional forwarder_ to push _consul_ domain queries to BIND
+3 Host running Consul agent with configuration to forward Consul DNS queries to Consul agent on port 8600 [use learn.hashicorp guide](https://learn.hashicorp.com/consul/security-networking/forwarding)
 
-- option 1: dnsmasq utility
+- options 1 and 2 are covered in a separate [guide](https://github.com/raygj/consul-content/blob/master/consul-dns/consul%20DNS%20BIND%20walkthrough.md)
+- option 3 is covered in the next section for CentOS7, Ubuntu 18.04, Windows Server 2016
 
-```
-sudo apt install dnsmasq -y
+#### Option 1: dnsmasq utility Ubuntu
 
-sudo nano /etc/dnsmasq.d/10-consul
+`sudo apt install dnsmasq -y`
 
-sudo systemctl restart dnsmasq
+`sudo nano /etc/dnsmasq.d/10-consul`
 
-sudo systemctl status dnsmasq
-```
-
-- option 2: systemd-resolved
-```
-sudo nano /etc/systemd/resolved.conf
-
-// file should be updated as follows:
-
-DNS=127.0.0.1
-Domains=~consul
-
-// add iptables statement redirecting UDP/TCP 53 to 8600:
-
-sudo iptables -t nat -A OUTPUT -d 192.168.1.188 -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
-sudo iptables -t nat -A OUTPUT -d 192.168.1.188 -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
+-
 
 ```
 
-	- test DNS resolution
-`ping active.vault.service.consul`
-
-# Enable forward lookup of the 'consul' domain:
 server=/consul/127.0.0.1#8600
 
 # Uncomment and modify as appropriate to enable reverse DNS lookups for
@@ -145,10 +127,21 @@ server=/consul/127.0.0.1#8600
 rev-server=192.168.0.0/16,127.0.0.1#8600
 #rev-server=224.0.0.0/4,127.0.0.1#8600
 #rev-server=240.0.0.0/4,127.0.0.1#8600
-
-sudo systemctl restart dnsmasq
-
 ```
+
+`sudo systemctl restart dnsmasq`
+
+- test DNS resolution
+
+`ping active.vault.service.consul`
+
+
+### troubleshooting DNS
+- use tcpdmp to monitor queries to 53 and 8600
+
+`sudo tcpdump -nt -i ens160 udp port 53`
+`sudo tcpdump -nt -i ens160 udp port 8600'
+
 
 ## MySQL
 set values for `MYSQL_ROOT_PASSORD, MYSQL_DATABASE, MYSQL_PASSWORD` inputs

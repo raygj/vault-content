@@ -9,7 +9,7 @@ vaultnodea		CentOS7			Vault Ent 1.1.2
 vaultnodeb		CentOS7			Vault Ent 1.1.2
 transit-demo	Ubuntu 18.4		MySQL/Go app
 
-##References##
+**References**
 - https://learn.hashicorp.com/vault/encryption-as-a-service/eaas-transit
 - https://github.com/norhe/vault-transit-datakey-example
 
@@ -43,7 +43,9 @@ sudo apt install unzip -y
 - Go installed and set in path
 
 - Clone Git repo
+
 `mkdir ~/demo-app; cd ~/demo-app`
+
 `git clone https://github.com/norhe/vault-transit-datakey-example.git`
 
 ## Use Consul DNS to Find Active Vault Node
@@ -68,6 +70,7 @@ unzip consul_1.5.1_linux_amd64.zip
 echo 'export PATH=$PATH:~/consul' >> ~/.profile
 
 consul -autocomplete-install
+
 complete -C /usr/local/bin/consul consul
 ```
 
@@ -75,7 +78,9 @@ complete -C /usr/local/bin/consul consul
 
 ```
 mkdir ~/consul/data
+
 mkdir ~/consul/log/
+
 touch ~/consul/log/output.log
   ```
 
@@ -106,11 +111,15 @@ touch ~/consul/log/output.log
 
 #### Option 1: dnsmasq utility Ubuntu
 
+- install dnsmasq
+
 `sudo apt install dnsmasq -y`
+
+- edit dnsmasq config
 
 `sudo nano /etc/dnsmasq.d/10-consul`
 
--
+- drop the following into the file; this identifies the consul agent DNS listener on port 8600 and applicable CIDRs for reverse DNS
 
 ```
 
@@ -129,12 +138,13 @@ rev-server=192.168.0.0/16,127.0.0.1#8600
 #rev-server=240.0.0.0/4,127.0.0.1#8600
 ```
 
+- save and exit file, then restart dnsmasq process
+
 `sudo systemctl restart dnsmasq`
 
 - test DNS resolution
 
 `ping active.vault.service.consul`
-
 
 ### troubleshooting DNS
 - use tcpdmp to monitor queries to 53 and 8600

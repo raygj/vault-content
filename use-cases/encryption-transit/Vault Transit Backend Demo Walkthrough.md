@@ -38,6 +38,9 @@ transit-demo	Ubuntu 18.4		MySQL/Go app
 ```
 sudo apt install jq -y
 sudo apt install unzip -y
+sudo apt install bind-utils -y
+sudo apt install nmap -y
+sudo apt install  -y
 
 ```
 - Go installed and set in path
@@ -142,7 +145,7 @@ firewall-cmd --zone=public --add-service=http --permanent
 `curl http://192.168.1.xxx:8500/v1/agent/members?segment=_all | jq`
 
 - validate consul DNS from client
-`dig @127.0.0.1 -p 8600 active.vault.service.consul. A`
+`dig @192.168.1.xxx -p 8600 active.vault.service.consul. A`
 
 ### Resolving Consul DNS from host
 
@@ -211,17 +214,19 @@ rev-server=192.168.0.0/16,127.0.0.1#8600
 
 ```
 
-server=/consul/127.0.0.1#8600
+server=/consul/192.168.1.xxx#8600
 
 # Uncomment and modify as appropriate to enable reverse DNS lookups for
 # common netblocks found in RFC 1918, 5735, and 6598:
+
+rev-server=192.168.0.0/16,192.168.1.xxx#8600
+
 #rev-server=0.0.0.0/8,127.0.0.1#8600
 #rev-server=10.0.0.0/8,127.0.0.1#8600
 #rev-server=100.64.0.0/10,127.0.0.1#8600
 #rev-server=127.0.0.1/8,127.0.0.1#8600
 #rev-server=169.254.0.0/16,127.0.0.1#8600
 #rev-server=172.16.0.0/12,127.0.0.1#8600
-rev-server=192.168.0.0/16,127.0.0.1#8600
 #rev-server=224.0.0.0/4,127.0.0.1#8600
 #rev-server=240.0.0.0/4,127.0.0.1#8600
 ```
@@ -234,13 +239,11 @@ rev-server=192.168.0.0/16,127.0.0.1#8600
 
 `ping active.vault.service.consul`
 
-
-
 ### troubleshooting DNS
-- use tcpdmp to monitor queries to 53 and 8600
+- use tcpdmp to monitor queries to 53 and 8600 // determine int name by using `ip addr` command
 
-`sudo tcpdump -nt -i ens160 udp port 53`
-`sudo tcpdump -nt -i ens160 udp port 8600'
+`sudo tcpdump -nt -i <int name> udp port 53`
+`sudo tcpdump -nt -i <int name> udp port 8600'
 
 
 ## MySQL

@@ -69,6 +69,8 @@ unzip consul_1.5.1_linux_amd64.zip
 
 echo 'export PATH=$PATH:~/consul' >> ~/.profile
 
+source ~/.profile \\ centos, need verify ubuntu
+
 consul -autocomplete-install
 
 complete -C /usr/local/bin/consul consul
@@ -86,14 +88,14 @@ touch ~/consul/log/output.log
 
 - start consul agent as background process
 
-`~/consul/consul agent -data-dir="~/consul/data" -bind=192.168.1.188 -client=192.168.1.188 >> ~/consul/log/output.log &`
+`~/consul/consul agent -data-dir="~/consul/data" -bind=192.168.1.xxx -client=192.168.1.xxx >> ~/consul/log/output.log &`
 
 - join existing consul cluster/DC
 
-`~/consul/consul join -http-addr=192.168.1.188:8500 192.168.1.231`
+`~/consul/consul join -http-addr=192.168.1.xxx:8500 192.168.1.231`
 
 - verify join on consul cluster
-`curl http://192.168.1.188:8500/v1/agent/members?segment=_all | jq`
+`curl http://192.168.1.xxx:8500/v1/agent/members?segment=_all | jq`
 
 - validate consul DNS from client
 `dig @127.0.0.1 -p 8600 active.vault.service.consul. A`
@@ -109,13 +111,13 @@ touch ~/consul/log/output.log
 - options 1 and 2 are covered in a separate [guide](https://github.com/raygj/consul-content/blob/master/consul-dns/consul%20DNS%20BIND%20walkthrough.md)
 - option 3 is covered in the next section for CentOS7, Ubuntu 18.04, Windows Server 2016
 
-#### Option 1: dnsmasq utility Ubuntu
+#### Option 3: dnsmasq utility **Ubuntu**
 
 - install dnsmasq
 
 `sudo apt install dnsmasq -y`
 
-- edit dnsmasq config
+- create dnsmasq config // need to verify if default config is provided or not ?!?
 
 `sudo nano /etc/dnsmasq.d/10-consul`
 
@@ -145,6 +147,50 @@ rev-server=192.168.0.0/16,127.0.0.1#8600
 - test DNS resolution
 
 `ping active.vault.service.consul`
+
+#### Option 3: dnsmasq utility **CentOS7**
+
+- install dnsmasq
+
+`sudo yum install dnsmasq -y`
+
+- backup default config file
+
+`sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig`
+
+
+- create dnsmasq config
+
+`sudo nano /etc/dnsmasq.conf`
+
+- drop the following into the file; this identifies the consul agent DNS listener on port 8600 and applicable CIDRs for reverse DNS
+
+```
+
+server=/consul/127.0.0.1#8600
+
+# Uncomment and modify as appropriate to enable reverse DNS lookups for
+# common netblocks found in RFC 1918, 5735, and 6598:
+#rev-server=0.0.0.0/8,127.0.0.1#8600
+#rev-server=10.0.0.0/8,127.0.0.1#8600
+#rev-server=100.64.0.0/10,127.0.0.1#8600
+#rev-server=127.0.0.1/8,127.0.0.1#8600
+#rev-server=169.254.0.0/16,127.0.0.1#8600
+#rev-server=172.16.0.0/12,127.0.0.1#8600
+rev-server=192.168.0.0/16,127.0.0.1#8600
+#rev-server=224.0.0.0/4,127.0.0.1#8600
+#rev-server=240.0.0.0/4,127.0.0.1#8600
+```
+
+- save and exit file, then restart dnsmasq process
+
+`sudo systemctl restart dnsmasq`
+
+- test DNS resolution
+
+`ping active.vault.service.consul`
+
+
 
 ### troubleshooting DNS
 - use tcpdmp to monitor queries to 53 and 8600

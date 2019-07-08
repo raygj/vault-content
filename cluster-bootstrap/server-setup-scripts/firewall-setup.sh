@@ -41,6 +41,9 @@ cat << EOF > /etc/firewalld/services/telegraf.xml
 </service>
 EOF
 
+# identify default zone
+firewall-cmd --get-default-zone # identify the default zone
+
 # add custom services to default zone
 # assumes public zone
 
@@ -55,7 +58,6 @@ firewall-cmd --complete-reload
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7
 # 
 # firewall-cmd --state # verify service is running and reachable
-# firewall-cmd --get-default-zone # identify the default zone
 # systemctl restart network
 # systemctl reload firewalld
 # firewall-cmd --zone=public --list-all

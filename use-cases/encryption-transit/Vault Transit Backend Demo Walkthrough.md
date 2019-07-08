@@ -86,6 +86,50 @@ mkdir ~/consul/log/
 touch ~/consul/log/output.log
   ```
 
+### Setup Firewall
+
+`su root`
+
+- create firewalld service definition for consul ports
+
+```
+
+cat << EOF > /etc/firewalld/services/consul.xml
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>Consul</short>
+  <description>TCP connectivity required for HashiCorp Consul cluster communication.</description>
+  <port protocol="tcp" port="8300"/>
+  <port protocol="tcp" port="8301"/>
+  <port protocol="udp" port="8301"/>  
+  <port protocol="tcp" port="8302"/>
+  <port protocol="udp" port="8302"/>  
+  <port protocol="tcp" port="8500"/>
+  <port protocol="tcp" port="8600"/>
+  <port protocol="udp" port="8600"/>
+</service>
+EOF
+
+```
+- identify default zone
+
+`firewall-cmd --get-default-zone # identify the default zone`
+
+- add custom services to default zone (assumes the zone is _public_)
+
+```
+
+firewall-cmd --zone=public --add-service=consul --permanent
+firewall-cmd --zone=public --add-service=https --permanent
+firewall-cmd --zone=public --add-service=http --permanent
+
+```
+- reload firewalld
+
+`firewall-cmd --complete-reload`
+
+### Start Consul
+
 - start consul agent as background process
 
 `~/consul/consul agent -data-dir="~/consul/data" -bind=192.168.1.xxx -client=192.168.1.xxx >> ~/consul/log/output.log &`

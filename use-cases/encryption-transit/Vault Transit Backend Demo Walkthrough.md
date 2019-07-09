@@ -213,15 +213,15 @@ rev-server=192.168.0.0/16,127.0.0.1#8600
 
 ```
 
-server=/consul/192.168.1.xxx#8600
+server=/consul/192.168.1.xxx#8600 // this is the address of the host running dnsmasq
+server=192.168.1.yyy // this is your local, default DNS server for non-Consul domains
 
+no-resolv
 log-queries
 
 # Uncomment and modify as appropriate to enable reverse DNS lookups for
 # common netblocks found in RFC 1918, 5735, and 6598:
-
-rev-server=192.168.0.0/16,192.168.1.xxx#8600
-
+rev-server=192.168.0.0/16,192.168.1.193#8600
 #rev-server=0.0.0.0/8,127.0.0.1#8600
 #rev-server=10.0.0.0/8,127.0.0.1#8600
 #rev-server=100.64.0.0/10,127.0.0.1#8600
@@ -230,11 +230,36 @@ rev-server=192.168.0.0/16,192.168.1.xxx#8600
 #rev-server=172.16.0.0/12,127.0.0.1#8600
 #rev-server=224.0.0.0/4,127.0.0.1#8600
 #rev-server=240.0.0.0/4,127.0.0.1#8600
+
+
 ```
 
 - save and exit file, then restart dnsmasq process
 
 `sudo systemctl restart dnsmasq`
+
+
+- check dnsmasq status before testing
+
+`sudo systemctl status dnsmasq`
+
+_sample status, notice the two bindings from the config for 1.193#8600 and 1.1#53 respectively_
+
+[jray@consul-lab01 ~]$ sudo systemctl status dnsmasq
+● dnsmasq.service - DNS caching server.
+   Loaded: loaded (/usr/lib/systemd/system/dnsmasq.service; disabled; vendor preset: disabled)
+   Active: active (running) since Tue 2019-07-09 14:12:51 EDT; 3s ago
+ Main PID: 9069 (dnsmasq)
+   CGroup: /system.slice/dnsmasq.service
+           └─9069 /usr/sbin/dnsmasq -k
+
+Jul 09 14:12:51 consul-lab01 systemd[1]: Started DNS caching server..
+Jul 09 14:12:51 consul-lab01 dnsmasq[9069]: started, version 2.76 cachesize 150
+Jul 09 14:12:51 consul-lab01 dnsmasq[9069]: compile time options: IPv6 GNU-getopt DBus no-i18n IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
+Jul 09 14:12:51 consul-lab01 dnsmasq[9069]: using nameserver 192.168.1.193#8600 for domain 168.192.in-addr.arpa
+Jul 09 14:12:51 consul-lab01 dnsmasq[9069]: using nameserver 192.168.1.1#53
+Jul 09 14:12:51 consul-lab01 dnsmasq[9069]: using nameserver 192.168.1.193#8600 for domain consul
+Jul 09 14:12:51 consul-lab01 dnsmasq[9069]: read /etc/hosts - 2 addresses
 
 - test DNS resolution
 
@@ -353,75 +378,5 @@ export ENCODED_PII= "$(echo `4111-1111-1111-1111` | base64)"
 ENCODED_PII=`echo -n $text | base64`
 
 
-
-
-
 ## Access App
 http://<IP or hostname>:1234
-
-# Appendix: dnsmasq troubleshooting
-
-DNSmasq issue
-
-
-without "no-resolv" in the dnsmasq.conf
-
-Jul 08 20:00:07 consul-lab01 dnsmasq[8287]: using nameserver 192.168.1.193#8600 for domain 168.192.in-addr.arpa
-Jul 08 20:00:07 consul-lab01 dnsmasq[8287]: using nameserver 192.168.1.193#8600 for domain consul
-Jul 08 20:00:07 consul-lab01 dnsmasq[8287]: reading /etc/resolv.conf
-Jul 08 20:00:07 consul-lab01 dnsmasq[8287]: using nameserver 192.168.1.193#8600 for domain 168.192.in-addr.arpa
-Jul 08 20:00:07 consul-lab01 dnsmasq[8287]: using nameserver 192.168.1.193#8600 for domain consul
-Jul 08 20:00:07 consul-lab01 dnsmasq[8287]: using nameserver 192.168.1.1#53
-Jul 08 20:00:07 consul-lab01 dnsmasq[8287]: read /etc/hosts - 2 addresses
-
-
-with "no-resolve" in the dnsmasq.conf
-
-Jul 08 20:08:08 consul-lab01 systemd[1]: Started DNS caching server..
-Jul 08 20:08:08 consul-lab01 dnsmasq[8354]: started, version 2.76 cachesize 150
-Jul 08 20:08:08 consul-lab01 dnsmasq[8354]: compile time options: IPv6 GNU-getopt DBus no-i18n IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
-Jul 08 20:08:08 consul-lab01 dnsmasq[8354]: using nameserver 192.168.1.193#8600 for domain 168.192.in-addr.arpa
-Jul 08 20:08:08 consul-lab01 dnsmasq[8354]: using nameserver 192.168.1.193#8600 for domain consul
-Jul 08 20:08:08 consul-lab01 dnsmasq[8354]: read /etc/hosts - 2 addresses
-
-set /etc/resolve.conf as follows: nameserver 127.0.0.1, kept "no-resolve" in dnsmasq.conf
-
-restarted dnsmasq
-
-Jul 08 20:15:27 consul-lab01 systemd[1]: Started DNS caching server..
-Jul 08 20:15:27 consul-lab01 dnsmasq[8448]: started, version 2.76 cachesize 150
-Jul 08 20:15:27 consul-lab01 dnsmasq[8448]: compile time options: IPv6 GNU-getopt DBus no-i18n IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
-Jul 08 20:15:27 consul-lab01 dnsmasq[8448]: using nameserver 192.168.1.193#8600 for domain 168.192.in-addr.arpa
-Jul 08 20:15:27 consul-lab01 dnsmasq[8448]: using nameserver 192.168.1.193#8600 for domain consul
-Jul 08 20:15:27 consul-lab01 dnsmasq[8448]: read /etc/hosts - 2 addresses
-
-```
-
-server=/consul/192.168.1.193#8600
-
-no-resolv
-log-queries
-
-# Uncomment and modify as appropriate to enable reverse DNS lookups for
-# common netblocks found in RFC 1918, 5735, and 6598:
-rev-server=192.168.0.0/16,192.168.1.193#8600
-#rev-server=0.0.0.0/8,127.0.0.1#8600
-#rev-server=10.0.0.0/8,127.0.0.1#8600
-#rev-server=100.64.0.0/10,127.0.0.1#8600
-#rev-server=127.0.0.1/8,127.0.0.1#8600
-#rev-server=169.254.0.0/16,127.0.0.1#8600
-#rev-server=172.16.0.0/12,127.0.0.1#8600
-#rev-server=224.0.0.0/4,127.0.0.1#8600
-#rev-server=240.0.0.0/4,127.0.0.1#8600
-```
-
-```
-# Generated by NetworkManager
-nameserver 127.0.0.1
-
-```
-
-^^^^ with this config i was able to ping *consul successfully, however, i lost all other DNS resolution and would need Consul to act as a recursive DNS server for all other domains
-
-
-

@@ -1,17 +1,20 @@
 # Transit Backend: Encryption as a Service
-*Purpose*
+
+## Purpose
 
 Walkthrough Vault Encryption as a Service (EaaS) use case in a lab environment consisting of a Vault cluster and demo application.
 
-*Lab Environment*
+## Lab Environment
 
 vaultnodea		CentOS7			Vault Ent 1.1.2
 vaultnodeb		CentOS7			Vault Ent 1.1.2
 transit-demo	Ubuntu 18.4		MySQL/Go app
 
-**References**
-- https://learn.hashicorp.com/vault/encryption-as-a-service/eaas-transit
-- https://github.com/norhe/vault-transit-datakey-example
+## References
+
+[learn.hashicorp](https://learn.hashicorp.com/vault/encryption-as-a-service/eaas-transit)
+
+[transit example app](https://github.com/norhe/vault-transit-datakey-example)
 
 # High Level Steps
 
@@ -45,6 +48,8 @@ sudo apt install  -y
 ```
 - Go installed and set in path
 
+[digital ocen walkthrough](https://www.digitalocean.com/community/tutorials/how-to-install-go-on-ubuntu-18-04)
+
 - Clone Git repo
 
 `mkdir ~/demo-app; cd ~/demo-app`
@@ -52,7 +57,9 @@ sudo apt install  -y
 `git clone https://github.com/norhe/vault-transit-datakey-example.git`
 
 ## Use Consul DNS to Find Active Vault Node
+
 [learn.hashicorp](https://learn.hashicorp.com/consul/security-networking/forwarding)
+
 [consul dns info](https://www.consul.io/docs/agent/dns.html)
 
 ### Install and Configure Consul
@@ -147,7 +154,7 @@ firewall-cmd --zone=public --add-service=http --permanent
 - validate consul DNS from client
 `dig @192.168.1.xxx -p 8600 active.vault.service.consul. A`
 
-### Resolving Consul DNS from host
+## Resolving Consul DNS from host
 
 _goal is to get native OS resolution of *consul records_
 
@@ -160,7 +167,7 @@ _goal is to get native OS resolution of *consul records_
 - options 1 and 2 are covered in a separate [guide](https://github.com/raygj/consul-content/blob/master/consul-dns/consul%20DNS%20BIND%20walkthrough.md)
 - option 3 is covered in the next section for CentOS7, Ubuntu 18.04, Windows Server 2016
 
-#### Option 3: dnsmasq utility
+### Option 3: dnsmasq utility
 
 **Ubuntu 18.04 Steps**
 

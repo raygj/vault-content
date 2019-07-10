@@ -10,6 +10,8 @@ vaultnodea		CentOS7			Vault Ent 1.1.2
 vaultnodeb		CentOS7			Vault Ent 1.1.2
 transit-demo	Ubuntu 18.4		MySQL/Go app
 
+![diagram](/use-cases/encryption-transit/images/consul_lab.png)
+
 ## References
 
 [learn.hashicorp](https://learn.hashicorp.com/vault/encryption-as-a-service/eaas-transit)

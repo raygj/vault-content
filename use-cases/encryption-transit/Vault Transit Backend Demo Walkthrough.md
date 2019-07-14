@@ -50,7 +50,7 @@ sudo apt install  -y
 ```
 - Go installed and set in path
 
-[digital ocen walkthrough](https://www.digitalocean.com/community/tutorials/how-to-install-go-on-ubuntu-18-04)
+[digital ocean walkthrough](https://www.digitalocean.com/community/tutorials/how-to-install-go-on-ubuntu-18-04)
 
 - Clone Git repo
 

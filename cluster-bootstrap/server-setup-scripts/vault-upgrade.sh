@@ -1,4 +1,4 @@
-export VAULT_VERSION=1.1.2
+export VAULT_VERSION=1.2.0
 
 wget https://s3-us-west-2.amazonaws.com/hc-enterprise-binaries/vault/ent/${VAULT_VERSION}/vault-enterprise_${VAULT_VERSION}%2Bent_linux_amd64.zip
 

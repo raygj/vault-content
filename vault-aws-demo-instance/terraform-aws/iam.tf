@@ -63,12 +63,14 @@ data "aws_iam_policy_document" "vault-server" {
   statement {
     sid    = "VaultAWSAuthMethod"
     effect = "Allow"
+
     actions = [
       "ec2:DescribeInstances",
       "iam:GetInstanceProfile",
       "iam:GetUser",
-      "iam:GetRole"
-    ],
+      "iam:GetRole",
+    ]
+
     resources = ["*"]
   }
 

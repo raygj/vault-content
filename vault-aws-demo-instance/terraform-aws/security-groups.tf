@@ -20,7 +20,7 @@ resource "aws_security_group" "testing" {
     from_port   = 8200
     to_port     = 8200
     protocol    = "tcp"
-    cidr_blocks = ["100.14.96.173/32"]
+    cidr_blocks = ["100.14.96.173/32","10.0.101.0/24"]
   }
 
   # Vault cluster traffic

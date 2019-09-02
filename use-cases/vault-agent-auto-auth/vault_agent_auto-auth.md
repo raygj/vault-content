@@ -171,4 +171,176 @@ ttl=15m
 
 ```
 
+### Part 2: Login Manually From the Client Instance
+
+Now that we've configured the appropriate AWS IAM auth method on our Vault server, let's SSH into our **client** instance and verify that we're able to successfully utilize the instance profile to login to Vault.
+
+1. [From the Vault **Client**] Open a terminal on your client instance. If using the quick-start repo, the Vault binary should already be installed and configured to talk to your Vault server. You can check this by typing in `vault status`:
+
+`vault status`
+
+If following with your own examples, make sure you've downloaded the appropriate [Vault binary](https://releases.hashicorp.com/vault/) and set your VAULT_ADDR environment variable, for example:
+
+`export VAULT_ADDR=http://<private IP of Vault Server>:8200`
+
+2. [From the Vault **Client**] Using the Vault CLI, test the `login` operation:
+
+`vault login -method=aws role=dev-role-iam`
+
+If all components are configured accurately up to this point, then you will recieve a **success** message, similar to the follow:
+
+```
+
+Success! You are now authenticated. The token information displayed below
+is already stored in the token helper. You do NOT need to run "vault login"
+again. Future Vault requests will automatically use this token.
+
+Key                                Value
+---                                -----
+token                              s.ylLSNKH...
+token_accessor                     ppps6JVO8xTR15OHb8d9Nhzi
+token_duration                     15m
+token_renewable                    true
+token_policies                     ["default" "myapp-kv-ro"]
+identity_policies                  []
+policies                           ["default" "myapp-kv-ro"]
+token_meta_inferred_entity_id      n/a
+token_meta_role_id                 <your token meta role ID>
+token_meta_canonical_arn           arn:aws:iam::<you aws account number>:role/jray-vault-demo-vault-client-role
+token_meta_client_arn              arn:aws:sts::<you aws account number>:assumed-role/jray-vault-demo-vault-client-role/i-09a...
+token_meta_client_user_id          <you client user ID>
+token_meta_inferred_aws_region     n/a
+token_meta_inferred_entity_type    n/a
+token_meta_account_id              <you aws account number>
+token_meta_auth_type               iam
+
+```
+
+3. [From the Vault **Client**] We can also check to make sure that the token has the appropriate permissions to read our secrets:
+
+`vault kv get kv/myapp/config`
+
+### Part 3: Using Vault Agent Auto-Auth on the Client Instance
+
+In this section we'll take everything we've done so far and apply it to the Vault Agent Auto-Auth method and write out a token to an arbitrary location on disk.
+
+1. [From the Vault **Client**] First, we'll create a configuration file for the Vault Agent to use:
+
+```
+tee /home/ubuntu/auto-auth-conf.hcl <<EOF
+exit_after_auth = true
+pid_file = "./pidfile"
+
+auto_auth {
+	method "aws" {
+    	mount_path = "auth/aws"
+        	config = {
+            	type = "iam"
+				role = "dev-role-iam"
+            }
+        }
+
+sink "file" {
+	config = {
+		path = "/home/ubuntu/vault-token-via-agent"
+            }
+        }
+    }
+EOF
+
+```
+
+In this file, we're telling Vault Agent to use the `aws` auth method, located at the path `auth/aws` on our Vault server, authenticating against the IAM role `dev-role-iam`.
+
+We're also identifying a location on disk where we want to place this token. The `sink` block can be configured multiple times if we want Vault Agent to place the token into multiple locations.
+
+2. [From the Vault **Client**] Now we'll run the Vault Agent with the above config:
+
+`vault agent -config=/home/ubuntu/auto-auth-conf.hcl -log-level=debug`
+
+***NOTES:*** 
+
+In this example, because our `auto-auth-conf.hcl` configuration file contained the line `exit_after_auth = true`, Vault Agent simply authenticated and retrieved a token once, wrote it to the defined sink, and exited. 
+
+Vault Agent can also run in daemon mode where it will continuously renew the retrieved token, and attempt to re-authenticate if that token becomes invalid.
+
+
+3. [From the Vault **Client**] Let's try an API call using the token that Vault Agent pulled for us to test:
+
+```
+curl \
+--header "X-Vault-Token: $(cat /home/ubuntu/vault-token-via-agent)" \
+$VAULT_ADDR/v1/kv/myapp/config | jq
+
+```
+
+#### Response Wrapping
+
+4. [From the Vault **Client**] In addition to pulling a token and writing it to a location in plaintext, Vault Agent supports response-wrapping of the token, which provides an additional layer of protection for the token. Tokens can be wrapped by either the auth method or by the sink configuration, with each approach solving for different challenges, as described [here](https://www.vaultproject.io/docs/agent/autoauth/index.html#response-wrapping-tokens). In the following example, we will use the sink method.
+
+Let's update our `auto-auth-conf.hcl` file to indicate that we want the Vault token to be response-wrapped when written to the defined sink:
+
+```
+tee /home/ubuntu/auto-auth-conf.hcl <<EOF
+exit_after_auth = true
+pid_file = "./pidfile"
+
+auto_auth {
+	method "aws" {
+    	mount_path = "auth/aws"
+        	config = {
+            	type = "iam"
+				role = "dev-role-iam"
+            }
+        }
+
+sink "file" {
+	wrap_ttl = "10m"
+		config = {
+			path = "/home/ubuntu/vault-token-via-agent"
+            }
+        }
+    }
+EOF
+
+```
+
+5. [From the Vault **Client**] Let's run the Vault Agent and inspect the output:
+
+`vault agent -config=/home/ubuntu/auto-auth-conf.hcl -log-level=debug`
+
+5a. Inspect the contents of the file written to the sink:
+
+`cat /home/ubuntu/vault-token-via-agent | jq`
+
+Here we see that instead of a simple token value, we have a JSON object containing a response-wrapped token as well as some additional metadata. In order to get to the true token, we need to first perform an unwrap operation.
+
+6. [From the Vault **Client**] Let's unwrap the response-wrapped token and save it to a `VAULT_TOKEN` env var that other applications can use:
+
+`export VAULT_TOKEN=$(vault unwrap -field=token $(jq -r '.token' /home/ubuntu/vault-token-via-agent))`
+
+`echo $VAULT_TOKEN`
+
+Notice that the value saved to the `VAULT_TOKEN` is not the same as the `token` value in the file `/home/ubuntu/vault-token-via-agent`. The value in `VAULT_TOKEN` is the unwrapped token retrieved by Vault Agent. Additionally, note that if we try to unwrap that same value again, we get an error:
+
+`export VAULT_TOKEN=$(vault unwrap -field=token $(jq -r '.token' /home/ubuntu/vault-token-via-agent))`
+
+```
+Error unwrapping: Error making API request.
+
+URL: PUT http://<your Vault server IP>:8200/v1/sys/wrapping/unwrap
+Code: 400. Errors:
+
+* wrapping token is not valid or does not exist
+
+```
+### Summary
+
+In the previous section, we:
+
+- enabled AWS auth method using IAM role
+- created a RO policy and attached it to the AWS role
+- used the auto-login capability of the Vault Agent to log into Vault using the IAM policy
+- requested a response-wrapped token, then unwrapped it and exported the previously wrapped token to an env var
+
 # Walkthrough - Trusted Orchestrator - Terraform AppRole

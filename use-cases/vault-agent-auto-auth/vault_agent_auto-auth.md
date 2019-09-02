@@ -86,6 +86,8 @@ Set `VAULT_ADDR` environment variable (or update your path statement) to point t
 
 ### Part 1: Configure the AWS IAM Auth Method
 
+[courtesy of tdsacilowski](https://github.com/tdsacilowski/vault-agent-guide)
+
 In this section, we'll write some dummy data/policies and configure Vault to allow AWS IAM authentication from specifies IAM roles.
 
 1. [From the Vault **Server**] If you haven't done so already, perform a `vault operator init`. Make sure to note down your unseal keys and initial root token in a safe place. You will need these in the following steps (in production, you would secure these in a much better way, or use auto-unseal).
@@ -161,16 +163,6 @@ ttl=15m
 
 `aws iam get-role --role-name [VAR_ENVIRONMENT_NAME]-vault-client-role`
 
-examnple:
-
-```
-vault write auth/aws/role/dev-role-iam auth_type=iam \
-bound_iam_principal_arn=arn:aws:iam::753646501470:role/jray-vault-demo-vault-client-role \
-policies=myapp-kv-ro \
-ttl=15m
-
-```
-
 ### Part 2: Login Manually From the Client Instance
 
 Now that we've configured the appropriate AWS IAM auth method on our Vault server, let's SSH into our **client** instance and verify that we're able to successfully utilize the instance profile to login to Vault.
@@ -206,8 +198,8 @@ identity_policies                  []
 policies                           ["default" "myapp-kv-ro"]
 token_meta_inferred_entity_id      n/a
 token_meta_role_id                 <your token meta role ID>
-token_meta_canonical_arn           arn:aws:iam::<you aws account number>:role/jray-vault-demo-vault-client-role
-token_meta_client_arn              arn:aws:sts::<you aws account number>:assumed-role/jray-vault-demo-vault-client-role/i-09a...
+token_meta_canonical_arn           arn:aws:iam::<your aws account number>:role/jray-vault-demo-vault-client-role
+token_meta_client_arn              arn:aws:sts::<your aws account number>:assumed-role/jray-vault-demo-vault-client-role/i-09a...
 token_meta_client_user_id          <you client user ID>
 token_meta_inferred_aws_region     n/a
 token_meta_inferred_entity_type    n/a
@@ -343,4 +335,5 @@ In the previous section, we:
 - used the auto-login capability of the Vault Agent to log into Vault using the IAM policy
 - requested a response-wrapped token, then unwrapped it and exported the previously wrapped token to an env var
 
-# Walkthrough - Trusted Orchestrator - Terraform AppRole
+# Walkthrough - Trusted Orchestrator - AppRole
+

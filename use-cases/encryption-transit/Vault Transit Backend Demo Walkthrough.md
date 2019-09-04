@@ -375,12 +375,15 @@ _results in Consul agent being listed with a "left" status in the Consul cluster
 
 `sudo kill -INT <consul PID>`
 ## MySQL
+
 set values for `MYSQL_ROOT_PASSORD, MYSQL_DATABASE, MYSQL_PASSWORD` inputs
 
 ```
-docker pull mysql/mysql-server:5.7
+sudo docker pull mysql/mysql-server:5.7
+
 mkdir ~/transit-data
-docker run --name mysql-transit \
+
+sudo docker run --name mysql-transit \
   -p 3306:3306 \
   -v ~/transit-data:/var/lib/mysql \
   -e MYSQL_ROOT_PASSWORD=root \
@@ -391,7 +394,7 @@ docker run --name mysql-transit \
   -d mysql/mysql-server:5.7
   ```
 ## Vault
-Assumption is a root token will be used for the demo, in all our non-demo situations, a proper policy with _least privilege_ is created and used to consume EaaS via the Transit Backend. See https://learn.hashicorp.com/vault/encryption-as-a-service/eaas-transit#policy-requirements
+Assumption is a root token will be used for the demo, in all our non-demo situations, a proper policy with _least privilege_ is created and used to consume EaaS via the Transit Backend. [See](https://learn.hashicorp.com/vault/encryption-as-a-service/eaas-transit#policy-requirements)
 
 *NOTE*: Vault can encrypt a binary file such as an image. When you encrypt plaintext, it must be base64 encoded.
 

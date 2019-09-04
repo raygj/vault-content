@@ -48,20 +48,44 @@ sudo apt install nmap -y
 sudo apt install  -y
 
 ```
-- Go installed and set in path
+### Install Go and Setup Path
 
 [digital ocean walkthrough](https://www.digitalocean.com/community/tutorials/how-to-install-go-on-ubuntu-18-04)
 
-- Clone Git repo
+#### Install Go
+
+`cd ~`
+
+`curl -O https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz`
+
+`tar xvf go1.10.3.linux-amd64.tar.gz`
+
+`sudo chown -R root:root ./go`
+
+`sudo mv go /usr/local`
+
+#### Setup Path
+
+`sudo nano ~/.profile`
+
+```
+
+export GOPATH=$HOME/work
+export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+
+```
+
+`source ~/.profile`
+
+### Clone Git repo
 
 `mkdir ~/demo-app; cd ~/demo-app`
 
 `git clone https://github.com/norhe/vault-transit-datakey-example.git`
 
-### Using Consul Discovery
+### Using Consul Discovery to Locate Vault Service
 
 Optionally, setup Consul client to perform DNS queries to find active Vault server. Follow this [guide](https://github.com/raygj/consul-content/blob/master/consul-dns/using%20consul%20DNS%20walkthrough.md)
-
 
 ## MySQL
 
@@ -152,6 +176,15 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `export VAULT_TOKEN=<valid Vault token with appropriate policy>`
 
+### Run App
+
+`cd ~/demo-app/vault-transit-datakey-example`
+
+`go run main.go`
+
+#### Access App
+http://<IP or hostname>:1234
+
 
 
 
@@ -185,14 +218,7 @@ EOF
 
 ```
 
-
-
-
 - these did not work:
 export ENCODED_PII= "$(echo `4111-1111-1111-1111` | base64)"
 
 ENCODED_PII=`echo -n $text | base64`
-
-
-## Access App
-http://<IP or hostname>:1234

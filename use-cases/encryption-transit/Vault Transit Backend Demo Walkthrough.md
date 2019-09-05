@@ -131,43 +131,6 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `vault write -f transit/keys/my_app_key`
 
-### EaaS via CLI
-- Encrypt dummy credit card number 4111 1111 1111 1111
-
-`vault write transit/encrypt/my_app_key plaintext=$(base64 <<< "4111 1111 1111 1111")`
-
-- Decrypt cipher string
-`vault write transit/decrypt/my_app_key ciphertext="vault:v1: < encrypted string>"`
-
-- Decode decrypted string
-`base64 --decode <<< "< base64 encoded string>"`
-
-### EaaS via API
-- Vault token set as env var
-`export VAULT_TOKEN= < your token >`
-
-- Encrypt dummy credit card number 4111 1111 1111 1111
-	- generate Base64-encoded plaintext
-`base64 <<< "4111 1111 1111 1111"`
-
-- pass the Base64-encoded plaintext as API payload
-
-```
-    curl --header "X-Vault-Token: $VAULT_TOKEN" \
-    --request POST \
-    --data '{"plaintext": "< base64 encoded output>"}' \
-    https://active.vault.service.consul:8200/v1/transit/encrypt/my_app_key  | jq
-
-```
-
-- Decrypt 
-```
-       curl --header "X-Vault-Token: $VAULT_TOKEN" \
-       --request POST \
-       --data '{"ciphertext": "< encrypted cipher text>"}' \
-       https://active.vault.service.consul:8200/v1/transit/decrypt/orders | jq
-```
-
 ## On Go App VM: Setup and Run Go Application
 
 ### Setup environment
@@ -272,3 +235,40 @@ EOF
 export ENCODED_PII= "$(echo `4111-1111-1111-1111` | base64)"
 
 ENCODED_PII=`echo -n $text | base64`
+
+### EaaS via CLI
+- Encrypt dummy credit card number 4111 1111 1111 1111
+
+`vault write transit/encrypt/my_app_key plaintext=$(base64 <<< "4111 1111 1111 1111")`
+
+- Decrypt cipher string
+`vault write transit/decrypt/my_app_key ciphertext="vault:v1: < encrypted string>"`
+
+- Decode decrypted string
+`base64 --decode <<< "< base64 encoded string>"`
+
+### EaaS via API
+- Vault token set as env var
+`export VAULT_TOKEN= < your token >`
+
+- Encrypt dummy credit card number 4111 1111 1111 1111
+	- generate Base64-encoded plaintext
+`base64 <<< "4111 1111 1111 1111"`
+
+- pass the Base64-encoded plaintext as API payload
+
+```
+    curl --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request POST \
+    --data '{"plaintext": "< base64 encoded output>"}' \
+    https://active.vault.service.consul:8200/v1/transit/encrypt/my_app_key  | jq
+
+```
+
+- Decrypt 
+```
+       curl --header "X-Vault-Token: $VAULT_TOKEN" \
+       --request POST \
+       --data '{"ciphertext": "< encrypted cipher text>"}' \
+       https://active.vault.service.consul:8200/v1/transit/decrypt/orders | jq
+```

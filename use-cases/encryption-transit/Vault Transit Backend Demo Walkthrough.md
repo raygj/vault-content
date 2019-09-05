@@ -49,7 +49,7 @@ sudo apt install nmap -y
 
 ### Install Go and Setup Path
 
-[digital ocean walkthrough](https://www.digitalocean.com/community/tutorials/how-to-install-go-on-ubuntu-18-04)
+[For background info, see this Digital Ocean Walkthrough](https://www.digitalocean.com/community/tutorials/how-to-install-go-on-ubuntu-18-04)
 
 #### Install Go
 
@@ -84,7 +84,7 @@ export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 
 ### Using Consul Discovery to Locate Vault Service
 
-Optionally, setup Consul client to perform DNS queries to find active Vault server. Follow this [guide](https://github.com/raygj/consul-content/blob/master/consul-dns/using%20consul%20DNS%20walkthrough.md)
+Optionally, setup Consul client to perform DNS queries to find active Vault server. Follow this [guide.](https://github.com/raygj/consul-content/blob/master/consul-dns/using%20consul%20DNS%20walkthrough.md)
 
 ## MySQL
 
@@ -212,7 +212,7 @@ A base64 encoded string is returned, click `decode from base64`
 The original text from the web form is returned
 
 
-# Appendix - Extra Stuff That Of Interest
+# Appendix - Extra Stuff Of Interest
 
 ## Script to take input of data to encode and set as env var
 https://linuxhint.com/bash_base64_encode_decode/

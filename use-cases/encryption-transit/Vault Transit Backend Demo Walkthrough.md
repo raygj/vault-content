@@ -6,9 +6,9 @@ Walkthrough Vault Encryption as a Service (EaaS) use case in a lab environment c
 
 ## Lab Environment
 
-vaultnodea		CentOS7			Vault Ent 1.1.2
-vaultnodeb		CentOS7			Vault Ent 1.1.2
-transit-demo	Ubuntu 18.4		MySQL/Go app
+vaultnodea		CentOS7			Vault Ent 1.2.2
+vaultnodeb		CentOS7			Vault Ent 1.2.2
+transit-demo	Ubuntu 18.4		MySQL/Go app server
 
 ![diagram](/use-cases/encryption-transit/images/consul_lab.png)
 
@@ -24,17 +24,10 @@ transit-demo	Ubuntu 18.4		MySQL/Go app
 - Ubuntu VM Bootstrap
 - Clone Git repo
 - Docker MySQL instance
-- Basic Go app to interact with DB
+- Start Go app that interacts with local DB and remote Vault server
 
 ## Vault
 - Configure Transit Secret Engine
-- Encrypt Secrets
-
-### Optional
-- Decrypt a cipher-text
-- Rotate the Encryption Key
-- Update Key Configuration
-- Generate Data Key
 
 # Walkthrough
 
@@ -88,7 +81,11 @@ Optionally, setup Consul client to perform DNS queries to find active Vault serv
 
 ## MySQL
 
-set values for `MYSQL_ROOT_PASSORD, MYSQL_DATABASE, MYSQL_PASSWORD` inputs
+Pull Docker container
+
+Create target directory
+
+Set values for `MYSQL_ROOT_PASSORD, MYSQL_DATABASE, MYSQL_PASSWORD` inputs:
 
 ```
 
@@ -108,7 +105,7 @@ sudo docker run --name mysql-transit \
 
 ```
 
-### On Client VM: Validate Container Status
+### On Go App VM: Validate Container Status
 
 `sudo docker ps`
 
@@ -171,7 +168,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
        https://active.vault.service.consul:8200/v1/transit/decrypt/orders | jq
 ```
 
-## On Client VM: Setup and Run Go Application
+## On Go App VM: Setup and Run Go Application
 
 ### Setup environment
 
@@ -194,10 +191,51 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 [link to Vault Libraries](https://www.vaultproject.io/api/libraries.html)
 
-#### Test Access App
+# Demo Time
+
+## Test Access App
 
 http://<IP or hostname>:1234
 
+## Create Data
+
+Enter information from the web form with attachments...such as a HashiCorp log ;-)
+
+## Verify Data Is Encrypted On Go App VM
+
+Connect to MySQL
+
+`sudo docker exec -it mysql-transit mysql -uroot -proot`
+
+Change to my_app database
+
+`USE my_app;`
+
+Observe "address" field is encrypted
+
+`SELECT * FROM user_data LIMIT 10;`
+
+Show the attached file
+
+`SELECT user_id, file_id, mime_type, file_name FROM user_files LIMIT 10;`
+
+### Optional
+
+Copy encrypted strings from database record, for example:
+
+`vault:v1:wXTyPJTEujrwFj23dCpO05rv+zMvy5qMkkWqZBnNNpx7AjQCds6C47nfkg==`
+
+Go to Vault UI and browse to the transit secret engine you are using, for example:
+
+Secrets > transit > my_app_key > Decrypt
+
+Paste the encrypted string (including the **vault:v1:** prefix into the `ciphertext` field
+
+Click `decrypt`
+
+A Base64 encoded string is returned, click `decode from Base64`
+
+The original text from the web form is returned
 
 
 # Appendix

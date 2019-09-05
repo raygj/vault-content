@@ -144,6 +144,8 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `export VAULT_ADDR=< valid IP/FQDN or Consul FQDN>`
 
+*note* if you are using Consul DNS, you would specify the Vault server FQDN as _active.vault.service.consul_
+
 `export VAULT_TOKEN=<valid Vault token with appropriate policy>`
 
 ### Run App
@@ -191,7 +193,7 @@ Show the attached file
 
 `SELECT user_id, file_id, mime_type, file_name FROM user_files LIMIT 10;`
 
-### Optional
+### Decrypt Data in Vault UI
 
 Copy encrypted strings from database record, for example:
 

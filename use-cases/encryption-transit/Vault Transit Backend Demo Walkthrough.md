@@ -161,7 +161,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `go get -u github.com/hashicorp/vault/api`
 
-Go is the officially supported client library for Vault, however, [libraries are available](https://www.vaultproject.io/api/libraries.html) for _most_ (if not all) popular languages.
+Go and Ruby are the HashiCorp supported client libraries for Vault, however, [libraries are available](https://www.vaultproject.io/api/libraries.html) for _most_ (if not all) popular languages.
 
 # Demo Time
 

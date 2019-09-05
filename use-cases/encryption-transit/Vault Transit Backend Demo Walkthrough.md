@@ -45,7 +45,6 @@ sudo apt install jq -y
 sudo apt install unzip -y
 sudo apt install bind-utils -y
 sudo apt install nmap -y
-sudo apt install  -y
 
 ```
 ### Install Go and Setup Path
@@ -70,7 +69,7 @@ sudo apt install  -y
 
 ```
 
-export GOPATH=$HOME/work
+export GOPATH=$HOME
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 
 ```
@@ -79,7 +78,7 @@ export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 
 ### Clone Git repo
 
-`mkdir ~/demo-app; cd ~/demo-app`
+`mkdir ~/src/github.com/norhe/; cd ~/src/github.com/norhe/`
 
 `git clone https://github.com/norhe/vault-transit-datakey-example.git`
 
@@ -182,9 +181,17 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 ### Run App
 
-`cd ~/demo-app/vault-transit-datakey-example`
+`cd ~/src/github.com/norhe/vault-transit-datakey-example`
 
 `go run main.go`
+
+#### If you encounter missing packages for MySQL and Vault:
+
+`go get -u github.com/go-sql-driver/mysql`
+
+`go get -u github.com/hashicorp/vault/api`
+
+**need** to determine if github.com should be removed from the import statement with the /db and /secure
 
 #### Access App
 http://<IP or hostname>:1234

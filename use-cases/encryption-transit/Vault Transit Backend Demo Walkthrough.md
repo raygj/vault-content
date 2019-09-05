@@ -215,7 +215,9 @@ The original text from the web form is returned
 
 ## Script to take input of data to encode and set as env var
 
-[see](https://linuxhint.com/bash_base64_encode_decode/)
+Use case is outside the scope of this guide, but as a means of encoding data and grabbing it for encryption operations.
+
+[see this background info on base64 decode operations](https://linuxhint.com/bash_base64_encode_decode/)
 
 ```
 cat << EOF > /tmp/b64encode.sh

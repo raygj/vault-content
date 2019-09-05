@@ -7,7 +7,9 @@ Walkthrough Vault Encryption as a Service (EaaS) use case in a lab environment c
 ## Lab Environment
 
 vaultnodea		CentOS7			Vault Ent 1.2.2
+
 vaultnodeb		CentOS7			Vault Ent 1.2.2
+
 transit-demo	Ubuntu 18.4		MySQL/Go app server
 
 ![diagram](/use-cases/encryption-transit/images/consul_lab.png)
@@ -160,6 +162,8 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 http://<IP or hostname>:1234
 
+![diagram](/use-cases/encryption-transit/images/secureapphomepage.png)
+
 ## Create Data
 
 Enter information from the web form with attachments...such as a HashiCorp log ;-)
@@ -196,7 +200,7 @@ Paste the encrypted string (including the **vault:v1:** prefix into the `ciphert
 
 Click `decrypt`
 
-A Base64 encoded string is returned, click `decode from Base64`
+A base64 encoded string is returned, click `decode from base64`
 
 The original text from the web form is returned
 
@@ -252,10 +256,10 @@ ENCODED_PII=`echo -n $text | base64`
 `export VAULT_TOKEN= < your token >`
 
 - Encrypt dummy credit card number 4111 1111 1111 1111
-	- generate Base64-encoded plaintext
+	- generate base64-encoded plaintext
 `base64 <<< "4111 1111 1111 1111"`
 
-- pass the Base64-encoded plaintext as API payload
+- pass the base64-encoded plaintext as API payload
 
 ```
     curl --header "X-Vault-Token: $VAULT_TOKEN" \

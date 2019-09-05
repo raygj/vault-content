@@ -185,6 +185,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `go run main.go`
 
+
 #### If you encounter missing packages for MySQL and Vault:
 
 `go get -u github.com/go-sql-driver/mysql`
@@ -193,10 +194,9 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 [link to Vault Libraries](https://www.vaultproject.io/api/libraries.html)
 
+#### Test Access App
 
-#### Access App
 http://<IP or hostname>:1234
-
 
 
 

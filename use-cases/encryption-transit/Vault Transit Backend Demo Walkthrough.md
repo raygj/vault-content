@@ -10,7 +10,7 @@ vaultnodea		CentOS7			Vault Ent 1.2.2
 
 vaultnodeb		CentOS7			Vault Ent 1.2.2
 
-transit-demo	Ubuntu 18.4		MySQL/Go app server
+transit-demo	Ubuntu 18.4		MySQL/Go app server (referred to as the Go App VM)
 
 ![diagram](/use-cases/encryption-transit/images/consul_lab.png)
 
@@ -88,18 +88,17 @@ Optionally, setup Consul client to perform DNS queries to find active Vault serv
 
 ## MySQL
 
-Pull Docker container
+- Pull Docker container
 
-Create target directory
+`sudo docker pull mysql/mysql-server:5.7`
 
-Set values for `MYSQL_ROOT_PASSORD, MYSQL_DATABASE, MYSQL_PASSWORD` inputs:
+- Create target directory
+
+`mkdir ~/transit-data`
+
+- Start container with set values for `MYSQL_ROOT_PASSORD, MYSQL_DATABASE, MYSQL_PASSWORD`
 
 ```
-
-sudo docker pull mysql/mysql-server:5.7
-
-mkdir ~/transit-data
-
 sudo docker run --name mysql-transit \
   -p 3306:3306 \
   -v ~/transit-data:/var/lib/mysql \
@@ -138,13 +137,13 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `vault write -f transit/keys/my_app_key`
 
-## On Go App VM: Setup and Run Go Application
+## : Setup and Run Go Application
 
 ### Setup environment
 
 `export VAULT_ADDR=< valid IP/FQDN or Consul FQDN>`
 
-*note* if you are using Consul DNS, you would specify the Vault server FQDN as _active.vault.service.consul_
+*NOTE* if you are using Consul DNS, you would specify the Vault server FQDN as _active.vault.service.consul_
 
 `export VAULT_TOKEN=<valid Vault token with appropriate policy>`
 
@@ -161,7 +160,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `go get -u github.com/hashicorp/vault/api`
 
-Go and Ruby are the HashiCorp supported client libraries for Vault, however, [libraries are available](https://www.vaultproject.io/api/libraries.html) for _most_ (if not all) popular languages.
+*NOTE* Go and Ruby are the HashiCorp supported client libraries for Vault, however, [libraries are available](https://www.vaultproject.io/api/libraries.html) for _most_ (if not all) popular languages.
 
 # Demo Time
 
@@ -173,37 +172,39 @@ http://<IP or hostname>:1234
 
 ## Create Data
 
-Enter information from the web form with attachments...such as a HashiCorp logo :-) ![diagram](/use-cases/encryption-transit/images/hashicorp_graphic.jpg)
+Enter information from the web form, include an attachment...such as a HashiCorp logo :-) ![diagram](/use-cases/encryption-transit/images/hashicorp_graphic.jpg)
 
-## Verify Data Is Encrypted On Go App VM
+## View Encrypted Data on the Backend DB
 
-Connect to MySQL
+On Go App VM:
+
+- Connect to MySQL
 
 `sudo docker exec -it mysql-transit mysql -uroot -proot`
 
-Change to my_app database
+- Change to my_app database
 
 `USE my_app;`
 
-Observe "address" field is encrypted
+- Observe "address" field is encrypted
 
 `SELECT * FROM user_data LIMIT 10;`
 
-Show the attached file
+- Show the attached file
 
 `SELECT user_id, file_id, mime_type, file_name FROM user_files LIMIT 10;`
 
 ### Decrypt Data in Vault UI
 
-Copy encrypted strings from database record, for example:
+- Copy encrypted strings from database record, for example:
 
 `vault:v1:wXTyPJTEujrwFj23dCpO05rv+zMvy5qMkkWqZBnNNpx7AjQCds6C47nfkg==`
 
-Go to Vault UI and browse to the transit secret engine you are using, for example:
+- Go to Vault UI and browse to the transit secret engine you are using, for example:
 
-Secrets > transit > my_app_key > Decrypt
+`secrets > transit > my_app_key > decrypt`
 
-Paste the encrypted string (including the **vault:v1:** prefix into the `ciphertext` field
+- Paste the encrypted string (including the **vault:v1:** prefix into the `ciphertext` field
 
 Click `decrypt`
 

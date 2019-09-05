@@ -201,7 +201,7 @@ A Base64 encoded string is returned, click `decode from Base64`
 The original text from the web form is returned
 
 
-# Appendix
+# Appendix - Extra Stuff That Of Interest
 
 ## Script to take input of data to encode and set as env var
 https://linuxhint.com/bash_base64_encode_decode/

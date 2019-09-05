@@ -125,21 +125,23 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 *NOTE*: Vault does NOT store any data encrypted via the transit/encrypt endpoint. The output you received is the ciphertext. You can store this ciphertext at the desired location (e.g. MySQL database) or pass it to another application.
 
-- Enable Transit Backend at */eaas_demo* using `-path` argument
+- Enable Transit Backend 
 
-`vault secrets enable -path=eeas_demo transit`
+(alternatively, use the `-path` argument to mount the backend at a specific point/name)
 
-- Create key ring named *eaas_pii*
+`vault secrets enable transit`
 
-`vault write -f transit/keys/eaas_pii`
+- Create key ring named *my_app_key*
+
+`vault write -f transit/keys/my_app_key`
 
 ### EaaS via CLI
 - Encrypt dummy credit card number 4111 1111 1111 1111
 
-`vault write transit/encrypt/eaas_pii plaintext=$(base64 <<< "4111 1111 1111 1111")`
+`vault write transit/encrypt/my_app_key plaintext=$(base64 <<< "4111 1111 1111 1111")`
 
 - Decrypt cipher string
-`vault write transit/decrypt/eaas_pii ciphertext="vault:v1: < encrypted string>"`
+`vault write transit/decrypt/my_app_key ciphertext="vault:v1: < encrypted string>"`
 
 - Decode decrypted string
 `base64 --decode <<< "< base64 encoded string>"`
@@ -158,7 +160,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
     curl --header "X-Vault-Token: $VAULT_TOKEN" \
     --request POST \
     --data '{"plaintext": "< base64 encoded output>"}' \
-    https://active.vault.service.consul:8200/v1/transit/encrypt/eaas_pii | jq
+    https://active.vault.service.consul:8200/v1/transit/encrypt/my_app_key  | jq
 
 ```
 
@@ -173,6 +175,8 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 ## On Client VM: Setup and Run Go Application
 
 ### Setup environment
+
+`export VAULT_ADDR=< valid IP/FQDN or Consul FQDN>`
 
 `export VAULT_TOKEN=<valid Vault token with appropriate policy>`
 

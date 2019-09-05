@@ -123,9 +123,9 @@ Assuming the container is up and everything is running clean, move on...otherwis
 
 Assumption is a root token will be used for the demo, in all our non-demo situations, a proper policy with _least privilege_ is created and used to consume EaaS via the Transit Backend. [Guide on transit policy requirements](https://learn.hashicorp.com/vault/encryption-as-a-service/eaas-transit#policy-requirements)
 
-*NOTE*: Vault can encrypt a binary file such as an image. When you encrypt plaintext, it must be base64 encoded.
+*NOTE:*: Vault can encrypt a binary file such as an image. When you encrypt plaintext, it must be base64 encoded.
 
-*NOTE*: Vault does NOT store any data encrypted via the transit/encrypt endpoint. The output you received is the ciphertext. You can store this ciphertext at the desired location (e.g. MySQL database) or pass it to another application.
+*NOTE:*: Vault does NOT store any data encrypted via the transit/encrypt endpoint. The output you received is the ciphertext. You can store this ciphertext at the desired location (e.g. MySQL database) or pass it to another application.
 
 - Enable Transit Backend 
 
@@ -143,7 +143,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `export VAULT_ADDR=< valid IP/FQDN or Consul FQDN>`
 
-*NOTE* if you are using Consul DNS, you would specify the Vault server FQDN as _active.vault.service.consul_
+*NOTE:* if you are using Consul DNS, you would specify the Vault server FQDN as _active.vault.service.consul_
 
 `export VAULT_TOKEN=<valid Vault token with appropriate policy>`
 
@@ -160,7 +160,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `go get -u github.com/hashicorp/vault/api`
 
-*NOTE* Go and Ruby are the HashiCorp supported client libraries for Vault, however, [libraries are available](https://www.vaultproject.io/api/libraries.html) for _most_ (if not all) popular languages.
+*NOTE:* Go and Ruby are the HashiCorp supported client libraries for Vault, however, [libraries are available](https://www.vaultproject.io/api/libraries.html) for _most_ (if not all) popular languages.
 
 # Demo Time
 

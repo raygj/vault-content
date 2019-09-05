@@ -49,7 +49,7 @@ sudo apt install nmap -y
 
 ### Install Go and Setup Path
 
-[For background info, see this Digital Ocean Walkthrough](https://www.digitalocean.com/community/tutorials/how-to-install-go-on-ubuntu-18-04)
+For background info, see this [Digital Ocean Walkthrough.](https://www.digitalocean.com/community/tutorials/how-to-install-go-on-ubuntu-18-04)
 
 #### Install Go
 
@@ -211,11 +211,11 @@ A base64 encoded string is returned, click `decode from base64`
 
 The original text from the web form is returned
 
-
 # Appendix - Extra Stuff Of Interest
 
 ## Script to take input of data to encode and set as env var
-https://linuxhint.com/bash_base64_encode_decode/
+
+[see](https://linuxhint.com/bash_base64_encode_decode/)
 
 ```
 cat << EOF > /tmp/b64encode.sh
@@ -230,6 +230,7 @@ EOF
 `bash /tmp/b64encode.sh`
 
 ## CLI command to encode and set output as env var
+
 - this worked w/o syntax error but did not set the env var
 
 `export ENCODED_PII= "$(base64 <<< "4111-1111-1111-1111")"`
@@ -243,27 +244,38 @@ EOF
 ```
 
 - these did not work:
+
+```
 export ENCODED_PII= "$(echo `4111-1111-1111-1111` | base64)"
 
 ENCODED_PII=`echo -n $text | base64`
 
+```
+
 ### EaaS via CLI
+
 - Encrypt dummy credit card number 4111 1111 1111 1111
 
 `vault write transit/encrypt/my_app_key plaintext=$(base64 <<< "4111 1111 1111 1111")`
 
 - Decrypt cipher string
+
 `vault write transit/decrypt/my_app_key ciphertext="vault:v1: < encrypted string>"`
 
 - Decode decrypted string
+
 `base64 --decode <<< "< base64 encoded string>"`
 
 ### EaaS via API
+
 - Vault token set as env var
+
 `export VAULT_TOKEN= < your token >`
 
 - Encrypt dummy credit card number 4111 1111 1111 1111
+
 	- generate base64-encoded plaintext
+
 `base64 <<< "4111 1111 1111 1111"`
 
 - pass the base64-encoded plaintext as API payload
@@ -277,9 +289,11 @@ ENCODED_PII=`echo -n $text | base64`
 ```
 
 - Decrypt 
+
 ```
        curl --header "X-Vault-Token: $VAULT_TOKEN" \
        --request POST \
        --data '{"ciphertext": "< encrypted cipher text>"}' \
        https://active.vault.service.consul:8200/v1/transit/decrypt/orders | jq
+
 ```

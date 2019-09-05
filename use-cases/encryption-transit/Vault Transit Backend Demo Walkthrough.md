@@ -171,7 +171,7 @@ http://<IP or hostname>:1234
 
 ## Create Data
 
-Enter information from the web form with attachments...such as a ![diagram](/use-cases/encryption-transit/images/hashicorp_graphic.jpg)
+Enter information from the web form with attachments...such as a HashiCorp logo :-) ![diagram](/use-cases/encryption-transit/images/hashicorp_graphic.jpg)
 
 ## Verify Data Is Encrypted On Go App VM
 

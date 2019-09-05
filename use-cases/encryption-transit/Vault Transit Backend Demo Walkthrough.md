@@ -162,7 +162,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 http://<IP or hostname>:1234
 
-![diagram](/use-cases/encryption-transit/images/secureapphomepage.png)
+![diagram](/use-cases/encryption-transit/images/Secure_App_Homepage.png)
 
 ## Create Data
 

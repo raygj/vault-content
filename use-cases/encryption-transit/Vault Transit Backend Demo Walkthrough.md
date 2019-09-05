@@ -191,7 +191,8 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `go get -u github.com/hashicorp/vault/api`
 
-**need** to determine if github.com should be removed from the import statement with the /db and /secure
+[link to Vault Libraries](https://www.vaultproject.io/api/libraries.html)
+
 
 #### Access App
 http://<IP or hostname>:1234

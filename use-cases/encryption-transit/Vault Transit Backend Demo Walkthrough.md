@@ -23,18 +23,22 @@ transit-demo	Ubuntu 18.4		MySQL/Go app server
 # High Level Steps
 
 ## Demo App Server
+
 - Ubuntu VM Bootstrap
 - Clone Git repo
 - Docker MySQL instance
 - Start Go app that interacts with local DB and remote Vault server
 
 ## Vault
+
 - Configure Transit Secret Engine
 
 # Walkthrough
 
 ## Host Bootstrapping
+
 - Ubuntu host
+
 ```
 sudo apt install jq -y
 sudo apt install unzip -y
@@ -42,6 +46,7 @@ sudo apt install bind-utils -y
 sudo apt install nmap -y
 
 ```
+
 ### Install Go and Setup Path
 
 [digital ocean walkthrough](https://www.digitalocean.com/community/tutorials/how-to-install-go-on-ubuntu-18-04)
@@ -117,7 +122,7 @@ Assuming the container is up and everything is running clean, move on...otherwis
 
 ## On Vault VM: Vault Transit Configuration
 
-Assumption is a root token will be used for the demo, in all our non-demo situations, a proper policy with _least privilege_ is created and used to consume EaaS via the Transit Backend. [See](https://learn.hashicorp.com/vault/encryption-as-a-service/eaas-transit#policy-requirements)
+Assumption is a root token will be used for the demo, in all our non-demo situations, a proper policy with _least privilege_ is created and used to consume EaaS via the Transit Backend. [Guide on transit policy requirements](https://learn.hashicorp.com/vault/encryption-as-a-service/eaas-transit#policy-requirements)
 
 *NOTE*: Vault can encrypt a binary file such as an image. When you encrypt plaintext, it must be base64 encoded.
 
@@ -166,7 +171,7 @@ http://<IP or hostname>:1234
 
 ## Create Data
 
-Enter information from the web form with attachments...such as a HashiCorp log ;-)
+Enter information from the web form with attachments...such as a ![diagram](/use-cases/encryption-transit/images/hashicorp_graphic.jpg)
 
 ## Verify Data Is Encrypted On Go App VM
 

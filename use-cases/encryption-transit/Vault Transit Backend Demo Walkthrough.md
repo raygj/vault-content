@@ -82,6 +82,12 @@ export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 
 `git clone https://github.com/norhe/vault-transit-datakey-example.git`
 
+#### Workaround for Updated Source Files
+
+Merge pending on a change to `/secure/vaultUtils.go` replace this file with a new copy from [here](https://github.com/raygj/vault-content/blob/master/use-cases/encryption-transit/vault-transit-datakey-example/secure/vaultUtils.go)
+
+Grab 
+
 ### Using Consul Discovery to Locate Vault Service
 
 Optionally, setup Consul client to perform DNS queries to find active Vault server. Follow this [guide.](https://github.com/raygj/consul-content/blob/master/consul-dns/using%20consul%20DNS%20walkthrough.md)

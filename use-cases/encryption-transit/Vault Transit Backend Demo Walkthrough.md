@@ -143,7 +143,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `vault write -f transit/keys/my_app_key`
 
-## : Setup and Run Go Application
+## Setup and Run Go Application
 
 ### Setup environment
 

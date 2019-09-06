@@ -2,10 +2,18 @@
 
 https://www.vaultproject.io/docs/secrets/ad/index.html
 
+## lab overview
+
+Windows Server 2016 VM (evals available from Microsoft or AWS Windows image)
+Vault instance (dev or existing cluster)
+
 ### windows AD setup
 
 https://blogs.technet.microsoft.com/canitpro/2017/02/22/step-by-step-setting-up-active-directory-in-windows-server-2016/
 
+#### high-level domain steps
+
+deploy Windows 2016 instance
 configure network adapter point to localhost for DNS
 run server wizard, add roles for AD, DNS
 setup domain

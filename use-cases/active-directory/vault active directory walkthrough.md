@@ -4,8 +4,9 @@ https://www.vaultproject.io/docs/secrets/ad/index.html
 
 ## lab overview
 
-Windows Server 2016 VM (evals available from Microsoft or AWS Windows image)
-Vault instance (dev or existing cluster)
+- Windows Server 2016 VM (evals available from Microsoft or AWS Windows image)
+
+- Vault instance (dev or existing cluster)
 
 ### windows AD setup
 

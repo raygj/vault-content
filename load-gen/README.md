@@ -88,6 +88,8 @@ export MYSQL_URL="root:password@tcp(127.0.0.1:3306)/mysql"
 
 If you do not have a DB available, copy the original locustfile.py and then remove the database lines and DB references in the __dynamic__ line
 
+![image](/load-gen/images/locust_config.png)
+
 ## Set VAULT_TOKEN environment variable
 
 `export VAULT_TOKEN=< some token with appropriate policy>`
@@ -180,6 +182,20 @@ locust -H http://<Vault IP or DNS name>:8200 -c 25 -r 5
 Log into the GUI: http://<IP of the locust server>:8089
 
 Enter the number of users and hits, then start swarming
+
+![image](/load-gen/images/locust_ui.png)
+
+# Visualize the Chaos
+
+Go to Grafana Vault and Consul Cluster Health dashboards, set time table to “last 5 mins” and watch KPIs as load hits cluster
+
+Vault Dashboard
+
+![image](/load-gen/images/locust_ui.png)
+
+
+Consul Dashboard
+
 
 ![image](/load-gen/images/locust_ui.png)
 

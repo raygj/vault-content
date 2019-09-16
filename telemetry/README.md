@@ -20,3 +20,4 @@ Info:
 
 The [HashiCorp guide](https://s3-us-west-2.amazonaws.com/hashicorp-education/whitepapers/Vault/Vault-Consul-Monitoring-Guide.pdf) is written for Ubuntu Vault/Consul servers, but at this time my Vault/Consul cluster is CentOS 7, so this is the architecture the guide will be based on:
 
+![image](/telemetry/images/lab_env.png)

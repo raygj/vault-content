@@ -191,12 +191,10 @@ Go to Grafana Vault and Consul Cluster Health dashboards, set time table to “l
 
 Vault Dashboard
 
-![image](/load-gen/images/locust_ui.png)
+![image](/load-gen/images/vault_dashboard_unhappy.png)
 
 
 Consul Dashboard
 
 
-![image](/load-gen/images/locust_ui.png)
-
-
+![image](/load-gen/images/consul_dashboard_stress.png)

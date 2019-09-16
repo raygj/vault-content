@@ -248,3 +248,16 @@ We have provided sample dashboards for Vault and Consul here. To import them int
 6. From the dropdown list, select the data source you created earlier.
 7. Click "Import".
 
+GOTCHA: make sure the values of the datacenter= and role= tags match the values specified in the Grafana dashboard templates. If they do not match, data will not be displayed. You can verify the active tag values by checking your Telegraf config or issuing systemctl status telegraf and noting the output, such as:
+
+![image](/telemetry/images/dc_tag_gotcha.png)
+
+Now you should be able to see beautiful dashboards full of Vault and Consul metrics. If there are errors, you might need to customize each dashboard slightly. Depending on the versions of Vault and Consul you have, some metrics may not be available or may have been renamed.
+
+# Vault Dashboard
+
+![image](/telemetry/images/vault_dashboard.png)
+
+# Consul Dashboard
+
+![image](/telemetry/images/consul_dashboard.png)

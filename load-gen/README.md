@@ -98,6 +98,8 @@ If you do not have a DB available, copy the original locustfile.py and then remo
 
 #### OPTIONAL: Consul DNS on the load-gen host
 
+go [here](https://github.com/raygj/consul-content) for more info on Consul DNS used for service discovery
+
 unzip /tmp/consul_1.4.3_linux_amd64.zip -d /home/<user name>/consul/
 
 # setup log dir

@@ -335,6 +335,10 @@ In the previous section, we:
 - used the auto-login capability of the Vault Agent to log into Vault using the IAM policy
 - requested a response-wrapped token, then unwrapped it and exported the previously wrapped token to an env var
 
+# Katacoda Demo Environment
+
+[Vault Agent with AppRole](https://www.katacoda.com/hashicorp/scenarios/vault-agent)
+
 # Walkthrough - Trusted Orchestrator - AppRole
 
 https://github.com/raygj/vault-content/tree/master/use-cases/jenkins

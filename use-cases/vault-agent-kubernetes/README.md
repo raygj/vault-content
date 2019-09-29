@@ -25,6 +25,9 @@ Vault server, with KV store mounted at `/secret`
 ## Ubuntu MiniKube Host
 
 Ubuntu 18.04.3 LTS
+6G  RAM
+8  vCPU
+16G HDD
 
 ### Install Minikube
 

@@ -154,7 +154,7 @@ cd ~/vault-guides/identity/vault-agent-k8s-demo
 ```
 
 
-## Create Service Account
+## Prepare Service Account
 
 In Kubernetes, a service account provides an identity for processes that run in a Pod so that the processes can contact the API server.
 
@@ -162,11 +162,11 @@ See the provided `vault-auth-service-account.yml` file for the service account d
 
 `cat vault-auth-service-account.yml`
 
-- create service account
+1. create service account
 
 `sudo kubectl create serviceaccount vault-auth`
 
-- update the vault-auth service account with the service account definition `vault-auth-service-account.yml`
+2. update the vault-auth service account with the service account definition `vault-auth-service-account.yml`
 
 `sudo kubectl apply --filename vault-auth-service-account.yml`
 
@@ -178,12 +178,7 @@ See the provided `vault-auth-service-account.yml` file for the service account d
 
 tee myapp-kv-ro.hcl <<EOF
 # If working with K/V v1
-path "secret/myapp/*" {
-    capabilities = ["read", "list"]
-}
-
-# If working with K/V v2
-path "secret/data/myapp/*" {
+path "secret/*" {
     capabilities = ["read", "list"]
 }
 EOF
@@ -221,4 +216,8 @@ vault write auth/userpass/users/test-user \
         policies=myapp-kv-ro
 
 ```
+
+5. open another terminal session to the Vault server or use the UI to test the user's access...before proceeding
+
+
 

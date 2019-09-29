@@ -139,9 +139,9 @@ vault secrets enable -path=secret -version=1 kv
 
 ```
 
-# Configure Kubernetes and Vault
+# Configure Kubernetes
 
-## On minikube VM: Download Demo Assets and Set Working Directory
+## Download Demo Assets and Set Working Directory
 
 ```
 
@@ -164,9 +164,61 @@ See the provided `vault-auth-service-account.yml` file for the service account d
 
 - create service account
 
-`kubectl create serviceaccount vault-auth`
+`sudo kubectl create serviceaccount vault-auth`
 
 - update the vault-auth service account with the service account definition `vault-auth-service-account.yml`
 
-`kubectl apply --filename vault-auth-service-account.yml`
+`sudo kubectl apply --filename vault-auth-service-account.yml`
+
+# Configure Vault
+
+1. Create Policy
+
+```
+
+tee myapp-kv-ro.hcl <<EOF
+# If working with K/V v1
+path "secret/myapp/*" {
+    capabilities = ["read", "list"]
+}
+
+# If working with K/V v2
+path "secret/data/myapp/*" {
+    capabilities = ["read", "list"]
+}
+EOF
+
+```
+
+2. Apply Policy
+
+`vault policy write myapp-kv-ro myapp-kv-ro.hcl`
+
+3. Create a Secret
+
+```
+
+vault kv put secret/myapp/config username='appuser' \
+        password='suP3rsec(et!' \
+        ttl='30s'
+        
+```
+
+4. Create a User
+
+this is a Vault user account that will use the policy you just created, and the userpass auth methd
+
+- enable userpass auth method
+
+`vault auth enable userpass`
+
+- create a user name "test-user" bound to myapp-kv-ro policy
+
+```
+
+vault write auth/userpass/users/test-user \
+        password=training \
+        policies=myapp-kv-ro
+
+```
 

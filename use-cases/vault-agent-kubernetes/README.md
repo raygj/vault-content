@@ -127,6 +127,18 @@ In my case, I have an existing Vault cluster running locally that I will be usin
 
 The other prerequisite is that the KV secret engine is mounted at `secret/` this is not a hard requirement, but would require all subsequent commands to reflect the actual mount point, if you do not use this default.
 
+## Setup KV Engine
+
+the guide would like secrets engine KV version 1, to make sure this is setup correctly execute the following:
+
+```
+
+vault secrets disable secret
+
+vault secrets enable -path=secret -version=1 kv
+
+```
+
 # Configure Kubernetes and Vault
 
 ## On minikube VM: Download Demo Assets and Set Working Directory
@@ -141,6 +153,7 @@ cd ~/vault-guides/identity/vault-agent-k8s-demo
 
 ```
 
+
 ## Create Service Account
 
 In Kubernetes, a service account provides an identity for processes that run in a Pod so that the processes can contact the API server.
@@ -149,4 +162,11 @@ See the provided `vault-auth-service-account.yml` file for the service account d
 
 `cat vault-auth-service-account.yml`
 
+- create service account
+
+`kubectl create serviceaccount vault-auth`
+
+- update the vault-auth service account with the service account definition `vault-auth-service-account.yml`
+
+`kubectl apply --filename vault-auth-service-account.yml`
 

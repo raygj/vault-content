@@ -139,7 +139,7 @@ vault secrets enable -path=secret -version=1 kv
 
 ```
 
-# Configure Kubernetes
+# Configure Kubernetes, Vault, and then Test
 
 ## Download Demo Assets and Set Working Directory
 
@@ -333,5 +333,21 @@ vault write auth/kubernetes/role/example \
         bound_service_account_namespaces=default \
         policies=myapp-kv-ro \
         ttl=24h
+
+```
+
+## Test
+
+- use alpine to test connectivity and auth, start the container as such:
+
+`sudo kubectl run --generator=run-pod/v1 tmp --rm -i --tty --serviceaccount=vault-auth --image alpine:3.7`
+
+- once the container is started you will see a `/#` command prompt, install cURL and jq tools:
+
+```
+
+apk update
+
+apk add curl jq
 
 ```

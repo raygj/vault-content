@@ -22,12 +22,12 @@ Ubuntu VM running minikube
 Vault server, with KV store mounted at `/secret`
 
 
-## Ubuntu MiniKube Host
+## Ubuntu Minikube Host
 
 Ubuntu 18.04.3 LTS
 6G  RAM
 8  vCPU
-16G HDD
+16G HDD (do not try to run on SATA HDD, SSD is a requirement)
 
 ### Install Minikube
 
@@ -47,7 +47,7 @@ if you receive the error "Command `minikube` not found...", then you are ready t
 
 if `sudo systemctl status docker` returns 'unit docker.service could not be found.", then:
 
-`sudo apt install docker.io`
+`sudo apt install docker.io -y`
 
 and go to the next step.
 
@@ -90,10 +90,34 @@ assuming minikube starts OK, then you can set "none" as your default vm-driver:
 
 `sudo minikube config set vm-driver none`
 
+for this setting to take effect, you must stop minikube...delete the existing cluster...then start a new cluster, but this time you can just use:
+
+`sudo minikube start`
+
 Examples of using minikube [here](https://minikube.sigs.k8s.io/docs/examples/)
 
 - stop minikube: `sudo minikube stop`
 - delete cluster: `sudo minikube delete`
+
+6. Install kubectl
+
+kubectl is the Kubernetes command-line tool used to config and manage Kubernetes, it must be installed [separately](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux).
+
+```
+
+cd /usr/local/bin
+
+sudo curl -LO https://storage.googleapis.com/kubernetes-release/release/` \
+curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+
+sudo chmod +x ./kubectl
+
+```
+
+test to make sure kubectl is operational:
+
+`sudo kubectl version`
+
 
 # Vault Bootstraping
 
@@ -103,13 +127,26 @@ In my case, I have an existing Vault cluster running locally that I will be usin
 
 The other prerequisite is that the KV secret engine is mounted at `secret/` this is not a hard requirement, but would require all subsequent commands to reflect the actual mount point, if you do not use this default.
 
-# Prepare Kubernetes
+# Configure Kubernetes and Vault
 
-## Download Demo Assets
+## On minikube VM: Download Demo Assets and Set Working Directory
 
 ```
 
-cd ~/home
+cd ~/.
 
-git clone https://github.com/hashicorp/vault-guides/tree/master/identity/vault-agent-k8s-demo
+git clone https://github.com/hashicorp/vault-guides.git
+
+cd ~/vault-guides/identity/vault-agent-k8s-demo
+
+```
+
+## Create Service Account
+
+In Kubernetes, a service account provides an identity for processes that run in a Pod so that the processes can contact the API server.
+
+See the provided `vault-auth-service-account.yml` file for the service account definition to be used for this guide:
+
+`cat vault-auth-service-account.yml`
+
 

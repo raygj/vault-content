@@ -223,19 +223,22 @@ open another terminal session to the Vault server or use the UI to test the user
 
 6. Set Environment Variables on Vault Server
 
-- Set VAULT_SA_NAME to the service account you created earlier
+assuming your Vault and Minikube environments are different servers, you will need to collect data from Minikube environment to insert into the Vault configuration in the next section. if your Minikube and Vault VM are the same, then you can use the referenced in the [official guide](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s#step-2-configure-kubernetes-auth-method).
 
-`export VAULT_SA_NAME=$(kubectl get sa vault-auth -o jsonpath="{.secrets[*]['name']}")`
+go through each section on the Minikube VM and collect output of the commands into a text file
 
-- Set SA_JWT_TOKEN value to the service account JWT used to access the TokenReview API
+- collect the service account info for the vault-auth service account created earlier
 
-`export SA_JWT_TOKEN=$(kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data.token}" | base64 --decode; echo)`
+`sudo kubectl get sa vault-auth -o jsonpath="{.secrets[*]['name']}"`
 
-- Set SA_CA_CRT to the PEM encoded CA cert used to talk to Kubernetes API
+- collect the JWT token value associated with the vault-auth service account, this is used to access the TokenReview API
 
-`export SA_CA_CRT=$(kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data['ca\.crt']}" | base64 --decode; echo)`
+`sudo kubectl get secret < insert your service account value > -o jsonpath="{.data.token}" | base64 --decode; echo`
 
-- Set K8S_HOST to minikube IP address
+- collect the PEM encoded CA cert used to talk to Kubernetes API
 
-`export K8S_HOST=$(minikube ip)`
+`sudo kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data['ca\.crt']}" | base64 --decode; echo`
 
+- collect the private IP address of the Minikube VM, accessible by the Vault server
+
+`ip addr`

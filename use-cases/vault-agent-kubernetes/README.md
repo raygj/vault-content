@@ -225,6 +225,8 @@ open another terminal session to the Vault server or use the UI to test the user
 
 assuming your Vault and Minikube environments are different servers, you will need to collect data from Minikube environment to insert into the Vault configuration in the next section. if your Minikube and Vault VM are the same, then you can use the referenced in the [official guide](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s#step-2-configure-kubernetes-auth-method).
 
+7. Collect info required to configure Vault auth method
+
 go through each section on the Minikube VM and collect output of the commands into a text file
 
 - collect the service account info for the vault-auth service account created earlier
@@ -239,6 +241,97 @@ go through each section on the Minikube VM and collect output of the commands in
 
 `sudo kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data['ca\.crt']}" | base64 --decode; echo`
 
-- collect the private IP address of the Minikube VM, accessible by the Vault server
+- collect the private IP address of the minikube VM accessible by the Vault server (Vault will hit the 
 
 `ip addr`
+
+## Configure Vault Auth Method
+
+back on the Vault server, and using the data you collect in Step 7 of the previous section you will now configure Vault
+
+1. export the value JWT and cert you collect in Step 7 (there may be more elegant ways of doing this, but done is better than perfect)
+
+**note** the JWT is like any other auth token, treat is as a secret and do not leave in a text file on the server or post it to GitHub along with your cluster IP address ;-)
+
+```
+
+cd /tmp
+
+
+export SA_JWT_TOKEN=$"< your really long JWT string>"
+
+
+tee minikubeca.json <<EOF
+{
+  "text": "< paste CA string here>"
+}
+EOF
+
+
+export K8S_HOST=$"< ip addr of minikube host >"
+
+```
+
+for example:
+
+`export SA_JWT_TOKEN=$"eyJhbGciOiJSUzI1NiIsImtpZCI6IncwNndTQk1rcld0Sjg2MzVfQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InZhdWx0LWF1dGgtdG9rZW4tNTZ0bHciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoidmF1bHQtYXV0aCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjUzY2RjM2Y1LWViNGUtNDA4MS04ZDEzLTRhMmM1MDc4OTcxYyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OnZhdWx0LWF1dGgifQ.7d5dOmNzqhvb2lBuiE5f0tX7rLOYPMmbX_24zT6ydJc5aDoJSFxrzY5ds0SdZG8e8osbJSyXmEcp-Np7BqgRWxoi0p2JOOeJHJBFTeVqxtZmC7BCQMm8V3qbTj571pcXRxInRaWYxrZFg9GyM5cv4tVpRnJ4vtemQwhiEL12sWpinmFMbpfT8CXGRX7Eb6qfXW_nGEfEHKfa6E3aP6CpQXReer26GLoMAzx8Bj7E5iiaXH-m5pGS0X6EI1EsMkDkqeyWY4OoPtTzPzhPudc69--hrz_TW6gFGly8gtl4F9e7XUT1ghRmLdtWGm3yU2FmGIIyw-44bc6pxQ2ciQP7QQ"`
+
+```
+
+tee minikube.ca <<EOF
+
+-----BEGIN CERTIFICATE-----
+MIIC5zCCAc+gAwIBAgIBATANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwptaW5p
+a3ViZUNBMB4XDTE5MDkyODAxMjI1N1oXDTI5MDkyNjAxMjI1N1owFTETMBEGA1UE
+AxMKbWluaWt1YmVDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAONr
+d5J1ChVfTbLAFvChashicorprocks!!!//BU8BzqNrgoH1udexin/4vbKLauF7k+
+OqiYBZ6CyaXYxQ+MBv1+ZZ6SD4e03kSsKjf6Q4113P39KeT4dT0ya6h8OFg/Qxw0
+VbMjFxh2y93RD3CbwjrZf78ml+RS2MslKy2fX2T3joGC+NRoN7mpFNGgxUhgMb2r
+ZYFnyMH1VrMHu/kAq1gMF/Rd+P1sDT1StmeLHumhKplWeETKooC1/S+q2e6q4bH5
+Ztt9lh6salt9XDxYcc7qewrwerwerwerwererrrddr2FLA3OtTXIYdDJcPV+hmd9
+m+J0CAQsEz5ZzJwPy/cCAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgKkMB0GA1UdJQQW
+MBQGCCsGAQUFBwMCBggrBgEFBQcDATAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+DQEBCwUAA4IBAQDYGc55t9SW13ppW7CzDov6km2CsZ69/88ZNu7HbGMj7XF9OBbL
+q+ZPDN6X0lzWXnz+Xu9snrhrC+M3GbIlCgfXrZFdA8B68SIRpeEDqZX0l5GGBbEk
+VWZ+J+w37/t8ymesvbyHGx8iWZUq0u/23jTD5WcaYicXyHatY9Y8e31gdAhmqauA
+4zYmwGZ48aZraKvfPnZMapbPMTIMiEeeKYI2Sgz2x5tB3UUDGDZXe+A9Y4UveJhE
+wjoZbcflGWuH1O+GtL9UKKG9ofTTAjF79wWzYN5ZHCnDVCm+lXJaSwc/0HlP1LCn
+3p3pqiapO67H4k0a0SrvnWBOuzjWxITlFN4q
+-----END CERTIFICATE-----
+
+EOF
+
+```
+
+```
+
+export K8S_HOST=$"192.168.1.205"
+
+```
+
+2. enable the Kubernetes auth method at the default path ("auth/kubernetes")
+
+`vault auth enable kubernetes`
+
+3. tell Vault how to communicate with the Kubernetes (Minikube) cluster
+
+```
+
+vault write auth/kubernetes/config \
+        token_reviewer_jwt="$SA_JWT_TOKEN" \
+        kubernetes_host="https://$K8S_HOST:8443" \
+        kubernetes_ca_cert="minikube.ca"
+
+```
+
+4. Create a role named, 'example' to map Kubernetes Service Account to Vault policies and default token TTL
+
+```
+
+vault write auth/kubernetes/role/example \
+        bound_service_account_names=vault-auth \
+        bound_service_account_namespaces=default \
+        policies=myapp-kv-ro \
+        ttl=24h
+
+```

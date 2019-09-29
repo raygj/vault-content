@@ -1,10 +1,36 @@
-curl --header "X-Vault-Token: <root token>" --request PUT --data @/tmp/vaultlic.json http://127.0.0.1:8200/v1/sys/license
-    
-    
-    
-curl --header "X-Vault-Token: <root token>" http://127.0.0.1:8200/v1/sys/license
+create the vaultlic.json
 
+```
 
+cat vaultlic.json >>EOF
+
+{
+  "text": "< paste license string here>"
+}
+
+EOF
+
+```
+
+set vault token
+
+`export VAULT_TOKEN=$<root or admin token>
+
+write license
+
+```
+
+curl --header "X-Vault-Token: $VAULT_TOKEN" --request PUT --data @/tmp/vaultlic.json http://127.0.0.1:8200/v1/sys/license
+
+```
+
+validate
+
+```
+
+curl --header "X-Vault-Token: $VAULT_TOKEN" http://127.0.0.1:8200/v1/sys/license
+
+```
 
 Vault license update
 # On one of the Vault members (or via the API)

@@ -422,10 +422,42 @@ Success, should look like this:
 
 ```
 
+values such as policies, role, service_account_name, and service_account_secret_name should all look familiar.
 
+exit out of the alpine environment and continue
 
-# Vault Agent Auto-Auth
+`exit`
+
+# Vault Agent Auto-Auth with Consul Template
 
 Now that you have verified that the Kubernetes auth method has been configured on the Vault server, it is time to spin up a client Pod which leverages Vault Agent to automatically authenticate with Vault and retrieve a client token.
+
+For info on Vault Agent, [view the docs](https://www.vaultproject.io/docs/agent/index.html)or check out this [demo walkthrough](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-auto-auth/vault_agent_auto-auth.md)
+
+For info on Consul Template, [view this guide](https://learn.hashicorp.com/vault/developer/sm-app-integration)
+
+1. browse to the demo assets and view the Vault Agent configuration
+
+`more ~/vault-guides/identity/vault-agent-k8s-demo/configs-k8s/vault-agent-config.hcl`
+
+take note of the `auto_auth` method and role being used...also, the sink path
+
+2. view the Consul Template configuration
+
+`more ~/vault-guides/identity/vault-agent-k8s-demo/configs-k8s/consul-template-config.hcl`
+
+3. create a config map
+
+In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from image content to keep containerized applications portable. 
+
+- create a ConfigMap named, `example-vault-agent-config` pulling files from `configs-k8s` directory.
+
+`cd ~/vault-guides/identity/vault-agent-k8s-demo/`
+
+`sudo kubectl create configmap example-vault-agent-config --from-file=./configs-k8s/`
+
+- view the created ConfigMap
+
+`sudo kubectl get configmap example-vault-agent-config -o yaml`
 
 

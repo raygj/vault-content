@@ -2,7 +2,7 @@
 
 ## Summary
 
-Learn Kubernetes and Vault integration by using the Kubernetes auth method to authenticate clients using a Kubernetes Service Account Token, and then having Vault Agent manage the lifecycle of the Vault tokens.
+Learn Kubernetes and Vault integration by using the Kubernetes auth method to authenticate clients using a Kubernetes Service Account Token, use a read-only Vault policy to access secrets, and then having Vault Agent manage the lifecycle of the Vault tokens.
 
 [HashiCorp Source](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s)
 
@@ -156,7 +156,7 @@ cd ~/vault-guides/identity/vault-agent-k8s-demo
 
 ## Prepare Service Account
 
-In Kubernetes, a service account provides an identity for processes that run in a Pod so that the processes can contact the API server.
+In Kubernetes, a service account provides an identity for processes that run in a Pod. A dedicated Service Account will be created to be used by Vault (this is a privileged user like any other Vault secret engine configuration).
 
 See the provided `vault-auth-service-account.yml` file for the service account definition to be used for this guide:
 
@@ -199,9 +199,9 @@ vault kv put secret/myapp/config username='appuser' \
         
 ```
 
-4. Create a User
+4. Create a Test Read-Only User
 
-this is a Vault user account that will use the policy you just created, and the userpass auth methd
+this is a Vault user account that will use to test the policy you just created
 
 - enable userpass auth method
 
@@ -223,19 +223,25 @@ open another terminal session to the Vault server or use the UI to test the user
 
 6. Set Environment Variables on Vault Server
 
-assuming your Vault and Minikube environments are different servers, you will need to collect data from Minikube environment to insert into the Vault configuration in the next section. if your Minikube and Vault VM are the same, then you can use the referenced in the [official guide](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s#step-2-configure-kubernetes-auth-method).
+if your minikube and Vault VM are the same, then you can use the referenced in the [official guide](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s#step-2-configure-kubernetes-auth-method) which sets environment variables from the output of each `kubectl` command. then go to the next section to Configure Vault Auth Method.
+
+if your minikube and Vault VM are not colocated, go to step 7
 
 7. Collect info required to configure Vault auth method
 
-go through each section on the Minikube VM and collect output of the commands into a text file
+go through each section on the minikube VM and collect output of the commands into a text file
 
-- collect the service account info for the vault-auth service account created earlier
+- collect the service account token for the vault-auth service account created earlier (save this off in a text file as you'll need it in the Test section)
 
 `sudo kubectl get sa vault-auth -o jsonpath="{.secrets[*]['name']}"`
 
+then, set an environment variable so you can call this value in the next couple of commands:
+
+`export VAULT_SA_NAME=$"< insert your service account token value >"`
+
 - collect the JWT token value associated with the vault-auth service account, this is used to access the TokenReview API
 
-`sudo kubectl get secret < insert your service account value > -o jsonpath="{.data.token}" | base64 --decode; echo`
+`sudo kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data.token}" | base64 --decode; echo`
 
 - collect the PEM encoded CA cert used to talk to Kubernetes API
 
@@ -260,13 +266,7 @@ cd /tmp
 
 export SA_JWT_TOKEN=$"< your really long JWT string>"
 
-
-tee minikubeca.json <<EOF
-{
-  "text": "< paste CA string here>"
-}
-EOF
-
+export SA_CA_CRT=$"< your cert in PEM format >"
 
 export K8S_HOST=$"< ip addr of minikube host >"
 
@@ -278,9 +278,7 @@ for example:
 
 ```
 
-tee minikube.ca <<EOF
-
------BEGIN CERTIFICATE-----
+export SA_CA_CRT=$"-----BEGIN CERTIFICATE-----
 MIIC5zCCAc+gAwIBAgIBATANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwptaW5p
 a3ViZUNBMB4XDTE5MDkyODAxMjI1N1oXDTI5MDkyNjAxMjI1N1owFTETMBEGA1UE
 AxMKbWluaWt1YmVDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAONr
@@ -297,9 +295,7 @@ VWZ+J+w37/t8ymesvbyHGx8iWZUq0u/23jTD5WcaYicXyHatY9Y8e31gdAhmqauA
 4zYmwGZ48aZraKvfPnZMapbPMTIMiEeeKYI2Sgz2x5tB3UUDGDZXe+A9Y4UveJhE
 wjoZbcflGWuH1O+GtL9UKKG9ofTTAjF79wWzYN5ZHCnDVCm+lXJaSwc/0HlP1LCn
 3p3pqiapO67H4k0a0SrvnWBOuzjWxITlFN4q
------END CERTIFICATE-----
-
-EOF
+-----END CERTIFICATE-----"
 
 ```
 
@@ -320,9 +316,15 @@ export K8S_HOST=$"192.168.1.205"
 vault write auth/kubernetes/config \
         token_reviewer_jwt="$SA_JWT_TOKEN" \
         kubernetes_host="https://$K8S_HOST:8443" \
-        kubernetes_ca_cert="minikube.ca"
+        kubernetes_ca_cert="$SA_CA_CERT"
 
 ```
+
+use this command to validate the settings:
+
+`vault read auth/kubernetes/config`
+
+if all values look OK, then move on
 
 4. Create a role named, 'example' to map Kubernetes Service Account to Vault policies and default token TTL
 
@@ -338,11 +340,11 @@ vault write auth/kubernetes/role/example \
 
 ## Test
 
-- use alpine to test connectivity and auth, start the container as such:
+1. use alpine to test connectivity and auth, start the container as such:
 
 `sudo kubectl run --generator=run-pod/v1 tmp --rm -i --tty --serviceaccount=vault-auth --image alpine:3.7`
 
-- once the container is started you will see a `/#` command prompt, install cURL and jq tools:
+2. once the container is started you will see a `/#` command prompt, install cURL and jq tools:
 
 ```
 
@@ -351,3 +353,36 @@ apk update
 apk add curl jq
 
 ```
+ 
+3. set environment variable for VAULT_ADDR:
+
+`VAULT_ADDR=http://< IP of your Vault server or localhost >:8200`
+
+4. use the /sys/health endpoint to test the connection:
+
+`curl -s $VAULT_ADDR/v1/sys/health | jq`
+
+5. set environment variable for KUBE_TOKEN to the service token value collected in the last section or collect it again:
+
+collect service token value:
+
+`sudo kubectl get sa vault-auth -o jsonpath="{.secrets[*]['name']}"`
+
+set environment variable:
+
+`KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
+
+verify it was set:
+
+`echo $KUBE_TOKEN`
+
+6. now, authenticate against Vault
+
+```
+
+curl --request POST \
+        --data '{"jwt": "'"$KUBE_TOKEN"'", "role": "example"}' \
+        $VAULT_ADDR/v1/auth/kubernetes/login | jq
+
+```
+

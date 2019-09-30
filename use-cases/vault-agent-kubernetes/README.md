@@ -2,7 +2,7 @@
 
 ## Summary
 
-Learn Kubernetes and Vault integration by using the Kubernetes auth method to authenticate clients using a Kubernetes Service Account Token, use a read-only Vault policy to access secrets, and then having Vault Agent manage the lifecycle of the Vault tokens.
+Learn Kubernetes and HashiCorp Vault integration by using the Kubernetes auth method to authenticate clients using a Kubernetes Service Account Token, use a read-only Vault policy to access secrets, and then having Vault Agent manage the lifecycle of the Vault tokens.
 
 [HashiCorp Source](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s)
 
@@ -18,16 +18,13 @@ Running on local VMware ESXi environment managed with the community [Terraform E
 
 # Bootstrap Environment
 
-Ubuntu VM running minikube
-Vault server, with KV store mounted at `/secret`
+VM1: Ubuntu with Docker and Minikube
 
+VM2: HashiCorp Vault (OSS/ENT, cluster or dev mode)
 
 ## Ubuntu Minikube Host
 
-Ubuntu 18.04.3 LTS
-6G  RAM
-8  vCPU
-16G HDD (do not try to run on SATA HDD, SSD is a requirement)
+Ubuntu 18.04.3 LTS | 6G  RAM | 8  vCPU | 16G HDD (do not try to run on SATA HDD, SSD is a requirement)
 
 ### Install Minikube
 

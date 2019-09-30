@@ -386,3 +386,46 @@ curl --request POST \
 
 ```
 
+Success, should look like this:
+
+```
+"request_id": "74b1a4e5-12e7-f761-8301-dea8782606f4",
+"lease_id": "",
+"renewable": false,
+"lease_duration": 0,
+"data": null,
+"wrap_info": null,
+"warnings": null1,
+"auth": {
+"client_token": "s.g9AVD1WzYILqCbBGwdpbJASc",
+"accessor": "fIMeYG3bxzWThe875XtuH4jP",
+"policies": [
+ "default",
+ "myapp-kv-ro"-
+],
+"token_policies": [
+ "default",
+ "myapp-kv-ro"
+],
+"metadata": {
+ "role": "example",
+ "service_account_name": "vault-auth",
+ "service_account_namespace": "default",
+ "service_account_secret_name": "vault-auth-token-56tlw",
+ "service_account_uid": "53cdc3f5-eb4e-4081-8d13-4a2c5078971c"
+},
+"lease_duration": 86400,
+"renewable": true,
+"entity_id": "27fd1a66-3ab5-1630-03e2-914ad9ebc734",
+"token_type": "service",
+"orphan": true
+
+```
+
+
+
+# Vault Agent Auto-Auth
+
+Now that you have verified that the Kubernetes auth method has been configured on the Vault server, it is time to spin up a client Pod which leverages Vault Agent to automatically authenticate with Vault and retrieve a client token.
+
+

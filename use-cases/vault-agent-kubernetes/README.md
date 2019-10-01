@@ -115,7 +115,6 @@ test to make sure kubectl is operational:
 
 `sudo kubectl version`
 
-
 # Vault Bootstraping
 
 You can follow the [Vault Getting Start Guide](https://learn.hashicorp.com/vault/getting-started/install) to standup an instance of Vault or use [Terraform to deploy Vault on AWS](https://github.com/raygj/vault-content/tree/master/vault-aws-demo-instance)...tons of options, all of which will work for this walkthrough assuming your Minikube environment can talk to Vault.
@@ -157,7 +156,7 @@ In Kubernetes, a service account provides an identity for processes that run in 
 
 See the provided `vault-auth-service-account.yml` file for the service account definition to be used for this guide:
 
-`cat vault-auth-service-account.yml`
+`cat ~/vault-guides/identity/vault-agent-k8s-demo/vault-auth-service-account.yml`
 
 1. create service account
 
@@ -447,6 +446,14 @@ take note of the `auto_auth` method and role being used...also, the sink path
 
 In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from image content to keep containerized applications portable. 
 
+- edit the provided pod spec file `example-k8s-spec.yml` to reflect the location of your Vault server
+
+- backup original file (any time you touch YAML)
+
+`cp ~/vault-guides/identity/vault-agent-k8s-demo/example-k8s-spec.yml example-k8s-spec.yml.orig`
+
+- modify lines 43 and 74 to reflect the ip address of your Vault server, alternatively use DNS **note to self** need to evaluate using Consul DNS here
+
 - create a ConfigMap named, `example-vault-agent-config` pulling files from `configs-k8s` directory.
 
 `cd ~/vault-guides/identity/vault-agent-k8s-demo/`
@@ -456,5 +463,45 @@ In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from ima
 - view the created ConfigMap
 
 `sudo kubectl get configmap example-vault-agent-config -o yaml`
+
+4. create POD
+
+- Execute the following command to create the vault-agent-example Pod:
+
+`sudo kubectl apply -f example-k8s-spec.yml --record`
+
+after a minute or so the containers should be active and automatically authenticating against Vault
+
+5. verify Pod status
+
+_you could use the dashboard if you have it configured or want to jump through the hoops_
+
+`sudo kubectl get pods --show-labels`
+
+6. port-forward to connect to UI from outside of the VM:
+
+`sudo kubectl port-forward pod/vault-agent-example 8080:80`
+
+7. connect to UI from the browser
+
+http://< you minkube VM ip>
+
+8. validate Vault Agent sink contains static secret
+
+`sudo kubectl exec -it vault-agent-example --container consul-template sh`
+
+`echo $(cat /home/vault/.vault-token)`
+
+`exit`
+
+9. validate HTML source in the nginx container
+
+`sudo kubectl exec -it vault-agent-example --container nginx-container sh`
+
+`cat /usr/share/nginx/html/index.html`
+
+`exit`
+
+10. update the static secret on Vault and check back to validate it is being read and updated
 
 

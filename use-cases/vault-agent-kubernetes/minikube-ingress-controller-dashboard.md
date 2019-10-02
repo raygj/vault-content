@@ -24,40 +24,23 @@ verify the deployment, this will provide the external URL to test with
 
 `sudo kubectl get service web`
 
-output is http://<your VM's IP address>:<some port>
+output is http://<your Pod's IP address>:<some port>
+
+```
+
+NAME   TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+web    NodePort   10.111.129.88   <none>        8080:31342/TCP   18h
+
+```
 
 test from a browser that has access to your VM, you should see the hello,world app
 
-4. create ingress for Kubernetes Dashboard
-
-create hello, world instance
-
-`sudo kubectl create dash --image=gcr.io/google-samples/hello-app:1.0 --port=8080`
-
-expose the deployment
-
-`kubectl expose deployment web --target-port=8080 --type=NodePort`
-
-verify the deployment, this will provide the external URL to test with
-
-`sudo kubectl get service web`
-
-output is http://<your VM's IP address>:<some port>
-
-test from a browser that has access to your VM, you should see the hello,world app
-
-
-`sudo kubectl expose deployment dash --target-port=35845 --type=NodePort
-
-ssh method
-
-sudo kubectl proxy &
-
-ssh -R 8888:127.0.0.1:8001 $jray@192.168.1.205 
+4. create hello, world
 
 
 
-sudo kubectl proxy --port=30000 &
+
+
 
 
 
@@ -76,5 +59,8 @@ metadata:
 sudo kubectl apply -f dashboard-adminuser.yaml
 
 
+## ssh method
 
+sudo kubectl proxy &
 
+ssh -R 8888:127.0.0.1:8001 $jray@192.168.1.205 

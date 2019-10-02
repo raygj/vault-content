@@ -452,7 +452,7 @@ In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from ima
 
 - edit the provided pod spec file `example-k8s-spec.yml` to reflect the location of your Vault server
 
-- backup original file (any time you touch YAML)
+- backup original file (any time you touch YAML) also, [YAML linter](https://codebeautify.org/yaml-validator) to catch those pesky indentation mistakes
 
 `cp ~/vault-guides/identity/vault-agent-k8s-demo/example-k8s-spec.yml example-k8s-spec.yml.orig`
 

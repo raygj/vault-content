@@ -2,6 +2,8 @@
 
 Kubernetes requires an ingress controller to support inbound connectivity to deployed Pods. The [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/#what-is-ingress) controller is a port-forwarder that accepts connections on one IP address/port and forwards to another IP address/port. In your lab scenario you may have a different set of constraints, but the goal in the following section is to provide a working pattern that can be adopted.
 
+[nodeport-lb-ingress reference](https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0)
+
 1. enable NGINX ingress controller:
 
 `sudo minikube addons enable ingress`
@@ -146,7 +148,7 @@ web          NodePort    10.111.129.88   <none>        8080:31342/TCP   22h
 
 1. add a service defintion to the existing pod configuration by modifying the existing config map
 
-- backup original file (any time you touch YAML)
+- backup original file (any time you touch YAML) also, [YAML linter](https://codebeautify.org/yaml-validator) to catch those pesky indentation mistakes
 
 `cp ~/vault-guides/identity/vault-agent-k8s-demo/example-k8s-spec.yml example-k8s-spec-v1.yml`
 
@@ -200,43 +202,32 @@ we just created a new configmap that removed the nginx container and started a n
 
 6. create nginx service
 
-
-
-
-6. verify the service has been created
-
-
-7. create ingress-nginx.yml resource definition
-
-`nano ~/vault-guides/identity/vault-agent-k8s-demo/ingress-nginx.yml`
+`nano ~/vault-guides/identity/vault-agent-k8s-demo/nginx-srv.yml`
 
 ```
 
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: v1
+kind: Service
 metadata:
-  name: ingress-nginx
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: nginx-svc
 spec:
-  backend:
-    serviceName: default-http-backend
-    servicePort: 80
-  rules:
-  - host: myminikube.info
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: web
-          servicePort: 8080
+  selector:
+    run: example-vault-agent-config-v3
+  ports:
+     - protocol: "TCP"
+       port: 80
+       targetPort: 80
+
+  volumeMounts:
+    - name: shared-data
+      mountPath: /usr/share/nginx/html
 
 ```
 
-6. create an ingress resource
+7. build service
 
-`sudo kubectl create -f ingress-nginx.yml`
+`sudo kubectl apply -f ./nginx-srv.yml`
 
-7. validate ingress resource was created
+7. verify the service has been created
 
-`sudo kubectl describe ing ingress-nginx`
+`sudo kubectl describe svc nginx-svc`

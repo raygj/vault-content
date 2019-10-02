@@ -128,6 +128,8 @@ Hostname: web-9bbd7b488-94nwc
 
 # Extending the Concept
 
+**Work in Progress**
+
 using the ingress-nginx defintion above to expose another service (besides the hello world, web service we created above). kubernetes documentation on [services](https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/#creating-a-service)
 
 exposing the vault-agent-example pod from the [vault agent auto-auth](https://github.com/raygj/vault-content/tree/master/use-cases/vault-agent-kubernetes) walkthrough, assuming that work is functional, this section is about using the Ingress Controller to expose the test app and validate a pattern that can be used for future demos.

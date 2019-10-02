@@ -521,7 +521,7 @@ recall that we are forwarding 8080 of the VM to 80 on the nginx container
 
 if you do not receive this response you need to start troubleshooting port-forwarding as that is the likely culprit; go to the original SSH session where you start port-fowarding in Step 6 and see if there are any errors such as `unable to do port forwarding: socat not found` <- if this error is present you need to install socat, go up to Step 7 in the [Install Minikube](https://github.com/raygj/vault-content/tree/master/use-cases/vault-agent-kubernetes#install-minikube) section
 
-8. validate Vault Agent contains an active token
+8. view the active Vault token being used by Vault Agent
 
 `sudo kubectl exec -it vault-agent-example --container consul-template sh`
 
@@ -529,9 +529,9 @@ if you do not receive this response you need to start troubleshooting port-forwa
 
 `exit`
 
-you can use this token to log into the Vault UI (recall you have a ready only role)
+**note** you can use this token to log into the Vault UI
 
-9. validate HTML source in the nginx container
+9. view the HTML source in the nginx container
 
 `sudo kubectl exec -it vault-agent-example --container nginx-container sh`
 
@@ -539,7 +539,23 @@ you can use this token to log into the Vault UI (recall you have a ready only ro
 
 `exit`
 
-if you encounter a 404 from a web browser, but validation of Steps 8 and 9 are successful, then:
+10. update the static secret on Vault and check back (Step 9) to view it is being read and updated
+
+# Extra Effort: Kubernetes Ingress Controller to Support External Connectivity to Pod
+
+## Ingress Controller
+
+Kubernetes requires an ingress controller to support inbound connectivity to deployed Pods. The ingress controller is a port-forwarder that accepts connections on one IP address/port and forwards to another IP address/port. In your lab scenario you may have a different set of constraints, but the goal in the following section is to provide a working pattern that can be adopted.
+
+Separate walkthrough [here](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller-dashboard.md)
+
+# Troubleshooting
+
+## 404 from VM
+
+the methodology is validate all the container services are functional, then step through connectivity because that is most likely the issue. you want to verify the HTTP listener is responding from inside the container, then work your way out to the VM, and if you are exposing the container via the NodePort, then take that next step back to see where the failure first appears as there are several `proxy` links in the chain.
+
+if you encounter a 404 from the VM command line, then:
 
 get to the command line of the container
 
@@ -570,6 +586,8 @@ root@vault-agent-example:/# curl http://localhost
   </html>
 
 ```
+
+if you saw this response, then things are working corectly within the container and you need to move out a layer.
 
 exit the container
 
@@ -602,9 +620,8 @@ from the host VM running Docker and minikube, you would integate the logs:
 
 ```
 
-if you are trying the website (nodeport IP of your minikube VM), but are not seeing the IP of your host, then the requests are not getting through. in this case, it does not appear that requests outside of the container are making through to nginx because we only see the localhost curl request.
 
 
 
-10. update the static secret on Vault and check back to validate it is being read and updated
+
 

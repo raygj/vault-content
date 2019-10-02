@@ -466,7 +466,7 @@ In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from ima
 
 4. create POD
 
-- Execute the following command to create the vault-agent-example Pod:
+- Execute the following command to create (and deploy the containers within) the vault-agent-example Pod:
 
 `sudo kubectl apply -f example-k8s-spec.yml --record`
 

@@ -92,25 +92,35 @@ spec:
 
 ```
 
+6. create an ingress resource
 
+`sudo kubectl create -f ingress-nginx.yml`
 
-## create admin user for dashboard
+7. validate ingress resource was created
 
-~/vault-guides/identity/vault-agent-k8s-demo
+`sudo kubectl describe ing ingress-nginx`
 
-nano dashboard-adminuser.yaml
+8. update the hosts file of your local workstation to add DNS hostname for test environment
 
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: admin-user
-  namespace: kubernetes-dashboard
+recall that our ingress-nginx definition has a host rule that will respond to requests from **myminikube.info** that resolve to the NodePort address. the easiest way to do this is to setup a local hosts entry:
 
-sudo kubectl apply -f dashboard-adminuser.yaml
+`export minikubeip=<your nodeport address>`
 
+`echo "$minikubeip myminikube.info" | sudo tee -a /etc/hosts`
 
-## ssh method
+ping using name to make sure it resolves:
 
-sudo kubectl proxy &
+`ping myminikube.info`
 
-ssh -R 8888:127.0.0.1:8001 $jray@192.168.1.205 
+9. test from a browser
+
+http://myminikube.info
+
+```
+
+Hello, world!
+Version: 1.0.0
+Hostname: web-9bbd7b488-94nwc
+
+```
+

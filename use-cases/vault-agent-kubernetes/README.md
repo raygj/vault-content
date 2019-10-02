@@ -119,7 +119,7 @@ test to make sure kubectl is operational:
 
 `sudo apt install socat -y`
 
-# Vault Bootstraping
+# Vault Bootstrapping
 
 You can follow the [Vault Getting Start Guide](https://learn.hashicorp.com/vault/getting-started/install) to standup an instance of Vault or use [Terraform to deploy Vault on AWS](https://github.com/raygj/vault-content/tree/master/vault-aws-demo-instance)...tons of options, all of which will work for this walkthrough assuming your Minikube environment can talk to Vault.
 

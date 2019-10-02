@@ -18,9 +18,9 @@ Running on local VMware ESXi environment managed with the community [Terraform E
 
 # Bootstrap Environment
 
-VM1: Ubuntu with Docker and Minikube
+VM1:   Ubuntu with Docker and Minikube
 
-VM2: HashiCorp Vault (OSS/ENT, cluster or dev mode)
+VM2/3: HashiCorp Vault (OSS/ENT, cluster or dev mode...or co-locate with minikube if you'd like)
 
 ## Ubuntu Minikube Host
 

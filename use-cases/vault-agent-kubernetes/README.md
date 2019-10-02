@@ -344,7 +344,7 @@ vault write auth/kubernetes/role/example \
 
 `sudo kubectl run --generator=run-pod/v1 tmp --rm -i --tty --serviceaccount=vault-auth --image alpine:3.7`
 
-2. once the container is started you will see a `/#` command prompt, install cURL and jq tools:
+2. once the container is started you will see a `/#` command prompt, install curl and jq tools:
 
 ```
 
@@ -457,6 +457,8 @@ In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from ima
 `cp ~/vault-guides/identity/vault-agent-k8s-demo/example-k8s-spec.yml example-k8s-spec.yml.orig`
 
 - modify lines 43 and 74 to reflect the ip address of your Vault server, alternatively use DNS **note to self** need to evaluate using Consul DNS here
+
+`nano ~/vault-guides/identity/vault-agent-k8s-demo/example-k8s-spec.yml`
 
 - create a ConfigMap named, `example-vault-agent-config` pulling files from `configs-k8s` directory.
 

@@ -478,6 +478,13 @@ _you could use the dashboard if you have it configured or want to jump through t
 
 `sudo kubectl get pods --show-labels`
 
+view deployment status: [deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) are the desired state you have declared such as an image to run, the minimum number of instances, etc)
+
+`sudo kubectl get deployment`
+
+if you do not see `vault-agent-example` in the list of active/deployment images...then you have to troubleshoot step 
+
+
 6. port-forward to connect to UI from outside of the VM:
 
 `sudo kubectl port-forward pod/vault-agent-example 8080:80`
@@ -540,24 +547,25 @@ exit the container
 
 `exit`
 
-from the Ubuntu CLI, find the Docker container ID of the nginx container:
+from the Ubuntu CLI, find the Docker **container ID** of the **nginx** container:
 
 `sudo docker ps`
 
 then use the following command to view the logs of nginx
 
+`sudo docker logs < container ID >
 
-
-nginx logs are forwarded via a symbolic link from the container back to the underlying VM, such as
+**note** nginx logs normally written to `/var/log/nginx` but in a Docker environment they are forwarded via a symbolic link from the container back to the underlying VM, for example:
 
 ```
+ls -lt /var/log/nginx
 
 lrwxrwxrwx 1 root root 11 Sep 24 23:33 access.log -> /dev/stdout
 lrwxrwxrwx 1 root root 11 Sep 24 23:33 error.log -> /dev/stderr
 
 ```
 
-in this case, it does not appear that requests outside of the container are making through to nginx because we only see the localhost curl request:
+from the host VM running Docker and minikube, you would integate the logs:
 
 ```
 
@@ -566,7 +574,7 @@ in this case, it does not appear that requests outside of the container are maki
 
 ```
 
-
+if you are trying the website (nodeport IP of your minikube VM), but are not seeing the IP of your host, then the requests are not getting through. in this case, it does not appear that requests outside of the container are making through to nginx because we only see the localhost curl request.
 
 
 

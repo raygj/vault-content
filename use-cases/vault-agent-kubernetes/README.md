@@ -2,9 +2,9 @@
 
 ## Summary
 
-Learn Kubernetes and HashiCorp Vault integration by using the Kubernetes auth method to authenticate clients using a Kubernetes Service Account Token, use a read-only Vault policy to access secrets, and then having Vault Agent manage the lifecycle of the Vault tokens.
+Learn Kubernetes and HashiCorp Vault integration by using the Kubernetes auth method to authenticate clients using a Kubernetes Service Account Token, use a read-only Vault policy to access secrets, Vault Agent auto-auth, Consul Template write the secret to a file that is consumed by nginx, and finally, having Vault Agent manage the lifecycle of the Vault tokens.
 
-[HashiCorp Source](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s)
+This is a fail-safe walkthrough of the [official HashiCorp source](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s) and assumes you have experience with Vault, but little to none with Vault-Kubernetes integrations. At least that was my case when I started!
 
 ## Vault Agent Overview
 

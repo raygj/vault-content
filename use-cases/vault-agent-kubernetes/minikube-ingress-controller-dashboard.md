@@ -125,5 +125,9 @@ Hostname: web-9bbd7b488-94nwc
 ```
 # Extending the Concept
 
-exposing the vault-agent-example pod from the [vault agent auto-auth](https://github.com/raygj/vault-content/tree/master/use-cases/vault-agent-kubernetes)walkthrough
+exposing the vault-agent-example pod from the [vault agent auto-auth](https://github.com/raygj/vault-content/tree/master/use-cases/vault-agent-kubernetes) walkthrough
+
+using the ingress-nginx defintion above to expose another service (and service port)
+
+
 

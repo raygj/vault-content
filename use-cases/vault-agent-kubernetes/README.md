@@ -545,7 +545,7 @@ if you do not receive this response you need to start troubleshooting port-forwa
 
 ## 404 from VM
 
-the methodology is validate all the container services are functional, then step through connectivity because that is most likely the issue. you want to verify the HTTP listener is responding from inside the container, then work your way out to the VM, and if you are exposing the container via the NodePort, then take that next step back to see where the failure first appears as there are several `proxy` links in the chain.
+The troubleshooting methodology is to validate all the container services are functional, then step through connectivity because that is most likely the issue. you want to verify the nginx is responding from inside the container, then work your way out to the VM, and if you are exposing the container via the NodePort, then take that next step back to see where the failure first appears as there are several `proxy` links in the chain.
 
 if you encounter a 404 from the VM command line, then:
 

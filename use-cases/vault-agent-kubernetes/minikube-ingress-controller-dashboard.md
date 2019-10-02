@@ -1,6 +1,6 @@
 # Minikube Ingress Controller
 
-Kubernetes requires an ingress controller to support inbound connectivity to deployed Pods. The ingress controller is a port-forwarder that accepts connections on one IP address/port and forwards to another IP address/port. In your lab scenario you may have a different set of constraints, but the goal in the following section is to provide a working pattern that can be adopted.
+Kubernetes requires an ingress controller to support inbound connectivity to deployed Pods. The [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/#what-is-ingress) controller is a port-forwarder that accepts connections on one IP address/port and forwards to another IP address/port. In your lab scenario you may have a different set of constraints, but the goal in the following section is to provide a working pattern that can be adopted.
 
 1. enable NGINX ingress controller:
 
@@ -9,6 +9,22 @@ Kubernetes requires an ingress controller to support inbound connectivity to dep
 2. verify it the ingress controller is running (may take a minute or two):
 
 `sudo kubectl get pods -n kube-system`
+
+```
+
+NAME                                        READY   STATUS    RESTARTS   AGE
+coredns-5644d7b6d9-5c8zr                    1/1     Running   0          3d14h
+coredns-5644d7b6d9-6ct5d                    1/1     Running   0          3d14h
+etcd-minikube                               1/1     Running   0          3d14h
+kube-addon-manager-minikube                 1/1     Running   0          3d14h
+kube-apiserver-minikube                     1/1     Running   0          3d14h
+kube-controller-manager-minikube            1/1     Running   1          3d14h
+kube-proxy-srjv8                            1/1     Running   0          3d14h
+kube-scheduler-minikube                     1/1     Running   0          3d14h
+nginx-ingress-controller-57bf9855c8-lhc8m   1/1     Running   0          18h
+storage-provisioner                         1/1     Running   0          3d14h
+
+```
 
 3. deploy a hello, world app to test:
 
@@ -49,15 +65,32 @@ Hostname: web-9bbd7b488-94nwc
 
 now...how to forward traffic from outside the cluster?
 
-5. 
+5. create ingress-nginx.yml 
 
+`nano ~/vault-guides/identity/vault-agent-k8s-demo/ingress-nginx.yml`
 
+```
 
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  backend:
+    serviceName: default-http-backend
+    servicePort: 80
+  rules:
+  - host: myminikube.info
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: web
+          servicePort: 8080
 
-
-
-
-
+```
 
 
 

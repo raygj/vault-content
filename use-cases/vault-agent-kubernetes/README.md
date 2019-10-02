@@ -115,6 +115,10 @@ test to make sure kubectl is operational:
 
 `sudo kubectl version`
 
+7. install [SOCAT](https://github.com/kubernetes/kubernetes/blob/9fef5f2938bb9db0667de893a5733cb899afd8ed/pkg/kubelet/dockertools/manager.go#L1182) which is a package required by PortForward that you will use to forward traffic from a container back to the VM
+
+
+
 # Vault Bootstraping
 
 You can follow the [Vault Getting Start Guide](https://learn.hashicorp.com/vault/getting-started/install) to standup an instance of Vault or use [Terraform to deploy Vault on AWS](https://github.com/raygj/vault-content/tree/master/vault-aws-demo-instance)...tons of options, all of which will work for this walkthrough assuming your Minikube environment can talk to Vault.
@@ -482,16 +486,38 @@ view deployment status: [deployments](https://kubernetes.io/docs/concepts/worklo
 
 `sudo kubectl get deployment`
 
-if you do not see `vault-agent-example` in the list of active/deployment images...then you have to troubleshoot step 
+if you do not see `vault-agent-example` in the list of active/deployment images...then you have to troubleshoot step 4 <- hold that thought, may be issue with SOCAT required on the node to support port-forwarding
 
-
-6. port-forward to connect to UI from outside of the VM:
+6. port-forward to connect to nginx instance from the VM
 
 `sudo kubectl port-forward pod/vault-agent-example 8080:80`
 
-7. connect to UI from the browser
+at this point, you must leave this terminal open as this is command runs in the foreground and wil supply console log messages as transactions occur.
 
-http://< you minkube VM ip>
+7. open a new SSH session to your minikube VM
+
+`curl http://127.0.0.1`
+
+this should return a response such as:
+
+```
+
+root@vault-agent-example:/# curl http://localhost
+  <html>
+  <body>
+  <p>Some secrets:</p>
+  <ul>
+  <li><pre>username: appuser</pre></li>
+  <li><pre>password: suP3rsec(et!</pre></li>
+  </ul>
+
+  </body>
+  </html>
+  
+
+```
+
+if you do not receive this response you need to start troubleshooting port-forwarding as that is the likely culprit.
 
 8. validate Vault Agent contains an active token
 

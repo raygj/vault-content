@@ -33,9 +33,26 @@ web    NodePort   10.111.129.88   <none>        8080:31342/TCP   18h
 
 ```
 
-test from a browser that has access to your VM, you should see the hello,world app
+4. test connectivity from the VM to the container
 
-4. create hello, world
+`curl http://10.111.129.88:8080`
+
+you should see:
+
+```
+
+Hello, world!
+Version: 1.0.0
+Hostname: web-9bbd7b488-94nwc
+
+```
+
+now...how to forward traffic from outside the cluster?
+
+5. 
+
+
+
 
 
 

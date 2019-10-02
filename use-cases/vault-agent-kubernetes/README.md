@@ -541,14 +541,6 @@ if you do not receive this response you need to start troubleshooting port-forwa
 
 10. update the static secret on Vault and check back (Step 9) to view it is being read and updated
 
-# Extra Effort: Kubernetes Ingress Controller to Support External Connectivity to Pod
-
-## Ingress Controller
-
-Kubernetes requires an ingress controller to support inbound connectivity to deployed Pods. The ingress controller is a port-forwarder that accepts connections on one IP address/port and forwards to another IP address/port. In your lab scenario you may have a different set of constraints, but the goal in the following section is to provide a working pattern that can be adopted.
-
-Separate walkthrough [here](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller-dashboard.md)
-
 # Troubleshooting
 
 ## 404 from VM
@@ -620,8 +612,10 @@ from the host VM running Docker and minikube, you would integate the logs:
 
 ```
 
+# Extra Effort: Kubernetes Ingress Controller to Support External Connectivity to Pod
 
+## Ingress Controller
 
+Kubernetes requires an ingress controller to support inbound connectivity to deployed Pods. The ingress controller is a port-forwarder that accepts connections on one IP address/port and forwards to another IP address/port. In your lab scenario you may have a different set of constraints, but the goal in the following section is to provide a working pattern that can be adopted.
 
-
-
+Separate walkthrough [here](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller-dashboard.md)

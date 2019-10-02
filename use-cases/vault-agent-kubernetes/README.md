@@ -557,9 +557,14 @@ lrwxrwxrwx 1 root root 11 Sep 24 23:33 error.log -> /dev/stderr
 
 ```
 
+in this case, it does not appear that requests outside of the container are making through to nginx because we only see the localhost curl request:
 
+```
 
+@ubuntu:~$ sudo docker logs 664af31fb2ee
+127.0.0.1 - - [02/Oct/2019:02:10:45 +0000] "GET / HTTP/1.1" 200 166 "-" "curl/7.64.0" "-"
 
+```
 
 
 

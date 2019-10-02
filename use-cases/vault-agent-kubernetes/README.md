@@ -486,13 +486,15 @@ _you could use the dashboard if you have it configured or want to jump through t
 
 http://< you minkube VM ip>
 
-8. validate Vault Agent sink contains static secret
+8. validate Vault Agent contains an active token
 
 `sudo kubectl exec -it vault-agent-example --container consul-template sh`
 
 `echo $(cat /home/vault/.vault-token)`
 
 `exit`
+
+you can use this token to log into the Vault UI (recall you have a ready only role)
 
 9. validate HTML source in the nginx container
 
@@ -502,6 +504,66 @@ http://< you minkube VM ip>
 
 `exit`
 
-10. update the static secret on Vault and check back to validate it is being read and updated
+if you encounter a 404 from a web browser, but validation of Steps 8 and 9 are successful, then:
 
+get to the command line of the container
+
+`sudo kubectl exec -it -it vault-agent-example --container nginx-container  -- bash`
+
+install curl inside the container
+
+`apt update && apt-get install -y curl`
+
+use curl to verify you can get to the webserver locally
+
+`curl http://localhost`
+
+you should see the HTML output:
+
+```
+
+root@vault-agent-example:/# curl http://localhost
+  <html>
+  <body>
+  <p>Some secrets:</p>
+  <ul>
+  <li><pre>username: appuser</pre></li>
+  <li><pre>password: suP3rsec(et!</pre></li>
+  </ul>
+
+  </body>
+  </html>
+
+```
+
+exit the container
+
+`exit`
+
+from the Ubuntu CLI, find the Docker container ID of the nginx container:
+
+`sudo docker ps`
+
+then use the following command to view the logs of nginx
+
+
+
+nginx logs are forwarded via a symbolic link from the container back to the underlying VM, such as
+
+```
+
+lrwxrwxrwx 1 root root 11 Sep 24 23:33 access.log -> /dev/stdout
+lrwxrwxrwx 1 root root 11 Sep 24 23:33 error.log -> /dev/stderr
+
+```
+
+
+
+
+
+
+
+
+
+10. update the static secret on Vault and check back to validate it is being read and updated
 

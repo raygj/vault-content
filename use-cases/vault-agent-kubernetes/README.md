@@ -117,7 +117,7 @@ test to make sure kubectl is operational:
 
 7. install [SOCAT](https://github.com/kubernetes/kubernetes/blob/9fef5f2938bb9db0667de893a5733cb899afd8ed/pkg/kubelet/dockertools/manager.go#L1182) which is a package required by PortForward that you will use to forward traffic from a container back to the VM
 
-
+`sudo apt install socat -y`
 
 # Vault Bootstraping
 
@@ -486,7 +486,7 @@ view deployment status: [deployments](https://kubernetes.io/docs/concepts/worklo
 
 `sudo kubectl get deployment`
 
-if you do not see `vault-agent-example` in the list of active/deployment images...then you have to troubleshoot step 4 <- hold that thought, may be issue with SOCAT required on the node to support port-forwarding
+**note** i'm not sure why (yet), but the individual containers were never reflected as _deployed_ when issuing this command, however, the containers were up and running. <- need to dig in on K8S to understand this.
 
 6. port-forward to connect to nginx instance from the VM
 
@@ -494,9 +494,9 @@ if you do not see `vault-agent-example` in the list of active/deployment images.
 
 at this point, you must leave this terminal open as this is command runs in the foreground and wil supply console log messages as transactions occur.
 
-7. open a new SSH session to your minikube VM
+7. open a new SSH session to your minikube VM and connect on 8080
 
-`curl http://127.0.0.1`
+`curl http://127.0.0.1:8080`
 
 this should return a response such as:
 
@@ -517,7 +517,9 @@ root@vault-agent-example:/# curl http://localhost
 
 ```
 
-if you do not receive this response you need to start troubleshooting port-forwarding as that is the likely culprit.
+recall that we are forwarding 8080 of the VM to 80 on the nginx container
+
+if you do not receive this response you need to start troubleshooting port-forwarding as that is the likely culprit; go to the original SSH session where you start port-fowarding in Step 6 and see if there are any errors such as `unable to do port forwarding: socat not found` <- if this error is present you need to install socat, go up to Step 7 in the [Install Minikube](https://github.com/raygj/vault-content/tree/master/use-cases/vault-agent-kubernetes#install-minikube) section
 
 8. validate Vault Agent contains an active token
 

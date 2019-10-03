@@ -82,3 +82,14 @@ spec:
           "-config=/etc/consul-template/consul-template-config.hcl",
           #"-log-level=debug",
         ]
+
+    # Nginx container
+    - name: nginx-container
+      image: nginx
+
+      ports:
+        - containerPort: 80
+
+      volumeMounts:
+        - name: shared-data
+          mountPath: /usr/share/nginx/html

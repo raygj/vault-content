@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   name: vault-agent-example
   labels:
-    app: nginx
+    app: validate-creds
     role: vault-agent-example
     version: v1
 spec:

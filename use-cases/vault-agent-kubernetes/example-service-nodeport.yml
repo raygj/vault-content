@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-agent-example-svc
+  labels:
+    role: vault-agent-example
+spec:
+  selector:
+     app: 
+     version: v1
+     port:
+      type: NodePort

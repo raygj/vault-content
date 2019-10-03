@@ -200,6 +200,17 @@ using a browser, connect to the UI via `http://< your VM's external IP address >
 
 ingress relies on DNS, or the request URL to route traffic
 
+```
+    internet
+        |
+   [ Ingress ]
+   --|-----|--
+   [ Services ]
+
+```
+
+^^ [source](https://kubernetes.io/docs/concepts/services-networking/ingress/#what-is-ingress)
+
 ## Minikube Ingress Controller
 
 Kubernetes requires an ingress controller to support inbound connectivity to deployed Pods. The [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/#what-is-ingress) controller is a port-forwarder that accepts connections on one IP address/port and forwards to another IP address/port. In your lab scenario you may have a different set of constraints, but the goal in the following section is to provide a working pattern that can be adopted.
@@ -283,6 +294,8 @@ spec:
 7. validate ingress resource was created
 
 `sudo kubectl describe ing ingress-nginx`
+
+`sudo kubectl get ingress ingress-nginx`
 
 8. update the hosts file of your local workstation to add DNS hostname for test environment
 

@@ -34,9 +34,11 @@ _minikube can be install as a part of the manual Ubuntu installation, this guide
 
 The [official guide](https://kubernetes.io/docs/tasks/tools/install-minikube/) walks you through prerequisites for your environment such using a hypervisor (virtualbox, vmwarefusion, kvm2, etc.) or using Docker.
 
+**note** depending on environment you may or may not need to `sudo` and there is some guidance on relocating binaries and files to your user's home directory to avoid `sudo` but I choose to ignore that and run non-root.
+
 1. Check if minikube is already installed
 
-`minikube start`
+`sudo minikube start`
 
 if you receive the error "Command `minikube` not found...", then you are ready to proceed ;-)
 

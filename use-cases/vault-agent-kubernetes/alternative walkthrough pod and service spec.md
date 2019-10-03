@@ -217,11 +217,11 @@ Kubernetes requires an ingress controller to support inbound connectivity to dep
 
 [nodeport-lb-ingress reference](https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0)
 
-1. enable NGINX ingress controller:
+### enable NGINX ingress controller:
 
 `sudo minikube addons enable ingress`
 
-2. verify it the ingress controller is running (may take a minute or two):
+### verify it the ingress controller is running (may take a minute or two):
 
 `sudo kubectl get pods -n kube-system`
 
@@ -241,7 +241,7 @@ storage-provisioner                         1/1     Running   0          3d14h
 
 ```
 
-3. create ingress-nginx.yml resource definition
+### create ingress-nginx.yml resource definition
 
 `nano ~/vault-guides/identity/vault-agent-k8s-demo/ingress-nginx.yml`
 
@@ -264,9 +264,70 @@ spec:
       - path: /
         backend:
           serviceName: vault-agent-example-svc
-          servicePort: 30000
 
 ```
+
+### modify service spec file:
+
+in the previous section we defined the service using the spec.type NodePort, but when using an ingress controller the service should not be accessible outside of the cluster...so we will change the defintion to clusterIP
+
+`cd ~/vault-guides/identity/vault-agent-k8s-demo/`
+
+`nano vault-agent-example-svc.yml`
+
+```
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-agent-example-svc
+  labels:
+    app: validate-creds
+    role: vault-agent-example
+    version: v1
+spec:
+  selector:
+     app: validate-creds
+  ports:
+  -  port: 8080
+     protocol: TCP
+     targetPort: 80
+
+```
+
+**notes**
+
+1. spec.type should be set to ClusterIP, it was previously using NodePort in the last iteration
+
+2. spec.ports.nodePort cannot be defined when using ClusterIP, delete this line from the last iteration
+
+#### delete the existing service to modify/recreate it:
+
+`sudo kubectl delete svc vault-agent-example-svc`
+
+### apply the spec file to create the service:
+
+`sudo kubectl apply -f vault-agent-example-svc.yml`
+
+### validate service was created:
+
+`sudo kubectl get svc`
+
+you should see:
+
+```
+
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kubernetes                ClusterIP   10.96.0.1       <none>        443/TCP          4d22h
+vault-agent-example-svc   ClusterIP   10.104.3.38     <none>        8080/TCP         29m
+
+```
+
+- use describe service command for details:
+
+`sudo kubectl describe svc vault-agent-example-svc`
+
+
 
 **notes**
 
@@ -291,13 +352,13 @@ spec:
 
 `sudo kubectl edit ingress ingress-nginx`
 
-7. validate ingress resource was created
+###. validate ingress resource was created
 
 `sudo kubectl describe ing ingress-nginx`
 
 `sudo kubectl get ingress ingress-nginx`
 
-8. update the hosts file of your local workstation to add DNS hostname for test environment
+###. update the hosts file of your local workstation to add DNS hostname for test environment
 
 recall that our ingress-nginx definition has a host rule that will respond to requests from **myminikube.info** that resolve to the NodePort address. the easiest way to do this is to setup a local hosts entry:
 
@@ -315,10 +376,12 @@ http://vaultagent.demo
 
 expected result:
 ```
-Hello, world!
-Version: 1.0.0
-Hostname: web-9bbd7b488-94nwc
-```
+
+Some secrets:
+
+username: appuser
+password: suP3rsec(et!
+
 ```
 
 

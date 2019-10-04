@@ -379,4 +379,12 @@ password: suP3rsec(et!
 
 ```
 
+# And that's it...here's the diagram outlining the links in the chain required to terminate the HTTP request
 
+![diagram](/use-cases/vault-agent-kubernetes/images/vault-agent-k8s-lab-2.png)
+
+# Next Steps
+
+- Add Consul Connect to this mix to network k8s and non-k8s services
+
+- How does Consul + Ambassador fit in?

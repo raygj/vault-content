@@ -16,7 +16,7 @@ Running on local VMware ESXi environment managed with the community [Terraform E
 
 The following diagram is a final version of the lab and includes components of this walkthrough, as well as the optional add-on [walkthrough](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller.md)
 
-![diagram](/use-cases/vault-agent-kubernetes/images/vault-agent-k8s-lab.png)
+![diagram](/use-cases/vault-agent-kubernetes/images/vault-agent-k8s-lab-2.png)
 
 # Bootstrap Environment
 

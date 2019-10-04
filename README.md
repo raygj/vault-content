@@ -41,6 +41,9 @@
 	- static-secrets
 	- vault-agent-auto-auth
 	- vault-agent-kubernetes
+		- walkthrough
+		- helm charts
+		- misc YML
 
 ## vault-aws-demo-instance
 

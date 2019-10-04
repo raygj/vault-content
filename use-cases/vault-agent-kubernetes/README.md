@@ -14,6 +14,8 @@ This is a fail-safe walkthrough of the [official HashiCorp source](https://learn
 
 Running on local VMware ESXi environment managed with the community [Terraform ESXi provider](https://github.com/josenk/terraform-provider-esxi)...I wrote a [walkthrough here](https://github.com/raygj/terraform-content/blob/master/esxi/terraform%20esxi%20provider%20walkthrough.md). The [HashiCorp Vault Guides Repo](https://github.com/hashicorp/vault-guides/tree/master/identity/vault-agent-k8s-demo) contains Terraform configs and info to run on AKS or GKE.
 
+The following diagram is a final version of the lab and includes components of this walkthrough, as well as the optional add-on [walkthrough](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller.md)
+
 ![diagram](/use-cases/vault-agent-kubernetes/images/vault-agent-k8s-lab.png)
 
 # Bootstrap Environment
@@ -622,4 +624,4 @@ from the host VM running Docker and minikube, you would integate the logs:
 
 Kubernetes requires an ingress controller to support inbound connectivity to deployed Pods. The ingress controller is a port-forwarder that accepts connections on one IP address/port and forwards to another IP address/port. In your lab scenario you may have a different set of constraints, but the goal in the following section is to provide a working pattern that can be adopted.
 
-Separate walkthrough [here](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller-dashboard.md)
+Separate walkthrough [here](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller.md)

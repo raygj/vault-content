@@ -1,26 +1,20 @@
-https://www.udemy.com/course/kubernetes-certified-administrator/learn/lecture/10025316#overview
+# This Walk through...
 
-section 8, intro to services
+... is an add-on to [original walkthrough](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/README.md) where I dug in and learned more Kubernetes networking.
 
-pod is definied with labels such as `app, role, version` to view pods with labels:
+the gist of what's changing here:
 
-`sudo kubectl get pods --show-labels`
+Option 1 Section:
 
-these labels are used to define relationships for services
+- adding labels to pod spec to supporting mapping service
 
-* the vault-agent-example-v3 pod does not have labels defined, so there is nothing to attach to
+- map service to expose via NodePort
 
-* plan, go back to the original pod configuration, but add labels...then create a NodePort service to expose it outside
+Option 2 Section:
 
-`sudo kubectl delete pods <pod>`
+- build off of Option 1 Section, but change the service spec to ClusterIP and expose via Ingress Controller
 
-
-# edits to original walkthrough adding labels to pod spec and then service spec to expose UI outside of cluster
-
-
-3. create a config map
-
-In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from image content to keep containerized applications portable. You can create ConfigMaps from files or directories.
+## modify the previous config map
 
 - edit the provided pod spec file `example-k8s-spec.yml` to reflect the location of your Vault server
 
@@ -55,7 +49,7 @@ In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from ima
 
 `sudo kubectl get configmap example-vault-agent-config -o yaml`
 
-4. create POD
+## create POD
 
 - Execute the following command to create (and deploy the containers within) the vault-agent-example Pod:
 
@@ -63,9 +57,7 @@ In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from ima
 
 after a minute or so the containers should be active and automatically authenticating against Vault
 
-5. verify Pod status
-
-_you could use the dashboard if you have it configured or want to jump through the hoops_
+### verify Pod status
 
 `sudo kubectl get pods --show-labels`
 
@@ -88,13 +80,13 @@ view deployment status: [deployments](https://kubernetes.io/docs/concepts/worklo
 
 `sudo kubectl get pods -o wide --all-namespaces`
 
-6. port-forward to connect to nginx instance from the VM
+## port-forward to connect to nginx instance from the VM
 
 `sudo kubectl port-forward pod/vault-agent-example 8080:80`
 
 at this point, you must leave this terminal open as this is command runs in the foreground and wil supply console log messages as transactions occur.
 
-7. open a new SSH session to your minikube VM and connect on 8080
+## open a new SSH session to your minikube VM and connect on 8080
 
 `curl http://127.0.0.1:8080`
 
@@ -119,7 +111,6 @@ root@vault-agent-example:/# curl http://localhost
 recall that we are forwarding 8080 of the VM to 80 on the nginx container
 
 if you do not receive this response you need to start troubleshooting port-forwarding as that is the likely culprit; go to the original SSH session where you start port-fowarding in Step 6 and see if there are any errors such as `unable to do port forwarding: socat not found` <- if this error is present you need to install socat, go up to Step 7 in the [Install Minikube](https://github.com/raygj/vault-content/tree/master/use-cases/vault-agent-kubernetes#install-minikube) section
-
 
 ## Option 1: Define Service to Expose UI
 
@@ -195,10 +186,8 @@ vault-agent-example-svc   NodePort    10.105.114.151   <none>        8080:30193/
 
 using a browser, connect to the UI via `http://< your VM's external IP address >:30000
 
+# Option 2: Deploy an Ingress Controller
 
-# Now Deploy an Ingress Controller
-
-ingress relies on DNS, or the request URL to route traffic
 
 ```
     internet
@@ -210,6 +199,12 @@ ingress relies on DNS, or the request URL to route traffic
 ```
 
 ^^ [source](https://kubernetes.io/docs/concepts/services-networking/ingress/#what-is-ingress)
+
+- deploy ingress controller
+
+- modify service spec to support use with ingress controller
+
+**note** ingress relies on DNS, or the request URL to route traffic
 
 ## Minikube Ingress Controller
 

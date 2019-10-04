@@ -381,7 +381,7 @@ password: suP3rsec(et!
 
 # And that's it...here's the diagram outlining the links in the chain required to terminate the HTTP request
 
-![diagram](/use-cases/vault-agent-kubernetes/images/vault-agent-k8s-lab-2.png)
+![diagram](/use-cases/vault-agent-kubernetes/images/vault-agent-k8s-lab-3.png)
 
 # Next Steps
 

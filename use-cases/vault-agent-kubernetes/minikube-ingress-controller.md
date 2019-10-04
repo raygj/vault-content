@@ -4,13 +4,13 @@
 
 the gist of what's changing here:
 
-Option 1 Section:
+[Option 1 Section](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller.md#option-1-define-service-to-expose-ui)
 
 - adding labels to pod spec to supporting mapping service
 
 - map service to expose via NodePort
 
-Option 2 Section:
+[Option 2 Section](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller.md#option-2-deploy-an-ingress-controller)
 
 - build off of Option 1 Section, but change the service spec to ClusterIP and expose via Ingress Controller
 

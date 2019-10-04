@@ -1,0 +1,35 @@
+# standalone Vault with Audit Storage
+# after deployment, enable audit
+# kubectl exec -ti <POD NAME> --  vault audit enable file file_path=/vault/audit/vault_audit.log
+global:
+  enabled: true
+  image: "vault:1.2.2"
+
+server:
+  standalone:
+    enabled: true
+    config: |
+      listener "tcp" {
+        tls_disable = true
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+
+      storage "file" {
+        path = "/vault/data"
+      }
+
+  service:
+    enabled: true
+
+  dataStorage:
+    enabled: true
+    size: 10Gi
+    storageClass: null
+    accessMode: ReadWriteOnce
+
+  auditStorage:
+    enabled: true
+    size: 10Gi
+    storageClass: null
+    accessMode: ReadWriteOnce

@@ -14,7 +14,7 @@ This is a fail-safe walkthrough of the [official HashiCorp source](https://learn
 
 Running on local VMware ESXi environment managed with the community [Terraform ESXi provider](https://github.com/josenk/terraform-provider-esxi)...I wrote a [walkthrough here](https://github.com/raygj/terraform-content/blob/master/esxi/terraform%20esxi%20provider%20walkthrough.md). The [HashiCorp Vault Guides Repo](https://github.com/hashicorp/vault-guides/tree/master/identity/vault-agent-k8s-demo) contains Terraform configs and info to run on AKS or GKE.
 
-The following diagram is a final version of the lab and includes components of this walkthrough, as well as the optional add-on [walkthrough](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller.md)
+The following diagram is a final version of the lab and includes components of this walkthrough, as well as the optional add-on [walkthrough](https://github.com/raygj/vault-content/blob/master/use-cases/vault-agent-kubernetes/minikube-ingress-controller.md).
 
 ![diagram](/use-cases/vault-agent-kubernetes/images/vault-agent-k8s-lab-2.png)
 

@@ -4,10 +4,6 @@ References:
 
 https://medium.com/hashicorp-engineering/pki-as-a-service-with-hashicorp-vault-a8d075ece9a
 
-Mike McRill
-@Guy Barros you should be able to get the vault PKI intermediate setup to work pretty easily
-just submit the CSR it generates to the MS root CA
-
 ## Goal
 
 Configure Vault as a Intermediate CA from air-gapped, Windows Active Directory CA, and then use Consul Template to automatically renew and reset certificate for a webserver.

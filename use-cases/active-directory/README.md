@@ -1,4 +1,4 @@
-# vault active directory walkthrough
+# Vault Active Directory  walkthrough
 
 https://www.vaultproject.io/docs/secrets/ad/index.html
 

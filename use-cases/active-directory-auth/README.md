@@ -57,7 +57,9 @@ dsquery group -name vault-auth*
 
 ![diagram](/images/ldp_search.png)
 
-^^ here's an example using LDP utility to gather or validate the `objectClass` and `groupattr-memberOf` components of the LDAP config
+^^ here's an example using LDP utility to gather or validate the `objectClass` and `userattr` components of the LDAP config
+
+for instance, if you configure Vault with `userattr=CN` then you'd only be able to login with the full **CN** of the user, in this case `Jim Ray`, however if you configure Vault to use the **sAMAccountName** attribute, you'd be able to login with the short form `jray`
 
 - create AD user that will represent a standard users that will auth to Vault, via AD
 
@@ -88,6 +90,29 @@ token/    token    auth_token_60c32e30    token based credentials
 
 ### configure LDAP auth method
 
+- this config supports `sAMAccountName` attribute mapped to **userattr**, the short-form of the username (jray versus Jim Ray)
+
+```
+
+vault write auth/ldap/config \
+     url="ldap://192.168.1.240" \
+     binddn="CN=vaultadm,CN=Users,DC=vault-lab,DC=home,DC=org" \
+     bindpass='m8M34v-343v' \
+     starttls=false \
+     insecure_tls=false \
+     discoverdn=false \
+     deny_null_bind=true \
+     userattr="sAMAccountName" \
+     userdn="CN=Users,DC=vault-lab,DC=home,DC=org" \
+     groupfilter="(&(objectClass=person)(uid={{.Username}}))" \
+     groupattr="memberOf" \
+     groupdn="CN=vault-auth-group,CN=Users,DC=vault-lab,DC=home,DC=org" \
+     use_token_groups=true \
+     case_sensitive_names=true
+
+```
+
+- this config supports `CN` attribute mapped to **userattr**, the long-form of the the username (Jim Ray versus jray)
 ```
 
 vault write auth/ldap/config \

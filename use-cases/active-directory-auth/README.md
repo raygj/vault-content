@@ -161,7 +161,7 @@ EOF
 
 CLI
 
-`vault login -method=ldap username=jray password=m8M34v-343v`
+`vault login -method=ldap username="jim ray" password=m8M34v-343v`
 
 - success
 

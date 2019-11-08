@@ -23,21 +23,23 @@ walkthrough configuring AD as an authentication source for Vault
 
 - create Vault Bind user (with minium RO access) that will be used by Vault to communicate to Windows AD
 
-`Vault Bind, vaultbind`
+`vaultadm`
 
 - verify with `dsquery`
 
 ```
 
-dsquery user -name "vault bind"
+dsquery user -name "vaultadm"
 
-"CN=vault bind,CN=Users,DC=vault-lab,DC=home,DC=org"
+"CN=vaultadm,CN=Users,DC=vault-lab,DC=home,DC=org"
 
 ```
 
-- create AD group that will hold users that should have auth access to Vault
+- create AD group that will hold users that will be bound to the read-only Vault policy we will create in an upcoming step
 
 `vault-auth-group`
+
+**note** any user that authenticates successfully as a member of the Active Directory Users group will gain access to Vault, however, they will be assigned the `default` Vault policy which, out of the box is a restrictive deny-all policy.
 
 - use `dsquery` to pull/validate full LDAP string that will be used in the Vault connection details in the next step
 
@@ -59,19 +61,30 @@ dsquery group -name vault-auth*
 
 - create AD user that will represent a standard users that will auth to Vault, via AD
 
-`Vault Sample, vsample`
+`Jim Ray`
 
-- add this user `vsample` to the `vault-auth-group`
+- add this user `Jim Ray` to the `vault-auth-group`
+
+![diagram](/images/vault_auth_group_members.png)
 
 ## Vault Configuration
 
-### enable LDAP auth method at path `/windows`
+### enable LDAP auth method
 
 `vault auth enable ldap`
 
 - verify
 
 `vault auth list`
+
+```
+
+Path      Type     Accessor               Description
+----      ----     --------               -----------
+ldap/     ldap     auth_ldap_455d6935     n/a
+token/    token    auth_token_60c32e30    token based credentials
+
+```
 
 ### configure LDAP auth method
 
@@ -95,6 +108,8 @@ vault write auth/ldap/config \
 
 ```
 
+**note** this is an insecure configuration, which is helpful when initially configuring and testing the integration. please see [this link](https://www.vaultproject.io/docs/auth/ldap.html#scenario-2) for config supporting cert-based TLS.
+
 ### create KV mount for demo at path /windows-demo
 
 `vault secrets enable -path=windows-demo kv`
@@ -103,7 +118,18 @@ vault write auth/ldap/config \
 
 `vault secrets list`
 
-### create policy and map to `ldap` config
+```
+
+Path             Type         Accessor              Description
+----             ----         --------              -----------
+cubbyhole/       cubbyhole    cubbyhole_60b922a8    per-token private secret storage
+identity/        identity     identity_141e9934     identity store
+sys/             system       system_4df0a232       system endpoints used for control, policy and debugging
+windows-demo/    kv           kv_d7a7381d           n/a
+
+```
+
+### create policy and map it to the AD group `vault-auth-group`
 
 - create policy HCL file that limits access to KV mounted at `/windows-demo` to ready-only
 

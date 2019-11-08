@@ -53,6 +53,10 @@ dsquery group -name vault-auth*
 
 - use [ldp](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/cc771022(v%3Dws.11)) utility to connect to AD and verify credentials, LDAP strings, or explore directory
 
+![diagram](/images/ldp_search.png)
+
+^^ here's an example using LDP utility to gather or validate the `objectClass` and `groupattr-memberOf` components of the LDAP config
+
 - create AD user that will represent a standard users that will auth to Vault, via AD
 
 `Vault Sample, vsample`
@@ -81,7 +85,7 @@ vault write auth/ldap/config \
      insecure_tls=false \
      discoverdn=false \
      deny_null_bind=true \
-     userattr="sAMAccountName" \
+     userattr="CN" \
      userdn="CN=Users,DC=vault-lab,DC=home,DC=org" \
      groupfilter="(&(objectClass=person)(uid={{.Username}}))" \
      groupattr="memberOf" \

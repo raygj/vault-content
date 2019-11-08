@@ -22,7 +22,7 @@ unzip consul-enterprise_${CONSUL_VERSION}+ent_linux_amd64.zip
 cp -rp consul /usr/local/bin/consul
 
 # vault OSS
-export VAULT_VERSION=1.2.0
+export VAULT_VERSION=1.2.4
 
 wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip
 

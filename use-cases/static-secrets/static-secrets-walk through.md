@@ -1,24 +1,26 @@
 List Policies
 
-vault policy list
+`vault policy list`
 
 Static Secrets - KV engine
 
 show all active engines:
 
-vault secrets list
+`vault secrets list`
 
 CLI write a secret:
 
-vault kv put secret/demo/config/demo-api-key ttl=30m my-value=s3cr3t2
+`vault kv put secret/demo/config/demo-api-key ttl=30m my-value=s3cr3t2`
 
 CLI retrieve a secret:
 
-vault read secret/demo/config
+`vault read secret/demo/config`
 
 
 
 API list a secret:
+
+export VAULT_TOKEN=< some token >
 
  curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \

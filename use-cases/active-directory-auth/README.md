@@ -212,6 +212,18 @@ token_meta_username    jim ray
 
 ## troubleshooting
 
+- openldap-client util and CLI tests, [reference](https://tylersguides.com/guides/search-active-directory-ldapsearch/)
+
+`yum install openldap-client -y`
+
+- insecure search with binding user:
+
+`ldapsearch -x -H ldap://192.168.1.240 -D "CN=vaultadm,CN=Users,DC=vault-lab,DC=home,DC=org" -w m8M34v-343v`
+
+- secure search with binding user and cer
+
+`ldapsearch -H ldaps://192.168.1.240 -x -W -D "vaultadm@vault-lab.home.org" -b "dc=vault-lab,dc=home,dc=org" "sAMAccountName=vaultadm"`
+
 - wireshark on the Windows AD server you authenticating against
 
 ![diagram](/images/wireshark_failed_auth.png)

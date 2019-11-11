@@ -269,16 +269,32 @@ ldapsearch -ZZ -H ldap://192.168.1.240:389 -D vaultadm@home.org -W -b DC=home,DC
 
 here are some quick steps to create a demo Windows service with the credentials created in this walkthrough (and subsequently managed by Vault)
 
-## 
+## Demo Service
+
+- use simple Go code to create Windows EXE [code here](https://golangcode.com/writing-to-file/)
+- install Go for Windows
+- create local `.go` file
+- compile to EXE
+- create dir `c:\vault-demo` and copy `vault-demo.exe` into this dir
+- run EXE to write Hello World file
+
+- download pre-compiled EXE from [here](https://github.com/raygj/vault-content/tree/master/use-cases/active-directory-service-account-mgmt/windows-exe/vault-demo)
 
 ### PowerShell New-Service
 
 - code to create a service with `automatic startup` type
 
-`new-service -Name [INSERT SERVICE NAME] -DisplayName "[INSERT DISPLAY NAME]" -Description "[INSERT DESCRIPTION]" -BinaryPathName "[INSERT BINARY PATH]" -StartupType Automatic -Credential [INSERT CREDENTIALS]`
+```
 
+new-service -Name [INSERT SERVICE NAME] -DisplayName "[INSERT DISPLAY NAME]" -Description "[INSERT DESCRIPTION]" -BinaryPathName "[INSERT BINARY PATH]" -StartupType Automatic -Credential [INSERT CREDENTIALS]
+
+```
 - example
 
-`new-service -Name HashiCorp.Vault.Test.Service -DisplayName "HashiCorp Vault Demo Test Service" -Description "Test Service used for Vault Service Account demo" -BinaryPathName "C:\vault-demo\vault-demo.exe" -StartupType Automatic -Credential vault-lab\appsvc1`
+```
+
+new-service -Name HashiCorp.Vault.Test.Service -DisplayName "HashiCorp Vault Demo Test Service" -Description "Test Service used for Vault Service Account demo" -BinaryPathName "C:\vault-demo\vault-demo.exe" -StartupType Automatic -Credential vault-lab\appsvc1
+
+```
 
 1. Search, CMD > right-click `Run as administrator...`

@@ -1,0 +1,14 @@
+# To view in Web UI
+path "sys/mounts" {
+  capabilities = [ "read", "update" ]
+}
+
+# To configure the SSH secrets engine
+path "ssh/*" {
+  capabilities = [ "create", "read", "update", "delete", "list" ]
+}
+
+# To enable secrets engines
+path "sys/mounts/*" {
+  capabilities = [ "create", "read", "update", "delete" ]
+}

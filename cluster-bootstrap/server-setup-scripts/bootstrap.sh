@@ -11,9 +11,5 @@ firewall-cmd --get-default-zone > logger
 firewall-cmd --get-active-zones > logger
 
 # install apps and reboot
-yum install nano -y
-yum install unzip -y
-yum install open-vm-tools -y
-yum install net-tools -y
-yum install nmap -y
+yum install nano unzip open-vm-tools net-tools nmap epel-release jq -y
 reboot

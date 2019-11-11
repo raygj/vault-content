@@ -86,6 +86,7 @@ vault write ad/config \
 
 - `url` must use FQDN that matches `userdn` whcih must mactch the exact string of the CA cert used
 - make sure you can resolve FQDN of `url` from the Vault server, if neccessary add an entry in the HOSTS file
+- Rotate Root Credentials (binddn) password using [this procedure](https://www.vaultproject.io/api/secret/ad/index.html#rotate-root-credentials)
 
 #### export/import of CA cert
 
@@ -127,7 +128,7 @@ this maps to the `service account` in AD; not the account used by Vault to conne
 
 ### Vault CLI
 
-this command will request Vault to create a 
+this command will request Vault to create a new password for the bound service account; in our case `appsvc1`
 
 `vault read ad/creds/demo-app-svc`
 
@@ -216,9 +217,9 @@ curl \
 
 - DNS resolution of target LDAP server from Vault
 - valid cert loaded on Vault
-- invalide `userdn` path where service account is actually located in AD
+- invalid `userdn` path where service account is actually located in AD
 
-#### LDAP Result Code 53 Error
+## LDAP Result Code 53 Error
 
 [reference LDAP error codes](https://ldapwiki.com/wiki/WILL_NOT_PERFORM)
 
@@ -232,38 +233,79 @@ Error reading ad/creds/demo-app-svc: Error making API request.
 URL: GET http://127.0.0.1:8200/v1/ad/creds/demo-app-svc
 Code: 500. Errors:
 
-* 1 error occurred:
-	* LDAP Result Code 53 "Unwilling To Perform": 0000001F: SvcErr: DSID-031A1262, problem 5003 (WILL_NOT_PERFORM), data 0
+1 error occurred:
+LDAP Result Code 53 "Unwilling To Perform": 0000001F: SvcErr: DSID-031A1262, problem 5003 (WILL_NOT_PERFORM), data 0
 
 ```
 
-this error could be password complexity or if you are in `demo mode` and using non-TLS Active Directory will not rotate the password.
+more than likely this error is caused by using the insecure LDAP connection; new versions of Windows do not support password changes of insecure channels (there is no workaround or domain policy edit), suggest using the secure LDAP connection method.
 
-##### resolving password complexity
+## ldapsearch utility
 
-Option 1: use an Open Source password generator
+CLI utility for probing LDAP, for example:
 
-see [Vault plugin](https://github.com/sethvargo/vault-secrets-gen); the right choice for a prod environment...(walkthrough not covered in this guide).
+`ldapsearch -ZZ -H ldap://192.168.1.240:389 -D vaultadm@home.org -W -b DC=home,DC=org sAMAccountName=vaultadm`
 
-Option 2: relax the complexity requirement of AD; OK for a non-prod demo environment:
+# Appendix: Demo Service Account Password Rotation
 
-1. open Group Policy Management
-2. Drill-down on your domain until you reach `Default Domain Policy`, then
-3. Right-click on `Default Domain Policy`
-4. select `Edit`
-5. Group Policy Management Editor opens; drill down to `Password Policy` using this sequence:
+- suggest using something like VNC Viewer for Windows to demo service account rotation - need a functional service that works with Local System for the Log On As account
 
-> Computer Configuration > Policies > Windows Settings > Security Settings > Account Policies > Password Policy > “Password Must Meet Complexity Requirements” policy
+[HashiCorp Consul Template - Windows Release 0.22.1](https://releases.hashicorp.com/consul-template/0.22.1/consul-template_0.22.1_windows_amd64.zip)
 
-5. set to `Disable`
-6. close the policy
+[painless-password-rotation preso](https://www.hashicorp.com/resources/painless-password-rotation-hashicorp-vault)
 
-open a command or PS prompt and issue `gpupdate /force` to refresh the Group Policy
+[painless-password-rotation repo](https://github.com/scarolan/painless-password-rotation/blob/master/files/rotate_windows_password.ps1)
 
-### ldapsearch utility
+# Appendix: API-based configuration
 
+- set VAULT_TOKEN env var
 
-ldapsearch -ZZ -H ldap://192.168.1.240:389 -D vaultadm@home.org -W -b DC=home,DC=org sAMAccountName=vaultadm
+`export VAULT_TOKEN=< some token with appropriate policy/access>`
+
+- create payload.json
+
+```
+
+cat << EOF > /tmp/payload.json
+{
+  "service_account_name": "my-application@example.com",
+  "ttl": 100
+}
+EOF
+
+```
+- get latest credential information
+
+```    
+curl \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request GET \
+    --data @payload.json \
+    http://192.168.1.159:8200/v1/ad/roles/appsvc1
+
+```
+
+- output:
+
+```
+
+{
+  "request_id": "e94a50a9-9f6e-9758-7edc-ff1629113a24",
+  "lease_id": "",
+  "renewable": false,
+  "lease_duration": 0,
+  "data": {
+    "last_vault_rotation": "2019-11-11T20:40:49.915151419Z",
+    "password_last_set": "2019-11-11T20:40:49.7726369Z",
+    "service_account_name": "appsvc1@vault-lab.home.org",
+    "ttl": 100
+  },
+  "wrap_info": null,
+  "warnings": null,
+  "auth": null
+}
+
+```
 
 # Appendix: Create a Windows Service
 
@@ -303,4 +345,6 @@ new-service -Name HashiCorp.Vault.Test.Service -DisplayName "HashiCorp Vault Dem
 
 ![diagram](/images/ps_create_service.png)
 
+- assuming you enter the correct password, the service will be created...but stopped - go ahead and start it
 
+![diagram](/images/ps_service_success.png)

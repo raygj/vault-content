@@ -295,6 +295,12 @@ new-service -Name [INSERT SERVICE NAME] -DisplayName "[INSERT DISPLAY NAME]" -De
 
 new-service -Name HashiCorp.Vault.Test.Service -DisplayName "HashiCorp Vault Demo Test Service" -Description "Test Service used for Vault Service Account demo" -BinaryPathName "C:\vault-demo\vault-demo.exe" -StartupType Automatic -Credential vault-lab\appsvc1
 
+
 ```
 
-1. Search, CMD > right-click `Run as administrator...`
+- once you enter the PowerShell command you will be prompted to enter a password, this may be the initial password you set on the account or the password Vault set
+- if needed, pull the current password using an [API call](https://github.com/raygj/vault-content/tree/master/use-cases/active-directory-service-account-mgmt#vault-api-to-retrieve-password) 
+
+![diagram](/images/ps_create_service.png)
+
+

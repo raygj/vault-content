@@ -4,6 +4,12 @@ support SSH one-time passwords, with TTLs, and signed SSH keys to *Nix hosts
 
 **note** although recent versions of Windows Server support SSH, the Vault SSH Helper is not compiled to run in Windows. this may be added as an appendix to this walkthrough in the near future.
 
+## Overview
+
+An authenticated client requests an OTP from the Vault server. If the client is authorized, Vault issues and returns an OTP. The client uses this OTP during the SSH authentication to connect to the desired target host.
+
+When the client establishes an SSH connection, the OTP is received by the Vault helper which validates the OTP with the Vault server. The Vault server then deletes this OTP, ensuring that it is only used once.
+
 ## Resources
 
 [OpenSSH in Windows](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_overview)
@@ -17,6 +23,8 @@ support SSH one-time passwords, with TTLs, and signed SSH keys to *Nix hosts
 - Vault server
 - Ubuntu 18 VM
 - Windows Server 2016 VM
+
+**note** for production, it is assumed Vault is running in TLS mode and would have a valid cert and CA cert that can be used in the Vault SSH Helper config so endpoints can validate the Vault server when setting up SSH login.
 
 ## Bootstrap Ubuntu
 
@@ -40,21 +48,69 @@ support SSH one-time passwords, with TTLs, and signed SSH keys to *Nix hosts
 
 ### create Vault SSH helper config
 
+[reference on config options](https://github.com/hashicorp/vault-ssh-helper#vault-ssh-helper-configuration)
+
 `sudo mkdir /etc/vault-ssh-helper.d/`
+
+`sudo nano /etc/vault-ssh-helper.d/config.hcl`
+
+- production version, using PEM-encoded CA cert file specified in the `ca_cert` value. this CA cert is used by the client to verify Vault server's TLS certificate **assumes Vault is running in TLS mode**
 
 ```
 
-sudo cat << EOF > /etc/vault-ssh-helper.d/config.hcl
-vault_addr = "<VAULT_ADDRESS>"
+vault_addr = "https://<VAULT_ADDRESS>:8200"
 ssh_mount_point = "ssh"
 ca_cert = "/etc/vault-ssh-helper.d/vault.crt"
 tls_skip_verify = false
 allowed_roles = "*"
-EOF
 
 ```
 
+- sandbox version, using -dev to ignore cert requirement
+
+```
+
+vault_addr = "http://<VAULT_ADDRESS>:8200"
+ssh_mount_point = "ssh"
+ca_cert = "-dev"
+tls_skip_verify = true
+allowed_roles = "*"
+
+```
+
+#### validate ssh-helper is configured properly
+
+`vault-ssh-helper -verify-only -config=/etc/vault-ssh-helper.d/config.hcl`
+
+if successful, you will see a message such as:
+
+```
+
+Using SSH Mount point: ssh
+vault-ssh-helper verification successful!
+
+```
+
+
 ### modify existing SSHD config
+
+`sudo cp /etc/pam.d/sshd /etc/pam.d/sshd.orig`
+
+`sudo nano /etc/pam.d/sshd`
+
+- comment-out `@include common-auth` and add custom Vault lines
+
+```
+
+#@include common-auth
+auth requisite pam_exec.so quiet expose_authtok log=/tmp/vaultssh.log /usr/local/bin/vault-ssh-helper -config=/etc/vault-ssh-helper.d/config.hcl
+auth optional pam_unix.so not_set_pass use_first_pass nodelay
+
+```
+
+#### dev mode
+
+for sandbox where Vault is not running with TLS enabled
 
 `sudo cp /etc/pam.d/sshd /etc/pam.d/sshd.orig`
 
@@ -69,6 +125,8 @@ auth requisite pam_exec.so quiet expose_authtok log=/tmp/vaultssh.log /usr/local
 auth optional pam_unix.so not_set_pass use_first_pass nodelay
 
 ```
+
+**note** the presence of `-dev` in the /user/local/bin/vault-ssh-helper command string, this tells vault-ssh-helper it is OK to use HTTP and not validate a cert
 
 ### modify existing SSHD_CONFIG
 

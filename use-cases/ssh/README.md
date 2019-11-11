@@ -18,6 +18,8 @@ When the client establishes an SSH connection, the OTP is received by the Vault 
 
 [learn.hashicorp guide](https://learn.hashicorp.com/vault/secrets-management/sm-ssh-otp)
 
+[Vault-SSH-Helper repo](https://github.com/hashicorp/vault-ssh-helper#vault-ssh-helper-configuration)
+
 ## Environment
 
 - Vault server
@@ -158,6 +160,7 @@ UsePAM yes
 
 - a role is created for each user (default user)
 - the CIDR block should be as granular as possible, wildcard (0.0.0.0/0) for testing only
+- uses One-Time-Password (OTP) engine
 
 ```
 
@@ -198,7 +201,7 @@ EOF
 
 to generate an OTP credential for an IP of the remote host belongs to the otp_key_role:
 
-### from the Vault UI
+### using the Vault UI
 
 1. Select `ssh` under Secrets Engines.
 
@@ -226,3 +229,43 @@ jray@192.168.1.179's password:
 when prompted, paste the OTP you copied from the Vault UI
 
 6. Success!
+
+7. It's a OTP, so logout and try to use it again - **denied**
+
+### using an API call
+
+- set Vault token env var
+
+`export VAULT_TOKEN=<vault token with access to SSH policy>`
+
+- request OTP
+
+`curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data '{"ip": "192.168.1.207"}' http://192.168.1.159:8200/v1/ssh/creds/otp_key_role  | jq`
+
+- response
+
+```
+
+{
+  "request_id": "5b4885f7-00d6-09f8-9cd7-43c61b9e0490",
+  "lease_id": "ssh/creds/otp_key_role/yBMVPqkAvbJ4kcAYe3u9bgQx",
+  "renewable": false,
+  "lease_duration": 2764800,
+  "data": {
+    "ip": "192.168.1.207",
+    "key": "06e1e013-8bc7-bc69-3dad-d2043098de35",
+    "key_type": "otp",
+    "port": 22,
+    "username": "jray"
+  },
+  "wrap_info": null,
+  "warnings": null,
+  "auth": null
+}
+
+```
+
+## Troubleshooting
+
+- use `vault-ssh-helper -verify-only -config=/etc/vault-ssh-helper.d/config.hcl` to verify the remote agent's config is valid and can talk to Vault
+- if needed, setup tcpdump to capture traffic on the Vault server from the remote host `tcpdump -i <interface name> host <remote host IP>`

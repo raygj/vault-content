@@ -264,3 +264,21 @@ open a command or PS prompt and issue `gpupdate /force` to refresh the Group Pol
 
 
 ldapsearch -ZZ -H ldap://192.168.1.240:389 -D vaultadm@home.org -W -b DC=home,DC=org sAMAccountName=vaultadm
+
+# Appendix: Create a Windows Service
+
+here are some quick steps to create a demo Windows service with the credentials created in this walkthrough (and subsequently managed by Vault)
+
+## 
+
+### PowerShell New-Service
+
+- code to create a service with `automatic startup` type
+
+`new-service -Name [INSERT SERVICE NAME] -DisplayName "[INSERT DISPLAY NAME]" -Description "[INSERT DESCRIPTION]" -BinaryPathName "[INSERT BINARY PATH]" -StartupType Automatic -Credential [INSERT CREDENTIALS]`
+
+- example
+
+`new-service -Name HashiCorp.Vault.Test.Service -DisplayName "HashiCorp Vault Demo Test Service" -Description "Test Service used for Vault Service Account demo" -BinaryPathName "C:\vault-demo\vault-demo.exe" -StartupType Automatic -Credential vault-lab\appsvc1`
+
+1. Search, CMD > right-click `Run as administrator...`

@@ -1,80 +1,164 @@
-# Setup
+# Vault Enterprise Namespaces Demo
 
-Create a “finance” and an “education” namespace:
-$ vault namespace create finance
-$ vault namespace create education
-Now create child namespaces:
-$ vault namespace create -namespace=education training
-$ vault namespace create -namespace=education certification
-List namespaces:
-$ vault namespace list
+simple walkthrough illustrating Namespace feature of Vault Enterprise to support multitenancy
+
+## Configure Vault
+
+using a root token (non-prod) or with a non-root token with sufficient [sysadm privileges](https://learn.hashicorp.com/vault/operations/namespaces#step-2-write-policies)
+
+### Create a “finance” and an “education” namespace
+
+`vault namespace create finance`
+
+`vault namespace create education`
+
+### now create child namespaces within Education namespace
+
+`vault namespace create -namespace=education training`
+
+`vault namespace create -namespace=education certification`
+
+### list namespaces
+
+`vault namespace list`
+
+- output
+
+```
+
 education/
 finance/
 
-$ vault namespace list -namespace=education
+```
+
+### list child namespaces of Education namespace
+
+`vault namespace list -namespace=education`
+
+- output
+
+```
 certification/
 training/
+```
 
-# Command/Input
+## Demo Setup
 
-Author the namespace admin policy file:
-finance-admins.hcl
+- author the Finance namespace admin policy file
+
+```
+
+cat << EOF > /tmp/finance-admins.hcl
 # Full permissions on the finance path
 path "finance/*" {
    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
-C Create the policy in Vault:
-# Create finance-admins policy
-$ vault policy write finance-admins finance-admins.hcl
-E  Generate a token associated with this policy. We are only using token for simplicity,          c  we could instead associate this policy with any other authentication method.
-$ vault token create -policy=finance-admins
-Key                Value
----                -----
-token              1258090c-5074-fe52-d57c-f1aa304d95f2
-token_accessor     fdee81f5-bcbf-b5cc-4082-025a6f0c725f
-token_duration     768h
-token_renewable    true
-token_policies     [finance-admins]
+EOF
 
-Now let’s work as if we were a finance-admins administrator. We want to create a policy to allow a third user to only create, read, update, delete and list secrets in the path “finance/secret/app1/”.
+```
 
-First create a policy:
-finance-app1.hcl
+- create the policy in Vault for Finance-Admin users
+
+`vault policy write finance-admins finance-admins.hcl`
+
+
+- generate a token associated with this policy 
+
+**note** this policy with any other authentication method.
+
+`vault token create -policy=finance-admins`
+
+- output
+
+```
+
+Key                  Value
+---                  -----
+token                s.XhDAWO93Zjpb5AQtw77mQIIQ
+token_accessor       9n4Q093MZcj2cikTRavCbxcY
+token_duration       768h
+token_renewable      true
+token_policies       ["default" "finance-admins"]
+identity_policies    []
+policies             ["default" "finance-admins"]
+
+```
+
+## Demo - Namespace Management
+
+Now let’s work as if we were a finance-admins administrator. The task is to create a policy to allow a _third user_ to only create, read, update, delete and list secrets in the path `finance/secret/app1/`
+
+- login in using the token created under the finance-admin policy
+
+`vault login < token with finance-admin privilege >`
+
+- first create a policy that limits access to 
+
+```
+
+cat << EOF > /tmp/finance-app1.hcl
 # Full permissions on the finance path
 path "finance/secret/app1/*" {
    capabilities = ["create", "read", "update", "delete", "list"]
 }
-Now let’s use the token associated with the Finance namespace admin. Since we are using token authentication, you just need to export to VAULT_TOKEN
+EOF
 
-$ export VAULT_TOKEN=<finance-admin-token>
+```
 
-Now you can run
-$ vault policy -namespace=finance write finance-app1 finance-app1.hcl 
+- create the policy in Vault granting access to `/secret/app1` within the Finance namespace
+
+`vault policy write -namespace=finance finance-app1 finance-app1.hcl`
 
 If you try to write the policy outside the assigned namespace, you will get an error:
-$ vault policy write finance-app1 finance-app1.hcl 
 
-This demonstrates that a namespace admin can only manage users and policies of their assigned namespace.
+`vault policy write finance-app1 finance-app1.hcl`
 
-Now let’s mount a secret engine within this namespace:
-$ vault enable kv -namespace=finance -path=secret
+```
 
-Finally, let’s create a token associate with the app1 policy. Once again, this policy could be associated with any authentication method, we are only using token for simplicity.
+Error uploading policy: Error making API request.
 
-$ vault token create -policy=finance-app1
-Key                Value
----                -----
-token              1258090c-5074-fe52-d57c-f1aa304d95f2
-token_accessor     fdee81f5-bcbf-b5cc-4082-025a6f0c725f
-token_duration     768h
-token_renewable    true
-token_policies     [finance-app1]
+URL: PUT http://127.0.0.1:8200/v1/sys/policies/acl/finance-app1
+Code: 403. Errors:
 
-And now we can login as the app1 user, and validate that this user can only work within the specified constraints.
+* 1 error occurred:
+	* permission denied
 
-$ export VAULT_TOKEN=<app1-token>
-$ vault kv -namespace=finance put secret/app1 value=test
-$ vault kv -namespace=finance get secret/app1
-$ vault kv -namespace=education secret/app1
-# fails
+```
 
+this demonstrates that a namespace admin can only manage users and policies of their assigned namespace
+
+## Demo - Namespace Secret Engine
+
+- let’s mount a secret engine within this namespace
+
+`vault secrets enable -namespace=finance -path=secret kv`
+
+- let’s create a token associate with the `app1` policy; once again, this policy could be associated with any authentication method
+
+`vault token create -namespace=finance -policy=finance-app1`
+
+- output
+
+```
+
+Key                  Value
+---                  -----
+token                s.9gplZolD3TdbfRe7g2PE5yf6.KYK0T
+token_accessor       rKo37nkxnW4b2NgzI08n6iF6.KYK0T
+token_duration       768h
+token_renewable      true
+token_policies       ["default" "finance-app1"]
+identity_policies    []
+policies             ["default" "finance-app1"]
+
+```
+
+- now we can login as the app1 user, and validate that this user can only work within the specified constraints of the `finanice-app1` policy
+
+`vault login < token with finance-app1 privilege >`
+
+`vault kv -namespace=finance put secret/app1 value=test`
+
+`vault kv -namespace=finance get secret/app1`
+
+`vault kv -namespace=education secret/app1`

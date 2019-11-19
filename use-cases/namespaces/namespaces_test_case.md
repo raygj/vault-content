@@ -129,7 +129,7 @@ this demonstrates that a namespace admin can only manage users and policies of t
 
 ## Demo - Namespace Secret Engine
 
-- let’s mount a secret engine within this namespace
+- let’s mount a secret engine within the Finance namespace
 
 `vault secrets enable -namespace=finance -path=secret kv`
 
@@ -153,7 +153,7 @@ policies             ["default" "finance-app1"]
 
 ```
 
-- now we can login as the app1 user, and validate that this user can only work within the specified constraints of the `finanice-app1` policy
+- now we can login into Vault as the app1 user, and validate that this user can only work within the specified constraints of the `finanice-app1` policy
 
 `vault login < token with finance-app1 privilege >`
 
@@ -165,15 +165,15 @@ policies             ["default" "finance-app1"]
 
 `vault k vput secret/app1 value=test`
 
-success!
+**success!**
 
 - try to read a secret from `secret/app1`
 
 `vault kv get secret/app1`
 
-success!
+**success!**
 
-- try to write a secret from education namespace
+- try to write a secret to the education namespace
 
 `export VAULT_NAMESPACE=education`
 

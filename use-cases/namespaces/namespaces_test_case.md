@@ -98,7 +98,7 @@ Now let’s work as if we were a finance-admins administrator. The task is to cr
 
 cat << EOF > /tmp/finance-app1.hcl
 # Full permissions on the finance path
-path "finance/secret/app1/*" {
+path "secret/app1/*" {
    capabilities = ["create", "read", "update", "delete", "list"]
 }
 EOF
@@ -143,8 +143,8 @@ this demonstrates that a namespace admin can only manage users and policies of t
 
 Key                  Value
 ---                  -----
-token                s.9gplZolD3TdbfRe7g2PE5yf6.KYK0T
-token_accessor       rKo37nkxnW4b2NgzI08n6iF6.KYK0T
+token                s.kQVjtoPR6f4Ra5H3dwUw98rW.KYK0T
+token_accessor       uhAc2FBQPxkDaVRAM2GSxXZw.KYK0T
 token_duration       768h
 token_renewable      true
 token_policies       ["default" "finance-app1"]
@@ -157,8 +157,35 @@ policies             ["default" "finance-app1"]
 
 `vault login < token with finance-app1 privilege >`
 
-`vault kv -namespace=finance put secret/app1 value=test`
+- set the default namespace for the CLI session
 
-`vault kv -namespace=finance get secret/app1`
+`export VAULT_NAMESPACE=finance`
 
-`vault kv -namespace=education secret/app1`
+- try writing a secret to `secret/app1`
+
+`vault k vput secret/app1 value=test`
+
+success!
+
+- try to read a secret from `secret/app1`
+
+`vault kv get secret/app1`
+
+success!
+
+- try to write a secret from education namespace
+
+`export VAULT_NAMESPACE=education`
+
+`vault kv put secret/app1 value=test`
+
+```
+
+Error making API request.
+
+URL: GET http://127.0.0.1:8200/v1/sys/internal/ui/mounts/secret/app1
+Code: 403. Errors:
+
+* preflight capability check returned 403, please ensure client's policies grant access to path "secret/app1/"
+
+```

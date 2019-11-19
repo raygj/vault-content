@@ -2,6 +2,8 @@
 
 simple walkthrough illustrating Namespace feature of Vault Enterprise to support multitenancy
 
+[reference to learn.hashicorp](https://learn.hashicorp.com/vault/operations/namespaces) guide that includes Entity feature and non-root policies.
+
 ## Configure Vault
 
 using a root token (non-prod) or with a non-root token with sufficient [sysadm privileges](https://learn.hashicorp.com/vault/operations/namespaces#step-2-write-policies)

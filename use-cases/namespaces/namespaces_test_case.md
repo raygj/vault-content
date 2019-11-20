@@ -155,6 +155,8 @@ policies             ["default" "finance-app1"]
 
 ```
 
+### KV secret engine V2
+
 - now we can login into Vault as the app1 user, and validate that this user can only work within the specified constraints of the `finanice-app1` policy
 
 `vault login < token with finance-app1 privilege >`
@@ -165,7 +167,7 @@ policies             ["default" "finance-app1"]
 
 - try writing a secret to `secret/app1`
 
-`vault k vput secret/app1 value=test`
+`vault kv put secret/app1 value=test`
 
 **success!**
 
@@ -183,11 +185,98 @@ policies             ["default" "finance-app1"]
 
 ```
 
-Error making API request.
+### KV secret engine V1
 
-URL: GET http://127.0.0.1:8200/v1/sys/internal/ui/mounts/secret/app1
-Code: 403. Errors:
+- now we can login into Vault as the app1 user, and validate that this user can only work within the specified constraints of the `finanice-app1` policy
 
-* preflight capability check returned 403, please ensure client's policies grant access to path "secret/app1/"
+`vault login < token with finance-app1 privilege >`
+
+- try writing a secret to `secret/app1`
+
+`vault write -namespace=finance secret/app1/test value=test`
+
+**success!**
+
+- try to read a secret from `secret/app1`
+
+`vault read -namespace=finance secret/app1/test`
+
+**success!**
+
+- try to write a secret to the education namespace
+
+`vault write -namespace=education secret/app1/test value=test`
 
 ```
+
+Error writing data to secret/app1/test: Error making API request.
+
+URL: PUT http://127.0.0.1:8200/v1/secret/app1/test
+Code: 403. Errors:
+
+* 1 error occurred:
+	* permission denied
+
+```
+
+## API walkthrough
+
+- to check the KV secrets engine version, use the sys/mounts endpoint:
+
+`export VAULT_TOKEN= < root or token with priveleges >`
+
+```
+
+curl --header "X-Vault-Token: $VAULT_TOKEN" \
+       http://127.0.0.1:8200/v1/sys/mounts | jq
+
+```       
+
+- enable KV secrets engine v1 at kv-v1/
+
+```
+
+curl --header "X-Vault-Token: $VAULT_TOKEN" \
+       --request POST \
+       --data '{ "type": "kv" }' \
+       http://127.0.0.1:8200/v1/sys/mounts/kv-v1
+
+```
+
+**note** production should use HTTPS
+
+### write a secret
+
+- create the payload file
+
+```
+
+cat << EOF > /tmp/kv_write.json
+{
+  "options": {
+      "cas": 0
+  },
+  "data": {
+      "foo": "bar",
+      "zip": "zap"
+    }
+}
+EOF
+
+```
+
+- send the API request to write the payload
+
+`export VAULT_TOKEN=< token with finance-app1 role >`
+
+```
+
+curl \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request POST \
+    --data @kv_write.json \
+    http://127.0.0.1:8200/v1/secret/data/my-secret
+
+```
+
+**note** production should use HTTPS

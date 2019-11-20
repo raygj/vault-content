@@ -183,8 +183,6 @@ policies             ["default" "finance-app1"]
 
 `vault kv put secret/app1 value=test`
 
-```
-
 ### KV secret engine V1
 
 - now we can login into Vault as the app1 user, and validate that this user can only work within the specified constraints of the `finanice-app1` policy

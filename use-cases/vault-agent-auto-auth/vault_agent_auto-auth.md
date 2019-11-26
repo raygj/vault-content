@@ -102,25 +102,36 @@ In this section, we'll write some dummy data/policies and configure Vault to all
 
 ```
 
-vault policy write myapp-kv-ro - <<EOF
-path "kv/myapp/*" {
+cat << EOF > myapp-kv-ro.hcl 
+
+path "demo/myapp/*" {
 capabilities = ["read", "list"]
 }
 EOF
 
 ```
 
+- write the policy
+
+`vault policy write myapp-kv-ro myapp-kv-ro.hcl`
+
+- view active policies and their contents
+
+`vault policy list`
+
+`vault policy read myapp-kv-ro`
+
 4a. Check that KV secrets engine is enabled, if not, enable it:
 
 `vault secrets list`
 
-`vault secrets enable kv`
+`vault secrets enable -path=demo`
 
 4b. Create dummy data:
 
 ```
 
-vault kv put kv/myapp/config \
+vault kv put demo/myapp/config \
 username='appuser' \
 password='suP3rsec(et!'
 
@@ -213,7 +224,7 @@ token_meta_auth_type               iam
 
 3. [From the Vault **Client**] We can also check to make sure that the token has the appropriate permissions to read our secrets:
 
-`vault kv get kv/myapp/config`
+`vault kv get demo/myapp/config`
 
 ### Part 3: Using Vault Agent Auto-Auth on the Client Instance
 

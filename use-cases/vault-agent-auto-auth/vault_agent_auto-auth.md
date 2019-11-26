@@ -104,7 +104,7 @@ In this section, we'll write some dummy data/policies and configure Vault to all
 
 cat << EOF > myapp-kv-ro.hcl 
 
-path "demo/myapp/*" {
+path "demo/*" {
 capabilities = ["read", "list"]
 }
 EOF

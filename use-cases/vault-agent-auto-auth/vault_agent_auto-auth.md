@@ -169,11 +169,14 @@ Now that we've configured the appropriate AWS IAM auth method on our Vault serve
 
 1. [From the Vault **Client**] Open a terminal on your client instance. If using the quick-start repo, the Vault binary should already be installed and configured to talk to your Vault server. You can check this by typing in `vault status`:
 
-`vault status`
-
-If following with your own examples, make sure you've downloaded the appropriate [Vault binary](https://releases.hashicorp.com/vault/) and set your VAULT_ADDR environment variable, for example:
+Set your VAULT_ADDR environment variable, for example:
 
 `export VAULT_ADDR=http://<private IP of Vault Server>:8200`
+
+`vault status`
+
+If following with your own examples, make sure you've downloaded the appropriate [Vault binary](https://releases.hashicorp.com/vault/)
+
 
 2. [From the Vault **Client**] Using the Vault CLI, test the `login` operation:
 
@@ -203,7 +206,7 @@ token_meta_client_arn              arn:aws:sts::<your aws account number>:assume
 token_meta_client_user_id          <you client user ID>
 token_meta_inferred_aws_region     n/a
 token_meta_inferred_entity_type    n/a
-token_meta_account_id              <you aws account number>
+token_meta_account_id              <your aws account number>
 token_meta_auth_type               iam
 
 ```

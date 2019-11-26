@@ -90,13 +90,13 @@ Set `VAULT_ADDR` environment variable (or update your path statement) to point t
 
 In this section, we'll write some dummy data/policies and configure Vault to allow AWS IAM authentication from specifies IAM roles.
 
-1. [From the Vault **Server**] If you haven't done so already, perform a `vault operator init`. Make sure to note down your unseal keys and initial root token in a safe place. You will need these in the following steps (in production, you would secure these in a much better way, or use auto-unseal).
+1. [From the Vault **Server**] If you haven't done so already, perform a `vault operator init`. Make sure to note your unseal keys and initial root token in a safe place. You will need these in the following steps (in production, you would secure these in a much better way, or use auto-unseal).
 
 2. [From the Vault **Server**] If your Vault server is sealed, perform the `vault operator unseal` operation 1 key shard (this a demo environment!).
 
 3. [From the Vault **Server**] Login using your initial root token (or other administrative login that you might have already configured).
 
-`vault login <root or admin token>
+`vault login <root or admin token>`
 
 4. [From the Vault **Server**] Create a read-only policy for our clients:
 

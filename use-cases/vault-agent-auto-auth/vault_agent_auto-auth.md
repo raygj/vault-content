@@ -276,7 +276,7 @@ Vault Agent can also run in daemon mode where it will continuously renew the ret
 ```
 curl \
 --header "X-Vault-Token: $(cat /home/ubuntu/vault-token-via-agent)" \
-$VAULT_ADDR/v1/kv/myapp/config | jq
+$VAULT_ADDR/v1/demo/myapp/config | jq
 
 ```
 
@@ -340,6 +340,16 @@ Code: 400. Errors:
 * wrapping token is not valid or does not exist
 
 ```
+
+- use the `$VAULT_TOKEN` environment variable in an API request
+
+```
+curl \
+--header "X-Vault-Token: $VAULT_TOKEN" \
+$VAULT_ADDR/v1/demo/myapp/config | jq
+
+```
+
 ### Summary
 
 In the previous section, we:

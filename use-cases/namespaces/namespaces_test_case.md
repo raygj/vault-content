@@ -111,6 +111,8 @@ EOF
 
 `vault policy write -namespace=finance finance-app1 finance-app1.hcl`
 
+**note** this is considered the "identity" approach where policies do not include the namespace, but rather are applied at the namespace level. this allows the policies to be consistent, fewer versions to track.
+
 If you try to write the policy outside the assigned namespace, you will get an error:
 
 `vault policy write finance-app1 finance-app1.hcl`
@@ -218,6 +220,25 @@ Code: 403. Errors:
 ```
 
 ## API walkthrough
+
+- pass the target namespace in the X-Vault-Namespace header:
+
+```
+
+curl --header "X-Vault-Token: ..." \
+--header "X-Vault-Namespace: <namespace>" \
+--request GET \ https://127.0.0.1:8200/v1/sys/mounts
+
+```
+
+- or, make the namespace as a part of the API endpoint:
+
+```
+
+curl --header "X-Vault-Token: ..." \ --request GET \
+https://127.0.0.1:8200/v1/<namespace>/sys/mounts
+
+```
 
 - to check the KV secrets engine version, use the sys/mounts endpoint:
 

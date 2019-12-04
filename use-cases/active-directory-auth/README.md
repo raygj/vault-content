@@ -71,6 +71,8 @@ for instance, if you configure Vault with `userattr=CN` then you'd only be able 
 
 ## Vault Configuration
 
+**note** for Vault Enterprise where namespaces are deployed it is possible to enable the LDAP auth at the root namespace, then use external-internal group mappings to propagate LDAP identity to namespaces. You have to create an internal group in each namespace, but you don't have to enable and configure LDAP auth method.
+
 ### enable LDAP auth method
 
 `vault auth enable ldap`

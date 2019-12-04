@@ -12,7 +12,7 @@ resource "aws_security_group" "testing" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["100.34.183.112/32"]
+    cidr_blocks = ["136.179.21.65/32"]
   }
 
   # Vault API traffic
@@ -20,7 +20,7 @@ resource "aws_security_group" "testing" {
     from_port   = 8200
     to_port     = 8200
     protocol    = "tcp"
-    cidr_blocks = ["100.34.183.112/32","10.0.101.0/24"]
+    cidr_blocks = ["136.179.21.65/32","10.0.101.0/24"]
   }
 
   # Vault cluster traffic
@@ -36,7 +36,7 @@ resource "aws_security_group" "testing" {
     from_port   = 8500
     to_port     = 8500
     protocol    = "tcp"
-    cidr_blocks = ["100.34.183.112/32"]
+    cidr_blocks = ["136.179.21.65/32"]
   }
 
   # Internal Traffic

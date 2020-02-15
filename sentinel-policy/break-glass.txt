@@ -1,0 +1,12 @@
+import "time"
+
+main = rule when not request.unauthenticated {
+    time.load(token.creation_time).unix >
+      time.load("2017-09-17T13:25:29Z").unix
+}
+
+
+
+
+
+

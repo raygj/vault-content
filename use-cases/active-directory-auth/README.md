@@ -135,7 +135,7 @@ vault write auth/ldap/config \
 
 ```
 
-**note** this is an insecure configuration, which is helpful when initially configuring and testing the integration. please see [this link](https://www.vaultproject.io/docs/auth/ldap.html#scenario-2) for config supporting cert-based TLS.
+**note** this is an insecure configuration, which is helpful when initially configuring and testing the integration. please see [this link](https://www.vaultproject.io/docs/auth/ldap.html#scenario-2) for config supporting cert-based TLS. And the [Appendix]()
 
 ### create KV mount for demo at path /windows-demo
 
@@ -235,3 +235,58 @@ token_meta_username    jim ray
 ![diagram](/images/wireshark_success_auth.png)
 
 ^^ this is a successful login attempt, notice the how the flow continues past the bind success of the failed flow...the next step being actually looking for the user in question and then associated groups.
+
+# Appendix: Secure LDAP Configuration
+
+### Vault config using secure LDAP
+
+- configure connection to active directory using variables for username, password, userdn
+	- this requires an active directory account with appropriate privileges
+- assumes secure ldap, TLS, is enabled
+- assumes CA cert exported from Windows Domain controller and imported to Vault server, see [HERE](https://github.com/raygj/vault-content/tree/master/use-cases/active-directory-service-account-mgmt#secure-ldap-requires-ca-cert-from-windows-ca-where-ad-resides)
+
+```
+
+vault write auth/ldap/config \
+	binddn=${USERNAME} bindpass=${PASSWORD} \
+	url="ldaps://vault-ad-test.vault-ad-test.net:636" \
+	userdn=${USERDN} \
+	userattr="cn"\
+	certificate=@vault-ad-test.cer\
+	groupfilter="(&(objectClass=group) \
+	(member:1.2.840.113556.1.4.1941:={{.UserDN}}))"\
+	groupdn=${USERDN}\
+	groupattr="cn"
+
+```
+
+### test using ldapsearch utility
+
+```
+
+ldapsearch -H ldaps://vault-ad-test.vault-ad-test.net:636 -D \
+"vault-admin@vault-ad-test.net" -w "Test12345678" -b "CN=Users,DC=vault-ad-test,DC=net" \
+"(&(objectClass=group)(memberOf:1.2.840.113556.1.4.1941:=CN=vault-ad-test,CN=Users,DC=vault-ad-test,DC=net))"
+
+```
+
+### configure login method for vault-ad-test user
+
+`vault login -method=ldap username=vault-ad-test`
+
+### bind active directory group
+
+`vault write auth/ldap/groups/"Domain Admins" name="Domain Admins" policies=foo,bar`
+
+## API call to verify configuration
+
+`export VAULT_TOKEN=<some token>`
+
+```
+
+curl \
+    --header "X-Vault-Token:${VAULT_TOKEN}" \
+    --request LIST \
+    http://127.0.0.1:8200/v1/auth/ldap/groups | jq
+
+```

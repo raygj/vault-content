@@ -135,7 +135,7 @@ vault write auth/ldap/config \
 
 ```
 
-**note** this is an insecure configuration, which is helpful when initially configuring and testing the integration. please see [this link](https://www.vaultproject.io/docs/auth/ldap.html#scenario-2) for config supporting cert-based TLS. And the [Appendix]()
+**note** this is an insecure configuration, which is helpful when initially configuring and testing the integration. please see [this link](https://www.vaultproject.io/docs/auth/ldap.html#scenario-2) for config supporting cert-based TLS. And the [Appendix](https://github.com/raygj/vault-content/tree/master/use-cases/active-directory-auth#appendix-secure-ldap-configuration)
 
 ### create KV mount for demo at path /windows-demo
 

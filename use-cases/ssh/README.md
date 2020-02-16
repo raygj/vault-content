@@ -269,3 +269,15 @@ when prompted, paste the OTP you copied from the Vault UI
 
 - use `vault-ssh-helper -verify-only -config=/etc/vault-ssh-helper.d/config.hcl` to verify the remote agent's config is valid and can talk to Vault
 - if needed, setup tcpdump to capture traffic on the Vault server from the remote host `tcpdump -i <interface name> host <remote host IP>`
+
+# Appendix: SSH Basics
+
+- create new SSH key
+
+`ssh-keygen -t rsa -b 4096 -C "name@github.com"`
+
+- copy SSH key to a host
+
+`ssh-copy-id -i ~/.ssh/mykey user@host`
+
+_This logs into the server host, and copies keys to the server, and configures them to grant access by adding them to the authorized_keys file. The copying may ask for a password or other authentication for the server._

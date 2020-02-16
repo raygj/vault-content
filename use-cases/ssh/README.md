@@ -272,12 +272,31 @@ when prompted, paste the OTP you copied from the Vault UI
 
 # Appendix: SSH Basics
 
-- create new SSH key
+## create new SSH key
+
+this will overwrite any existing key in your `~/.ssh` directory
 
 `ssh-keygen -t rsa -b 4096 -C "name@github.com"`
 
-- copy SSH key to a host
+## copy your SSH key to a host
 
-`ssh-copy-id -i ~/.ssh/mykey user@host`
+`ssh-copy-id -i ~/.ssh/id_rsa user@host`
 
 _This logs into the server host, and copies keys to the server, and configures them to grant access by adding them to the authorized_keys file. The copying may ask for a password or other authentication for the server._
+
+## store passphrase in Mac Keychain
+
+`ssh-add -K ~/.ssh/id_rsa`
+
+`nano ~/.ssh/config`
+
+```
+
+Host *
+  UseKeychain yes
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_rsa
+  
+```
+
+

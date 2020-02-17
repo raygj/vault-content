@@ -278,6 +278,8 @@ this will overwrite any existing key in your `~/.ssh` directory
 
 `ssh-keygen -t rsa -b 4096 -C "name@github.com"`
 
+**note**apparently there is a known issue with Terraform not being able to process a password-protected private key, see [here](https://github.com/yugabyte/terraform-gcp-yugabyte/issues/10)
+
 ## copy your SSH key to a host
 
 `ssh-copy-id -i ~/.ssh/id_rsa user@host`

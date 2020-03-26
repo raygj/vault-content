@@ -2,7 +2,8 @@
 
 ## General Notes
 
-- the Vault Enterprise license file is supplied by your HashiCorp TAM or SE
+- HashiCorp Vault Enterprise customer receive information on how to retrieve a pre-licensed binary
+- If you download a Vault Enterprise binary from [releases.hashicorp.com](https://releases.hashicorp.com/) the Vault Enterprise license file will be supplied by your HashiCorp TAM or SE
 - the license should be applied on a single node while the other (usually 2 stand-by nodes) are not running
   - once the license is applied on the single active node and verified, start the Vault service and unseal each of the stand-by nodes
   - the enterprise license will be replicated to the stand-by nodes

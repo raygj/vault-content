@@ -2,7 +2,7 @@
 
 ## General Notes
 
-- HashiCorp Vault Enterprise customer receive information on how to retrieve a pre-licensed binary
+- HashiCorp Vault Enterprise customers receive information on how to retrieve a pre-licensed binary
 - If you download a Vault Enterprise binary from [releases.hashicorp.com](https://releases.hashicorp.com/) the Vault Enterprise license file will be supplied by your HashiCorp TAM or SE
 - the license should be applied on a single node while the other (usually 2 stand-by nodes) are not running
   - once the license is applied on the single active node and verified, start the Vault service and unseal each of the stand-by nodes
@@ -18,7 +18,24 @@
 
 `export VAULT_TOKEN= < root or privileged token >`
 
-### prepare the Vault Enterprise license file
+### CLI method
+
+- input:
+
+`vault write sys/license text=< some very character string>`
+
+`enter`
+
+- output:
+
+`Success! Data written to: sys/license`
+
+
+### API method
+
+if you do not have access to the CLI, then use the API method.
+
+#### prepare the Vault Enterprise license file
 
 - the license file name is in the format `< some string of numbers >.hclic`
 - copy the `.hclic` file to server at `/tmp`:
@@ -47,7 +64,7 @@
 
 - save and exit the payload file
 
-### apply the license
+#### apply the license
 
 - assumes the env var is set and the curl command is issued on the Vault node (if not, replace 127.0.0.1 with the actual address of the Vault node):
 

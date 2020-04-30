@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# https://github.com/raygj/vault-content/blob/master/enterprise/vault_counter.sh
 # CLI commands to run manually:
 # vault read sys/internal/counters/tokens
 # vault read sys/internal/counters/entities

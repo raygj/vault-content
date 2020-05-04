@@ -1,7 +1,10 @@
 #!/bin/bash
 #
 # https://github.com/raygj/vault-content/blob/master/enterprise/vault_counter.sh
+# VAULT_TOKEN and VAULT_ADDR are required for script to run successfully
+#
 # CLI commands to run manually:
+#
 # vault read sys/internal/counters/tokens
 # vault read sys/internal/counters/entities
 # vault read sys/internal/counters/requests

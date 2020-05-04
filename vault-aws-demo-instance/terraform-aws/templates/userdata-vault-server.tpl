@@ -81,7 +81,7 @@ if [[ ! -z $${YUM} ]]; then
   sudo yum-config-manager --enable rhui-REGION-rhel-server-supplementary
   sudo yum-config-manager --enable rhui-REGION-rhel-server-extras
   sudo yum -y check-update
-  sudo yum install -q -y wget unzip bind-utils ruby rubygems ntp jq
+  sudo yum install -q -y wget unzip bind-utils ruby rubygems ntp jq nano
   sudo systemctl start ntpd.service
   sudo systemctl enable ntpd.service
 elif [[ ! -z $${APT_GET} ]]; then
@@ -262,7 +262,7 @@ configure_systemd_resolved() {
   echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
   echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
   sudo apt-get install iptables-persistent
-  
+
   sudo systemctl restart systemd-resolved
 }
 

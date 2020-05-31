@@ -310,7 +310,7 @@ policies             ["apps-db-readonly-cred" "default"]
 
 - list active creds in each Vault Cluster
 
-- ask Vault primary for DB creds managed by Primary, using token from primary
+- ask Vault Primary for DB creds managed by Primary, using token from Primary
 
 ```
 
@@ -322,7 +322,7 @@ curl --header "X-Vault-Token: $VAULT_TOKEN_PRI" \
 
 **success!**
 
-- ask Vault perf secondary for creds managed by Performance Secondary, using token from performance secondary
+- ask Vault Performance Secondary for creds managed by Performance Secondary, using token from Performance Secondary
 
 ```
 
@@ -334,7 +334,7 @@ curl --header "X-Vault-Token: $VAULT_TOKEN_PERF" \
 
 **success!**
 
-- ask Vault primary for DB creds managed by Primary, using token from secondary
+- ask Vault Primary for DB creds managed by Primary, using token from Performance Secondary
 
 ```
 
@@ -347,7 +347,7 @@ curl --header "X-Vault-Token: $VAULT_TOKEN_PERF" \
 **fail!** Vault Token created by Performance Secondary is not valid on Primary
 
 
-- ask Vault perf secondary for DB creds managed by Primary, using token from primary
+- ask Vault Performance Secondary for DB creds managed by Primary, using token from Primary
 
 ```
 

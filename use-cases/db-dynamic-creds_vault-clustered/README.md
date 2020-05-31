@@ -304,9 +304,9 @@ policies             ["apps-db-readonly-cred" "default"]
 
 - edit HOSTS file to keep API calls "clean"
 
-`sed -i ", <IP of primary vault node>  vault-primary" /etc/hosts`
+`sudo sed -i ", <IP of primary vault node>  vault-primary" /etc/hosts`
 
-`sed -i ", <IP of perf secondary vault node>  vault-perf" /etc/hosts`
+`sudo sed -i ", <IP of perf secondary vault node>  vault-perf" /etc/hosts`
 
 - list active creds in each Vault Cluster
 
@@ -320,6 +320,8 @@ curl --header "X-Vault-Token: $VAULT_TOKEN_PRI" \
 
 ```
 
+**success!**
+
 - ask Vault perf secondary for creds managed by Performance Secondary, using token from performance secondary
 
 ```
@@ -330,6 +332,8 @@ curl --header "X-Vault-Token: $VAULT_TOKEN_PERF" \
 
 ```
 
+**success!**
+
 - ask Vault primary for DB creds managed by Primary, using token from secondary
 
 ```
@@ -339,3 +343,17 @@ curl --header "X-Vault-Token: $VAULT_TOKEN_PERF" \
        http://vault-primary:8200/v1/sys/leases/lookup/db-dc1/creds/readonly | jq
 
 ```
+
+**fail!** Vault Token created by Performance Secondary is not valid on Primary
+
+
+- ask Vault perf secondary for DB creds managed by Primary, using token from primary
+
+```
+
+curl --header "X-Vault-Token: $VAULT_TOKEN_PRI" \
+       --request LIST \
+       http://vault-perf:8200/v1/sys/leases/lookup/db-dc1/creds/readonly | jq
+
+```
+**fail!** Vault Token created by Primary is not valid on Performance Secondary

@@ -294,11 +294,19 @@ policies             ["apps-db-readonly-cred" "default"]
 
 # Testing from Vault Client
 
-- set Vault cred for Primary Cluster
+- set Vault token for Primary Cluster
 
 `export VAULT_TOKEN_PRI=s.UtCUFQ3xIXKgtbPQ4dQGEBvb`
 
+- set Vault token for Performance Secondary
+
 `export VAULT_TOKEN_PERF=s.qV5JGFJI5a6Buyye2TX1UFqI`
+
+- edit HOSTS file to keep API calls "clean"
+
+`sed -i ", <IP of primary vault node>  vault-primary" /etc/hosts`
+
+`sed -i ", <IP of perf secondary vault node>  vault-perf" /etc/hosts`
 
 - list active creds in each Vault Cluster
 

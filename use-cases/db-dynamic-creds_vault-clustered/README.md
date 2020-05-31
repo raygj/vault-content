@@ -286,8 +286,10 @@ policies             ["apps-db-readonly-cred" "default"]
 
 ### List All Leases
 
-`vault list sys/leases/lookup/db-dc1/creds/readonly`
+`vault list sys/leases/lookup/db-dc2/creds/readonly`
 
 ### Revoke All DB Creds
 
 `vault lease revoke -prefix=true db-dc2/creds/readonly`
+
+# Testing from Vault Client

@@ -31,13 +31,17 @@ you will execute these steps on each Vault node
 
 #### modify Consul Client config
 
+- grab private IP from EC2 service and set env var
+
+`export PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)`
+
 ```
 
 sudo tee /etc/consul.d/consul-default.json <<EOF
 {
   "datacenter": "vault-perf",
   "data_dir": "/opt/consul/data",
-  "bind_addr": "0.0.0.0",
+  "bind_addr": "$PRIVATE_IP",
   "client_addr": "0.0.0.0",
   "log_level": "INFO",
   "ui": true
@@ -77,9 +81,10 @@ sudo chown -R consul:consul /opt/consul/data
 
 - stop Vault, backup existing config, create new config that uses filesystem and Shamir keys, restart Vault
 
-export PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
-
 ```
+- grab private IP from EC2 service and set env var
+
+`export PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)`
 
 sudo systemctl stop vault
 
@@ -150,10 +155,10 @@ example output:
 
 Key                              Value
 ---                              -----
-wrapping_token:                  eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NvciI6IiIsImFkZHIiOiJodHRwOi8vMTAuMC4xMDEuOTQ6ODIwMCIsImV4cCI6MTU5MDc4NjEwMSwiaWF0IjoxNTkwNzg0MzAxLCJqdGkiOiJzLjYyV1RGRHNucFhNaE5IZGZFU01idzdQTyIsIm5iZiI6MTU5MDc4NDI5NiwidHlwZSI6IndyYXBwaW5nIn0.AIy6J0DERd4ONvI5YgacitFwinEmM6UwiygZ_8GkucIwnrk8u1olBhGVYDAj3TDk2XaxmCxqbtYLIKnmkYqJErcbAFeOBcIHsW-aXhquMozsDMRV_hW2CiPvd2g0vZbud1WHBU4Z6PVu_BRkr-yH3JXp0PvYV0PLXL1QInip8Y15NsEw
-wrapping_accessor:               FzabhI2NmwjehtvHdIo4wmAD
+wrapping_token:                  eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NvciI6IiIsImFkZHIiOiJodHRwOi8vMTAuMC4xMDEuOTQ6ODIwMCIsImV4cCI6MTU5MDc4NzI5MiwiaWF0IjoxNTkwNzg1NDkyLCJqdGkiOiJzLnFzQm9RcWxMVjR2MjlveXl6U3RoaEZmbCIsIm5iZiI6MTU5MDc4NTQ4NywidHlwZSI6IndyYXBwaW5nIn0.AJYJmWXq_toj0IOriHHs2a1JVIytn6VkTxXsmJWxdXqFHXgPozeXZLMEyqpju5cAlc0tdl7cayqRIObL4PJvYODiAUFm3Yb7ITpAin5vnNwhXZq7HUV2zlCjTxELazoXS2zRLLLL88AcVl3UKqxkr8AWq32RP06IihHA_uMjEsdqh0-r
+wrapping_accessor:               vaX54U4AzQBBP2kBmTJLMXzi
 wrapping_token_ttl:              30m
-wrapping_token_creation_time:    2020-05-29 20:31:41.213606477 +0000 UTC
+wrapping_token_creation_time:    2020-05-29 20:51:32.191195595 +0000 UTC
 wrapping_token_creation_path:    sys/replication/performance/primary/secondary-token
 
 ### Perf Replication Node
@@ -167,3 +172,41 @@ WARNING! The following warnings were returned from Vault:
   * Vault has successfully found secondary information; it may take a while to
   perform setup tasks. Vault will be unavailable until these tasks and initial
   sync complete.
+
+## Generate Root Token for Performance Secondary
+
+Root tokens on secondary are wiped once performance replication is enabled. Approach is to configure an Auth Method on the secondary before enabling replication. If not, then the `generate-root` process must be used.
+
+https://learn.hashicorp.com/vault/operations/ops-generate-root
+
+https://learn.hashicorp.com/vault/operations/ops-replication#secondary-tokens
+
+### on secondary
+
+- initiate the process
+
+`vault operator generate-root -init`
+
+- Shamir key holder initiate process to unwrap Nonce
+
+`vault operator generate-root`
+
+< you will be prompted to enter the unseal key(s) >
+
+output is an encoded token:
+
+Operation nonce: c1c2df36-63d1-d247-f266-7abba1c98014
+Unseal Key (will be hidden):
+Nonce            c1c2df36-63d1-d247-f266-7abba1c98014
+Started          true
+Progress         1/1
+Complete         true
+Encoded Token    GWQaBkQhdH4dB3MlTDItFCw2VRMoVBt2PX0
+
+- decode the token using the original OTP:
+
+vault operator generate-root \
+   -decode=<> \
+   -otp=<>
+
+output is unwrapped token

@@ -181,3 +181,113 @@ policies             ["apps-db-readonly-cred" "default"]
 - create DB cred
 
 `vault read db-dc1/creds/readonly`
+
+### List All Leases
+
+`vault list sys/leases/lookup/db-dc1/creds/readonly`
+
+### Revoke All DB Creds
+
+`vault lease revoke -prefix=true db-dc1/creds/readonly`
+
+
+------------------------------------------------------------------
+
+# Setup Postgres Backend on Vault Performance Secondary Server
+
+## Vault Policy
+
+this policy will be used to create accounts that will request and consume DB creds
+
+```
+
+sudo tee ~/app-db-cred.json <<EOF
+# Get credentials from the database secret engine
+path "db-dc2/creds/readonly" {
+  capabilities = [ "read" ]
+}
+EOF
+
+```
+
+## DB User Create SQL
+
+this code will be executed by Vault to create users in the target DB
+
+```
+sudo tee ~/db-user-create.sql <<EOF
+CREATE ROLE "{{name}}" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO "{{name}}";
+EOF
+```
+
+## Configure Postgres Secrets Engine
+
+- enable DB secrets engine
+
+`vault secrets enable -path=db-dc2 database`
+
+- configure Vault's connection to Postgres
+
+```
+
+export DB_HOST_IP=10.0.101.60
+export DB_NAME=demo
+
+vault write db-dc2/config/demo \
+ plugin_name=postgresql-database-plugin \
+ allowed_roles="readonly" \
+ connection_url="postgresql://{{username}}:{{password}}@$DB_HOST_IP:5432/$DB_NAME?sslmode=disable" \
+ username="vault-demo" \
+ password="temp123"
+
+```
+## Configure Vault Role
+
+**note** on the Performance Secondary we set the default TTL to 30 minutes to differentiate dynamic users in the Postgres DB
+
+`vault write db-dc2/roles/readonly db_name=demo creation_statements=@db-user-create.sql default_ttl=30m max_ttl=1h`
+
+## Apply Vault Policy to Role
+
+`vault policy write apps-db-readonly-cred app-db-cred.json`
+
+## Test the Configuration
+
+### App User/Service Test Token
+
+this token will be used by services that need a readonly DB cred
+
+`vault token create -policy="apps-db-readonly-cred"`
+
+- output:
+
+```
+Key                  Value
+---                  -----
+token                s.jkrG8qNuYRqR0vdSAHJjFBoj
+token_accessor       rlKxwpIl8rcD8Tapl6g36ORb
+token_duration       768h
+token_renewable      true
+token_policies       ["apps-db-readonly-cred" "default"]
+identity_policies    []
+policies             ["apps-db-readonly-cred" "default"]
+```
+
+### Generate DB Cred
+
+- login to Vault using token mapped to **readonly** role in the /db-dc1 mount and correpsoding **apps-db-readonly-cred** policy
+
+`vault login s.jkrG8qNuYRqR0vdSAHJjFBoj`
+
+- create DB cred
+
+`vault read db-dc2/creds/readonly`
+
+### List All Leases
+
+`vault list sys/leases/lookup/db-dc1/creds/readonly`
+
+### Revoke All DB Creds
+
+`vault lease revoke -prefix=true db-dc2/creds/readonly`

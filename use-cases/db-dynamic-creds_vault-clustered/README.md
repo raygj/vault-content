@@ -49,6 +49,10 @@ this instance will be tied to the primary Vault cluster
 
 `\du`
 
+- check list of DBs and access
+
+`\l`
+
 - quit Postgres
 
 `\q`
@@ -128,11 +132,12 @@ EOF
 ```
 
 export DB_HOST_IP=10.0.101.60
+export DB_NAME=demo
 
-vault write db-dc1/config/postgresql \
+vault write db-dc1/config/demo \
  plugin_name=postgresql-database-plugin \
  allowed_roles="readonly" \
- connection_url="postgresql://{{username}}:{{password}}@$DB_HOST_IP:5432/demo?sslmode=disable" \
+ connection_url="postgresql://{{username}}:{{password}}@$DB_HOST_IP:5432/$DB_NAME?sslmode=disable" \
  username="vault-demo" \
  password="temp123"
 

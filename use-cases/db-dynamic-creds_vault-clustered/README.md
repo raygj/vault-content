@@ -293,3 +293,41 @@ policies             ["apps-db-readonly-cred" "default"]
 `vault lease revoke -prefix=true db-dc2/creds/readonly`
 
 # Testing from Vault Client
+
+- set Vault cred for Primary Cluster
+
+`export VAULT_TOKEN_PRI=s.UtCUFQ3xIXKgtbPQ4dQGEBvb`
+
+`export VAULT_TOKEN_PERF=s.qV5JGFJI5a6Buyye2TX1UFqI`
+
+- list active creds in each Vault Cluster
+
+- ask Vault primary for DB creds managed by Primary, using token from primary
+
+```
+
+curl --header "X-Vault-Token: $VAULT_TOKEN_PRI" \
+       --request LIST \
+       http://vault-primary:8200/v1/sys/leases/lookup/db-dc1/creds/readonly| jq
+
+```
+
+- ask Vault perf secondary for creds managed by Performance Secondary, using token from performance secondary
+
+```
+
+curl --header "X-Vault-Token: $VAULT_TOKEN_PERF" \
+       --request LIST \
+       http://vault-perf:8200/v1/sys/leases/lookup/db-dc2/creds/readonly | jq
+
+```
+
+- ask Vault primary for DB creds managed by Primary, using token from secondary
+
+```
+
+curl --header "X-Vault-Token: $VAULT_TOKEN_PERF" \
+       --request LIST \
+       http://vault-primary:8200/v1/sys/leases/lookup/db-dc1/creds/readonly | jq
+
+```

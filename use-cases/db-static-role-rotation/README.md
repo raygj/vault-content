@@ -8,7 +8,7 @@ The focus of this walk through is testing static role password rotation for a DB
 
 [Refactor Vault Nodes into single node primary and perf secondary clusters](https://github.com/raygj/vault-content/blob/master/enterprise/create-two-clusters.md)
 
-[Test script for automated testing]()
+[Test script for automated testing](https://github.com/raygj/vault-content/blob/master/use-cases/db-static-role-rotation/test_script.sh)
 
 # Provision Postgres container and Postgres
 

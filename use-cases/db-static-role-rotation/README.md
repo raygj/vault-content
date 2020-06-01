@@ -10,6 +10,8 @@ The focus of this walk through is testing static role password rotation for a DB
 
 [Test script for automated testing](https://github.com/raygj/vault-content/blob/master/use-cases/db-static-role-rotation/test_script.sh)
 
+[learn.hashicorp guide](https://learn.hashicorp.com/vault/secrets-management/db-creds-rotation)
+
 # Provision Postgres container and Postgres
 
 - start Postgres container

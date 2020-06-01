@@ -228,7 +228,7 @@ policies             ["default" "postgres_static_app_policy"]
 
 `vault login s.K5aiwN8pX8uiZVMPbUfsVy0V`
 
-- issue `read` command to rotate passsword
+- issue `read` command to pull current passsword
 
 `vault read database/static-creds/test1`
 

@@ -12,6 +12,8 @@ The focus of this walk through is testing static role password rotation for a DB
 
 [learn.hashicorp guide](https://learn.hashicorp.com/vault/secrets-management/db-creds-rotation)
 
+[image!](/images/static-db-role.png)
+
 # Provision Postgres container and Postgres
 
 - start Postgres container
@@ -116,7 +118,7 @@ vault login
 - Enable database secret engine
 vault secrets enable database
 
-# test connectivity from primary cluster vault nodes to database engine
+- test connectivity from primary cluster Vault nodes to database engine
 (timeout 1 bash -c '</dev/tcp/< ip of Docker host>/5432 && echo PORT OPEN || echo PORT CLOSED') 2>/dev/null
 
 - configure postgres database config in database secret engine

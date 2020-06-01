@@ -81,7 +81,7 @@ read  -n 1 -p "Input Selection press ENTER:" mainmenuinput
 ssh -i < your certificate >.pem ubuntu@$PRI_HOST sudo systemctl start vault
 sleep 2
 
- PRI UNSEAL FIRE
+# PRI UNSEAL FIRE
 export VAULT_ADDR=$PRI_ADDR
 sleep 1
 unseal_env

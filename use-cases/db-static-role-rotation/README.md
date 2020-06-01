@@ -12,7 +12,7 @@ The focus of this walk through is testing static role password rotation for a DB
 
 [learn.hashicorp guide](https://learn.hashicorp.com/vault/secrets-management/db-creds-rotation)
 
-[image!](/images/static-db-role.png)
+![diagram](/images/static-db-role.png)
 
 # Provision Postgres container and Postgres
 

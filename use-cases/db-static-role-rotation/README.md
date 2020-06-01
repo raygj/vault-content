@@ -231,3 +231,9 @@ policies             ["default" "postgres_static_app_policy"]
 - issue `read` command to rotate passsword
 
 `vault read database/static-creds/test1`
+
+## Apendix
+
+- force a rotation event, only from Primary
+
+`vault write -f database/rotate-role/test1`

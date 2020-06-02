@@ -18,7 +18,7 @@ The focus of this walk through is testing static role password rotation for a DB
 
 - start Postgres container
 
-`docker run --name postgres -e POSTGRES_USER=root -e POSTGRES_PASSWORD=temp123 -d -p 5432:5432 postgres`
+`docker run --name postgres-1 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=temp123 -d -p 5432:5432 postgres`
 
 - access bash CLI of container
 
@@ -239,3 +239,9 @@ policies             ["default" "postgres_static_app_policy"]
 - force a rotation event, only from Primary
 
 `vault write -f database/rotate-role/test1`
+
+- install squirrelsql SQL tool
+
+`brew cask install adoptopenjdk`
+
+`brew cask install squirrelsql`

@@ -20,7 +20,7 @@ resource "aws_security_group" "testing" {
     from_port   = 8200
     to_port     = 8200
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0","10.0.101.0/24"]
+    cidr_blocks = ["0.0.0.0/0", "10.0.101.0/24"]
   }
 
   # Vault cluster traffic
@@ -39,6 +39,13 @@ resource "aws_security_group" "testing" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # postgresql Traffic
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   # Internal Traffic
   ingress {
     from_port = 0

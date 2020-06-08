@@ -39,13 +39,7 @@ transit-demo	Ubuntu 18.4		MySQL/Go app server (referred to as the Go App VM)
 
 - Ubuntu host
 
-```
-sudo apt install jq -y
-sudo apt install unzip -y
-sudo apt install bind-utils -y
-sudo apt install nmap -y
-
-```
+`sudo apt install jq unzip bind-utils nmap -y`
 
 ### Install Go and Setup Path
 
@@ -53,7 +47,7 @@ For background info, see this [Digital Ocean Walkthrough.](https://www.digitaloc
 
 #### Install Go
 
-`cd ~`
+`cd ~/`
 
 `curl -O https://dl.google.com/go/go1.12.9.linux-amd64.tar.gz`
 
@@ -131,7 +125,7 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 *NOTE:*: Vault does NOT store any data encrypted via the transit/encrypt endpoint. The output you received is the ciphertext. You can store this ciphertext at the desired location (e.g. MySQL database) or pass it to another application.
 
-- Enable Transit Backend 
+- Enable Transit Backend
 
 (alternatively, use the `-path` argument to mount the backend at a specific point/name)
 
@@ -295,7 +289,7 @@ ENCODED_PII=`echo -n $text | base64`
 
 ```
 
-- Decrypt 
+- Decrypt
 
 ```
        curl --header "X-Vault-Token: $VAULT_TOKEN" \

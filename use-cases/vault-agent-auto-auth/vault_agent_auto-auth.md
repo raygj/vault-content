@@ -102,7 +102,7 @@ In this section, we'll write some dummy data/policies and configure Vault to all
 
 ```
 
-cat << EOF > myapp-kv-ro.hcl 
+cat << EOF > myapp-kv-ro.hcl
 
 path "demo/*" {
 capabilities = ["read", "list"]
@@ -125,15 +125,15 @@ EOF
 
 `vault secrets list`
 
-`vault secrets enable -path=demo`
+`vault secrets enable -path=demo kv`
 
 4b. Create dummy data:
 
 ```
 
 vault kv put demo/myapp/config \
-username='appuser' \
-password='suP3rsec(et!'
+current_password=tH1si3ecure \
+last_password=Sup3rSecret
 
 ```
 
@@ -142,12 +142,12 @@ password='suP3rsec(et!'
 `vault auth enable aws`
 
 6. [From the Vault **Server**] Next, configure the AWS credentials that Vault will use to verify login requests from AWS clients:
-   
+
 `vault write -force auth/aws/config/client`
 
 ***NOTES:***
 
-In the above example, I'm relying on an instance profile to provide credentials to Vault. 
+In the above example, I'm relying on an instance profile to provide credentials to Vault.
 
 See [here](https://www.vaultproject.io/docs/auth/aws.html#recommended-vault-iam-policy) for an example IAM policy to give Vault in order for it to handle AWS IAM auth.
 
@@ -156,13 +156,13 @@ You can also pass in explicit credentials as such:
 `vault write auth/aws/config/client secret_key=AWS_SECRET_ACCESS_KEY access_key=AWS_ACCESS_KEY_ID`
 
 7. Identify the IAM instance profile role associated with the client instance that you intend to authenticate from.
-   
+
 If you're using the sample repo linked above in the intro, you'll have a `"${var.environment_name}-vault-client"` instance created for you with an instance profile role of `"${var.environment_name}-vault-client-role"`.
 
 If you're provisioning your own examples, spin up an EC2 instance and assign it any instance profile, the IAM role policy is not important from Vault's perspective. What *is* important is the fact that a `vault login` operation from the client instance can use the attached instance profile as a way to identify itself to Vault.
 
 [From the Vault **Server**] Configure a **Vault** role under the AWS authentication method that we configured in the previous step. A Vault auth role maps an AWS IAM role to a set of Vault policies (I'll reference the dummy policy created in step #4):
-   
+
 ```
 vault write auth/aws/role/dev-role-iam auth_type=iam \
 bound_iam_principal_arn=arn:aws:iam::<AWS_ACCOUNT_NUMBER>:role/<IAM role> \
@@ -264,9 +264,9 @@ We're also identifying a location on disk where we want to place this token. The
 
 `vault agent -config=/home/ubuntu/auto-auth-conf.hcl -log-level=debug`
 
-***NOTES:*** 
+***NOTES:***
 
-In this example, because our `auto-auth-conf.hcl` configuration file contained the line `exit_after_auth = true`, Vault Agent simply authenticated and retrieved a token once, wrote it to the defined sink, and exited. 
+In this example, because our `auto-auth-conf.hcl` configuration file contained the line `exit_after_auth = true`, Vault Agent simply authenticated and retrieved a token once, wrote it to the defined sink, and exited.
 
 Vault Agent can also run in daemon mode where it will continuously renew the retrieved token, and attempt to re-authenticate if that token becomes invalid.
 

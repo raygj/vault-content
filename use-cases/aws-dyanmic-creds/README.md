@@ -36,7 +36,7 @@ vault write aws/config/root \
 ### verify
 
 `vault read aws/config/root`
-    
+
 #create role that will be used by Vault to generate AWS creds
 
 ##policy for EC2 and other services can be pulled from AWS
@@ -72,6 +72,14 @@ EOF
 
 `vault read aws/creds/jray-role`
 
+#list active leases
+
+`vault list sys/leases/lookup/aws/creds/jray-role`
+
+#revoke all creds at mount point, via CLI
+
+`vault lease revoke -prefix=true aws/creds/jray-role`
+
 #revoke creds via CLI
 
 `vault lease revoke aws/creds/jray-role/`
@@ -83,9 +91,9 @@ EOF
 curl --header "X-Vault-Token: $VAULT_TOKEN" \
        --request GET \
        http://127.0.0.1:8200/v1/aws/creds/jray-role | jq
-       
+
 ```
-       
+
 #revoke all AWS creds at this mount point via API
 
 ```
@@ -94,7 +102,7 @@ curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST \
        http://127.0.0.1:8200/v1/sys/leases/revoke-prefix/aws/creds | jq
 
 ```
-       
+
 # configuration lease duration for a namespace
 
 `vault write -namespace=LOB-Team-1 aws/config/lease lease=5m lease_max=15m`
@@ -102,4 +110,3 @@ curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST \
 # read secret engine configuration
 
 `vault read aws/config/lease`
-

@@ -161,10 +161,10 @@ If you're using the sample repo linked above in the intro, you'll have a `"${var
 
 If you're provisioning your own examples, spin up an EC2 instance and assign it any instance profile, the IAM role policy is not important from Vault's perspective. What *is* important is the fact that a `vault login` operation from the client instance can use the attached instance profile as a way to identify itself to Vault.
 
-[From the Vault **Server**] Configure a **Vault** role under the AWS authentication method that we configured in the previous step. A Vault auth role maps an AWS IAM role to a set of Vault policies (I'll reference the dummy policy created in step #4):
+[From the Vault **Server**] Configure a **Vault** role under the AWS authentication method that we configured in the previous step. A Vault auth role maps an AWS IAM role to a set of Vault policies; you must use an existing IAM policy or create one with these [recommended permissions](https://www.vaultproject.io/docs/auth/aws.html#recommended-vault-iam-policy). Create the policy using TF code or the AWS console, then insert the IAM policy name in the config below.
 
 ```
-vault write auth/aws/role/dev-role-iam auth_type=iam \
+vault write auth/aws/role/<your Vault IAM policy name> auth_type=iam \
 bound_iam_principal_arn=arn:aws:iam::<AWS_ACCOUNT_NUMBER>:role/<IAM role> \
 policies=myapp-kv-ro \
 ttl=15m

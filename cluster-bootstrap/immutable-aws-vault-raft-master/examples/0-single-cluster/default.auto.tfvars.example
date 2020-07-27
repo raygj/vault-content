@@ -1,0 +1,3 @@
+vpc_id       = "vpc-6695700d"
+aws_region   = "us-east-2"
+vault_domain = "is.very-serious.business"

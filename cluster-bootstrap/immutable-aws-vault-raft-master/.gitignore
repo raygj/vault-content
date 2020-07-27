@@ -1,0 +1,24 @@
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Plan files
+*.tfplan
+
+# Disabled .tf files
+*.tf.disabled
+
+# Crash log files
+crash.log
+
+# Default vars files
+default.auto.tfvars
+
+# Ansible config
+ansible.cfg
+
+# Local resources created by Terraform
+.cluster_id_rsa

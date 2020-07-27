@@ -29,6 +29,4 @@ variable key_name {}
 # Instance tags for HashiBot AWS resource reaper
 variable hashibot_reaper_owner {}
 
-variable hashibot_reaper_ttl {
-  default = 48
-}
+variable hashibot_reaper_ttl {}

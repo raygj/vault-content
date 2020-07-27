@@ -1,0 +1,53 @@
+{
+  "_comment": "HashiCorp Implementation Services",
+  "variables": {
+    "deployment_version": "version-1",
+    "ami_prefix": "amzn2",
+    "app_name": "vault",
+    "vault_version": "1.4.0",
+    "ami_name": "{{user `ami_prefix`}}-{{user `app_name`}}-ent-{{user `vault_version`}}-{{timestamp}}",
+    "region": "us-east-2",
+    "vpc_id": "vpc-6695700d",
+    "subnet_id": "subnet-fe171a96",
+    "ssh_username": "ec2-user",
+    "source_ami_name": "amzn2-ami-hvm-2.0.20200304.0-x86_64-gp2",
+    "source_ami_owner": "amazon"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `region`}}",
+    "vpc_id": "{{ user `vpc_id`}}",
+    "subnet_id": "{{ user `subnet_id`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "{{user `source_ami_name`}}",
+        "root-device-type": "ebs"
+      },
+      "owners": ["{{user `source_ami_owner`}}"]
+    },
+    "instance_type": "m5.large",
+    "ssh_username": "{{ user `ssh_username` }}",
+    "ami_name": "{{user `ami_name`}}",
+    "ami_regions": [],
+    "ami_users": [],
+    "tags": {
+      "Name": "{{user `ami_name`}}"
+    }
+  }],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "files",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/setup.sh"
+    },
+    {
+      "type": "shell",
+      "inline": ["echo {{user `deployment_version`}} > ~/DEPLOYMENT_VERSION"]
+    }
+  ]
+}

@@ -9,7 +9,7 @@ module "vault-oss" {
   vpc_id                = "vpc-9cd6c8e6"
   vault_version         = "1.5.0"
   owner                 = "jray-at-hashicorp"
-  name_prefix           = "jgr"
+  name_prefix           = "jray"
   key_name              = "jray"
   instance_type         = "t2.micro"
   vault_nodes           = "3"

@@ -4,7 +4,7 @@ provider "aws" {
 
 module "vault-starter" {
   source                = "app.terraform.io/jray-hashi/vault-starter/aws"
-  version               = "0.1.2"
+  version               = "0.2.3"
   allowed_inbound_cidrs = ["var.allowed_inbound_cidrs"]
   vpc_id                = "vpc-9cd6c8e6"
   vault_version         = "var.vault_version"

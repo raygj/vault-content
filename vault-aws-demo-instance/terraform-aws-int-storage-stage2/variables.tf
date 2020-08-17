@@ -9,9 +9,10 @@ variable "allowed_inbound_cidrs" {
   default     = "100.14.98.25/32"
 }
 
-variable "input_vpc_id" {
-  description = "ID of VPC"
-}
+#variable "input_vpc_id" {
+#  description = "ID of VPC"
+#}
+
 variable "vault_version" {
   # version of Vault OSS to install
   description = "Vault OSS version x.y.z"

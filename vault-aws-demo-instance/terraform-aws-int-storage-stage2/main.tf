@@ -3,11 +3,8 @@ provider "aws" {
 }
 
 module "vault-oss" {
-  #  source                = "hashicorp/vault-oss/aws"
-  #  version               = "0.2.0"
-  #  allowed_inbound_cidrs = ["192.168.0.0/32"]
-  source                = "app.terraform.io/jray-hashi/vault-starter/aws"
-  version               = "0.2.4"
+  source                = "hashicorp/vault-oss/aws"
+  version               = "0.2.0"
   allowed_inbound_cidrs = ["100.14.98.25/32"]
   vpc_id                = "vpc-9cd6c8e6"
   vault_version         = "1.5.0"

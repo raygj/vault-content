@@ -10,10 +10,10 @@ module "vault-oss" {
   version               = "0.2.4"
   allowed_inbound_cidrs = ["100.14.98.25/32"]
   vpc_id                = "vpc-9cd6c8e6"
-  vault_version         = "var.vault_version"
-  owner                 = "var.owner"
-  name_prefix           = "var.namespace"
-  key_name              = "var.ssh_key_name"
-  instance_type         = "var.aws_instance_type"
+  vault_version         = "1.5.0"
+  owner                 = "jray-at-hashicorp"
+  name_prefix           = "jray-sandbox"
+  key_name              = "jray"
+  instance_type         = "t2.micro"
   vault_nodes           = "3"
 }

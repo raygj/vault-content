@@ -9,9 +9,9 @@ variable "aws_region" {
 #  default     = "100.14.98.25/32"
 #}
 
-variable "vpc_id" {
-  description = "ID of VPC"
-}
+#variable "vpc_id" {
+#  description = "ID of VPC"
+#}
 
 variable "vault_version" {
   # version of Vault OSS to install
@@ -38,7 +38,7 @@ variable "aws_instance_type" {
   description = "EC2 instance type"
 }
 
-variable "vault_nodes" {
-  # Number of cluster nodes
-  description = "number of Vault nodes (1,3,5)"
-}
+#variable "vault_nodes" {
+# Number of cluster nodes
+#  description = "number of Vault nodes (1,3,5)"
+#}

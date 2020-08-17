@@ -9,7 +9,7 @@ variable "allowed_inbound_cidrs" {
   default     = "100.14.98.25/32"
 }
 
-variable "vpc_id" {
+variable "input_vpc_id" {
   description = "ID of VPC"
 }
 variable "vault_version" {

@@ -3,25 +3,23 @@ variable "aws_region" {
   description = "target AWS region"
 }
 
-variable "allowed_inbound_cidrs" {
-  type        = string
-  description = "List of CIDR blocks to permit inbound Vault access from"
-  default     = "100.14.98.25/32"
-}
-
-#variable "input_vpc_id" {
-#  description = "ID of VPC"
+#variable "allowed_inbound_cidrs" {
+#  type        = string
+#  description = "List of CIDR blocks to permit inbound Vault access from"
+#  default     = "100.14.98.25/32"
 #}
+
+variable "vpc_id" {
+  description = "ID of VPC"
+}
 
 variable "vault_version" {
   # version of Vault OSS to install
   description = "Vault OSS version x.y.z"
-  default     = ""
 }
 variable "owner" {
   # Used within HashiCorp accounts for resource reaping
   description = "EC2 instance owner"
-  default     = ""
 }
 
 variable "namespace" {

@@ -1,7 +1,6 @@
 variable "aws_region" {
   # select region
   description = "target AWS region"
-  default     = "us-east-1"
 }
 
 variable "allowed_inbound_cidrs" {

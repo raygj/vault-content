@@ -1,6 +1,6 @@
 module "vault_demo_vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "1.60.0"
+  version = "2.47.0"
 
   name = "${var.environment_name}-vpc"
   cidr = "10.0.0.0/16"

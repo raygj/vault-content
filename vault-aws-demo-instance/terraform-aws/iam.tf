@@ -4,35 +4,35 @@
 ## Vault Server IAM Config
 resource "aws_iam_instance_profile" "vault-server" {
   name = "${var.environment_name}-vault-server-instance-profile"
-  role = "${aws_iam_role.vault-server.name}"
+  role = aws_iam_role.vault-server.name
 }
 
 resource "aws_iam_role" "vault-server" {
   name               = "${var.environment_name}-vault-server-role"
-  assume_role_policy = "${data.aws_iam_policy_document.assume_role.json}"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
 resource "aws_iam_role_policy" "vault-server" {
   name   = "${var.environment_name}-vault-server-role-policy"
-  role   = "${aws_iam_role.vault-server.id}"
-  policy = "${data.aws_iam_policy_document.vault-server.json}"
+  role   = aws_iam_role.vault-server.id
+  policy = data.aws_iam_policy_document.vault-server.json
 }
 
 # Vault Client IAM Config
 resource "aws_iam_instance_profile" "vault-client" {
   name = "${var.environment_name}-vault-client-instance-profile"
-  role = "${aws_iam_role.vault-client.name}"
+  role = aws_iam_role.vault-client.name
 }
 
 resource "aws_iam_role" "vault-client" {
   name               = "${var.environment_name}-vault-client-role"
-  assume_role_policy = "${data.aws_iam_policy_document.assume_role.json}"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
 resource "aws_iam_role_policy" "vault-client" {
   name   = "${var.environment_name}-vault-client-role-policy"
-  role   = "${aws_iam_role.vault-client.id}"
-  policy = "${data.aws_iam_policy_document.vault-client.json}"
+  role   = aws_iam_role.vault-client.id
+  policy = data.aws_iam_policy_document.vault-client.json
 }
 
 //--------------------------------------------------------------------
@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "vault-server" {
       "kms:DescribeKey",
     ]
 
-    resources = ["${aws_kms_key.vault.arn}"]
+    resources = [aws_kms_key.vault.arn]
   }
 }
 
@@ -98,3 +98,4 @@ data "aws_iam_policy_document" "vault-client" {
     resources = ["*"]
   }
 }
+

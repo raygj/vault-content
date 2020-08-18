@@ -10,6 +10,12 @@ module "vault_demo_vpc" {
   public_subnets  = ["10.0.101.0/24"]
 
   tags = {
-    Name = "${var.environment_name}-vpc"
+    Name      = "${var.environment_name}-vpc"
+    owner     = var.hashibot_reaper_owner
+    region    = var.hc_region
+    purpose   = var.purpose
+    TTL       = var.hashibot_reaper_ttl
+    terraform = var.tf_used
+    workspace = var.workspace_id
   }
 }

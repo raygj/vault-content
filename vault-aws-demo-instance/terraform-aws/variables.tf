@@ -35,7 +35,18 @@ variable "key_name" {
 variable "hashibot_reaper_owner" {
 }
 
-variable "hashibot_reaper_ttl" {
-  default = 48
+# hashicorp team region
+variable "hc_region" {
+  default = "NA-GLOBALS"
 }
 
+variable "purpose" {
+  default = "demo-environment"
+}
+
+variable "tf_used" {
+  default = "yes"
+}
+
+variable "workspace_id" {
+}

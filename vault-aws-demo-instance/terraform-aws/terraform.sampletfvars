@@ -15,3 +15,9 @@ vault_zip_file = "https://releases.hashicorp.com/vault/1.5.0/vault_1.5.0_linux_a
 #version of Vault to download and install
 consul_zip_file = "https://releases.hashicorp.com/consul/1.7.2/consul_1.7.2_linux_amd64.zip"
 #version of Consul to download and install
+# hashicorp team region
+hc_region = "NA-GLOBALS"
+# purpose for resources
+purpose = "demo-environment"
+# what is the TFC or TFE workspace name
+workspace_id = "aws-vault-demo-env"

@@ -12,10 +12,14 @@ resource "aws_instance" "vault-server" {
   iam_instance_profile        = aws_iam_instance_profile.vault-server.id
 
   tags = {
-    Name     = "${var.environment_name}-vault-server-${count.index}"
-    ConsulDC = var.consul_dc
-    owner    = var.hashibot_reaper_owner
-    TTL      = var.hashibot_reaper_ttl
+    Name      = "${var.environment_name}-vault-server-${count.index}"
+    ConsulDC  = var.consul_dc
+    owner     = var.hashibot_reaper_owner
+    region    = var.hc_region
+    purpose   = var.purpose
+    TTL       = var.hashibot_reaper_ttl
+    terraform = var.tf_used
+    workspace = var.workspace_id
   }
 
   user_data = data.template_file.vault-server.rendered
@@ -41,4 +45,3 @@ data "template_file" "vault-server" {
     tpl_consul_bootstrap_expect = var.vault_server_count
   }
 }
-

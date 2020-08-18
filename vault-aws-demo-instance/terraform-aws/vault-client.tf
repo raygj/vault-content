@@ -11,10 +11,14 @@ resource "aws_instance" "vault-client" {
   iam_instance_profile        = aws_iam_instance_profile.vault-client.id
 
   tags = {
-    Name     = "${var.environment_name}-vault-client"
-    ConsulDC = "consul-${var.aws_region}"
-    owner    = var.hashibot_reaper_owner
-    TTL      = var.hashibot_reaper_ttl
+    Name      = "${var.environment_name}-vault-client"
+    ConsulDC  = var.consul_dc
+    owner     = var.hashibot_reaper_owner
+    region    = var.hc_region
+    purpose   = var.purpose
+    TTL       = var.hashibot_reaper_ttl
+    terraform = var.tf_used
+    workspace = var.workspace_id
   }
 
   user_data = data.template_file.vault-client.rendered
@@ -38,4 +42,3 @@ data "template_file" "vault-client" {
     tpl_vault_server_addr  = aws_instance.vault-server[0].private_ip
   }
 }
-

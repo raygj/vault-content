@@ -35,6 +35,10 @@ variable "key_name" {
 variable "hashibot_reaper_owner" {
 }
 
+# Instance tags for HashiBot AWS resource reaper
+variable "hashibot_reaper_ttl" {
+}
+
 # hashicorp team region
 variable "hc_region" {
   default = "NA-GLOBALS"

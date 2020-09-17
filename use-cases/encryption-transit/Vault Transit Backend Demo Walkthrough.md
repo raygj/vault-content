@@ -49,9 +49,9 @@ For background info, see this [Digital Ocean Walkthrough.](https://www.digitaloc
 
 `cd ~/`
 
-`curl -O https://dl.google.com/go/go1.12.9.linux-amd64.tar.gz`
+`curl -O https://dl.google.com/go/go1.15.linux-amd64.tar.gz`
 
-`tar xvf go1.12.9.linux-amd64.tar.gz`
+`tar xvf go1.15.linux-amd64.tar.gz`
 
 `sudo chown -R root:root ./go`
 
@@ -72,7 +72,7 @@ export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 
 ### Clone Git repo
 
-`mkdir ~/src/github.com/norhe/; cd ~/src/github.com/norhe/`
+`mkdir -p ~/src/github.com/norhe/; cd ~/src/github.com/norhe/`
 
 `git clone https://github.com/norhe/vault-transit-datakey-example.git`
 
@@ -85,6 +85,12 @@ Merge pending on a change to `/secure/vaultUtils.go` replace this file with a ne
 Optionally, setup Consul client to perform DNS queries to find active Vault server. Follow this [guide.](https://github.com/raygj/consul-content/blob/master/consul-dns/using%20consul%20DNS%20walkthrough.md)
 
 ## MySQL
+
+### docker install on Amazon Ubuntu
+source: https://geekylane.com/install-docker-on-aws-ec2-ubuntu-18-04-script-method/
+
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
 
 - Pull Docker container
 
@@ -145,20 +151,19 @@ Assumption is a root token will be used for the demo, in all our non-demo situat
 
 `export VAULT_TOKEN=<valid Vault token with appropriate policy>`
 
-### Run App
-
-`cd ~/src/github.com/norhe/vault-transit-datakey-example`
-
-`go run main.go`
-
-
-#### If you encounter missing packages for MySQL and Vault:
+### Add MySQL and Vault packages
 
 `go get -u github.com/go-sql-driver/mysql`
 
 `go get -u github.com/hashicorp/vault/api`
 
 *NOTE:* Go and Ruby are the HashiCorp supported client libraries for Vault, however, [libraries are available](https://www.vaultproject.io/api/libraries.html) for _most_ (if not all) popular languages.
+
+### Run App
+
+`cd ~/src/github.com/norhe/vault-transit-datakey-example`
+
+`go run main.go`
 
 # Demo Time
 
@@ -206,95 +211,6 @@ On Go App VM:
 
 Click `decrypt`
 
-A base64 encoded string is returned, click `decode from base64`
+A base64 encoded string is returned, decode in CLI or UI [here](https://www.base64decode.org/)
 
 The original text from the web form is returned
-
-# Appendix - Extra Stuff Of Interest
-
-## Script to take input of data to encode and set as env var
-
-Use case is outside the scope of this guide, but as a means of encoding data and grabbing it for encryption operations.
-
-[see this background info on base64 decode operations](https://linuxhint.com/bash_base64_encode_decode/)
-
-```
-cat << EOF > /tmp/b64encode.sh
-#!/bin/bash
-echo "Enter Some text to encode"
-read text
-etext=`echo -n $text | base64`
-echo "Encoded text is : $etext"
-EOF
-```
-
-`bash /tmp/b64encode.sh`
-
-## CLI command to encode and set output as env var
-
-- this worked w/o syntax error but did not set the env var
-
-`export ENCODED_PII= "$(base64 <<< "4111-1111-1111-1111")"`
-
-```
-    curl --header "X-Vault-Token: $VAULT_TOKEN" \
-    --request POST \
-    --data '{"plaintext": "$ENCODED_PII"}' \
-    https://active.vault.service.consul:8200/v1/transit/encrypt/eaas_pii | jq
-
-```
-
-- these did not work:
-
-```
-export ENCODED_PII= "$(echo `4111-1111-1111-1111` | base64)"
-
-ENCODED_PII=`echo -n $text | base64`
-
-```
-
-### EaaS via CLI
-
-- Encrypt dummy credit card number 4111 1111 1111 1111
-
-`vault write transit/encrypt/my_app_key plaintext=$(base64 <<< "4111 1111 1111 1111")`
-
-- Decrypt cipher string
-
-`vault write transit/decrypt/my_app_key ciphertext="vault:v1: < encrypted string>"`
-
-- Decode decrypted string
-
-`base64 --decode <<< "< base64 encoded string>"`
-
-### EaaS via API
-
-- Vault token set as env var
-
-`export VAULT_TOKEN= < your token >`
-
-- Encrypt dummy credit card number 4111 1111 1111 1111
-
-	- generate base64-encoded plaintext
-
-`base64 <<< "4111 1111 1111 1111"`
-
-- pass the base64-encoded plaintext as API payload
-
-```
-    curl --header "X-Vault-Token: $VAULT_TOKEN" \
-    --request POST \
-    --data '{"plaintext": "< base64 encoded output>"}' \
-    https://active.vault.service.consul:8200/v1/transit/encrypt/my_app_key  | jq
-
-```
-
-- Decrypt
-
-```
-       curl --header "X-Vault-Token: $VAULT_TOKEN" \
-       --request POST \
-       --data '{"ciphertext": "< encrypted cipher text>"}' \
-       https://active.vault.service.consul:8200/v1/transit/decrypt/orders | jq
-
-```

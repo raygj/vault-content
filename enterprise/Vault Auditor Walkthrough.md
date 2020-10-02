@@ -80,7 +80,7 @@ https://releases.hashicorp.com/vault-auditor/1.0.1/vault-auditor_1.0.1_linux_amd
 - expectation is that client count would be (1) for root user and (2) for the non-root Userpass users that were created
 - run analysis
 
-`./vault-auditor parse /Users/jray/Documents/hashi/vault-auditor/logs
+`./vault-auditor parse /Users/jray/Documents/hashi/vault-auditor/logs`
 
 
 ```

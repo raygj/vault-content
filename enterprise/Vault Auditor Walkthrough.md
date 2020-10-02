@@ -1,6 +1,6 @@
 # Vault Auditor Walkthrough
 
-_Vault auditor is a publicly available command line tool which runs on Linux and MacOS thatparses through Vault audit logs sitting on the filesystem and returns a client count seen in thoselogs. The tool does not connect to Vault directly and only operates on log data._
+_Vault auditor is a publicly available command line tool which runs on Linux and MacOS that parses through Vault audit logs sitting on the filesystem and returns a client count seen in those logs. The tool does not connect to Vault directly and only operates on log data._
 
 ## requirements
 

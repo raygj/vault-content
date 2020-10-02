@@ -39,6 +39,14 @@ resource "aws_security_group" "testing" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Transit Demo App UI
+  ingress {
+    from_port   = 1234
+    to_port     = 1234
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Internal Traffic
   ingress {
     from_port = 0
@@ -54,4 +62,3 @@ resource "aws_security_group" "testing" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-

@@ -72,7 +72,7 @@ https://releases.hashicorp.com/vault-auditor/1.0.1/vault-auditor_1.0.1_linux_amd
 
 - to parse a time period within a logset
 
-`vault-auditor parse -start-date=2020-07-01 -end-date=2020-07-31 ./`
+`./vault-auditor parse -start-date=2020-07-01 -end-date=2020-07-31 ./`
 
 ### example environemnt
 
@@ -91,4 +91,4 @@ Total files processed: 1
 Date range: 2020-10-02T18:02:13Z - 2020-10-02T18:19:03Z
 ```
 
-**note** Non-Entity tokens are tokens not associated with an entity, either as a result of a root token, orphan token or batch token creation (and usage).
+**note** Non-Entity tokens are tokens not associated with an entity, either as a result of a root token, orphaned token or batch token creation (and usage).

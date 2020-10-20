@@ -40,7 +40,7 @@ if logging is not currently enabled, follow these steps and get a cup of coffee 
 
 - it is recommended to pull logs from a central source for analysis on a system that is NOT running Vault
 - when functionality is added in Vautl 1.6 there will be a `usage` command added that can be used within a cluster
-- Vault Auditor can process multiple logs, a single log is used in the exmaples that follow
+- Vault Auditor can process multiple logs
 - logs from each Primary and Secondary Performance cluster should be analyzed
 
 `sudo cp /var/log/vault_audit.log /tmp/vault_audit.log`

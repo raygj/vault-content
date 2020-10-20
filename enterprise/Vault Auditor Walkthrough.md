@@ -66,13 +66,13 @@ https://releases.hashicorp.com/vault-auditor/1.0.1/vault-auditor_1.0.1_linux_amd
 
 ## execute
 
-- run Vault Auditor against a specific log
+run Vault Auditor against a specific log:
 
 `./vault-auditor parse /some/path/to/log/file(s)`
 
-- to parse a time period within a logset
+to parse a time period within a logset:
 
-`./vault-auditor parse -start-date=2020-07-01 -end-date=2020-07-31 ./`
+`./vault-auditor parse -start-date=2020-07-01 -end-date=2020-07-31 /some/path/to/log/file(s)`
 
 ### example environemnt
 

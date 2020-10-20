@@ -66,7 +66,7 @@ https://releases.hashicorp.com/vault-auditor/1.0.1/vault-auditor_1.0.1_linux_amd
 
 ## execute
 
-run Vault Auditor against a specific log:
+run Vault Auditor against a specific log(s):
 
 `./vault-auditor parse /some/path/to/log/file(s)`
 

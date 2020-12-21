@@ -40,7 +40,7 @@ if logging is not currently enabled, follow these steps and get a cup of coffee 
 
 - it is recommended to pull logs from a central source for analysis on a system that is NOT running Vault
 - when functionality is added in Vautl 1.6 there will be a `usage` command added that can be used within a cluster
-- Vault Auditor can process multiple logs, a single log is used in the exmaples that follow
+- Vault Auditor can process multiple logs
 - logs from each Primary and Secondary Performance cluster should be analyzed
 
 `sudo cp /var/log/vault_audit.log /tmp/vault_audit.log`
@@ -66,13 +66,13 @@ https://releases.hashicorp.com/vault-auditor/1.0.1/vault-auditor_1.0.1_linux_amd
 
 ## execute
 
-- run Vault Auditor against a specific log
+run Vault Auditor against a specific log(s):
 
 `./vault-auditor parse /some/path/to/log/file(s)`
 
-- to parse a time period within a logset
+to parse a time period within a logset:
 
-`vault-auditor parse -start-date=2020-07-01 -end-date=2020-07-31 ./`
+`./vault-auditor parse -start-date=2020-07-01 -end-date=2020-07-31 /some/path/to/log/file(s)`
 
 ### example environemnt
 
@@ -91,4 +91,4 @@ Total files processed: 1
 Date range: 2020-10-02T18:02:13Z - 2020-10-02T18:19:03Z
 ```
 
-**note** Non-Entity tokens are tokens not associated with an entity, either as a result of a root token, orphan token or batch token creation (and usage).
+**note** Non-Entity tokens are tokens not associated with an entity, either as a result of a root token, orphaned token or batch token creation (and usage).

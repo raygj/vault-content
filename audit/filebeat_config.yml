@@ -1,0 +1,13 @@
+```
+---
+filebeat.inputs:
+  -
+    json.add_error_key: true
+    json.keys_under_root: true
+    paths:
+      - /var/log/vault_audit.log
+    type: log
+output.elasticsearch:
+  hosts:
+    - "192.168.1.69:9200"
+```

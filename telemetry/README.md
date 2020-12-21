@@ -1,10 +1,14 @@
 # Background and Goals
 
-Vault and Consul contain telemetry capabilities that support monitoring for health and utilization. This guide is a walkthrough meant as a minimal viable installation of OSS tools to support telemetry visualization using Grafana templates. There are alternatives including using [Prometheus](https://prometheus.io/) or Splunk.
+Vault and Consul contain telemetry capabilities that support monitoring for health and utilization. Additionally, Vault audit logs contain data that should be monitored for events that indicate missue or missconfiguration that may impact the health or performance of the Vault cluster.
+
+This guide is a walkthrough meant as a minimal viable installation of OSS tools to support telemetry and visualization using Grafana templates. There are alternatives including [Splunk](https://www.hashicorp.com/blog/splunk-app-for-monitoring-hashicorp-vault) and [Prometheus](https://medium.com/@mwieczorek/yet-another-vault-monitoring-with-prometheus-blog-post-f525c862baca).
 
 # Pre-Reqs and References:
 
-Setup a Vault-Consul cluster cohabitated install:
+Setup a Vault-Consul cluster (cohabitated install) or Vault Integrated Storage cluster(s):
+
+There are plenty of resources and guides a minimally vialble Vault cluster (single node) with Integrated Storage is an easy way to stand up a stafeful cluster with very low infrastructure overhead. By standing up and maintaining a Vault cluster, albeit a single or 3 node cluster, will allow for continue education and enablement as you continue to develop and add use cases. While you are enable these use cases, the telemetry and audit services will be helpful for troubleshooting and gaining insight info operating a Vault cluster.
 
 [manual on VMs of your choice](https://github.com/raygj/vault-content/tree/master/cluster-bootstrap)
 
@@ -16,9 +20,9 @@ Info:
 
 [Vault Monitoring Guide...source for this walkthrough](https://s3-us-west-2.amazonaws.com/hashicorp-education/whitepapers/Vault/Vault-Consul-Monitoring-Guide.pdf)
 
-# Architecture Used
+The [HashiCorp guide](https://s3-us-west-2.amazonaws.com/hashicorp-education/whitepapers/Vault/Vault-Consul-Monitoring-Guide.pdf)
 
-The [HashiCorp guide](https://s3-us-west-2.amazonaws.com/hashicorp-education/whitepapers/Vault/Vault-Consul-Monitoring-Guide.pdf) is written for Ubuntu Vault/Consul servers, but at this time my Vault/Consul cluster is CentOS 7, so the guide will be written with that in mind. This is the architecture the guide will be based on:
+This is the architecture the guide will be based on:
 
 ![image](/telemetry/images/lab_env.png)
 
@@ -28,135 +32,22 @@ The [HashiCorp guide](https://s3-us-west-2.amazonaws.com/hashicorp-education/whi
 
 ### bootstrap
 
-- install nano, unzip, wget (and open-vm-tools) as needed
-
-`sudo apt-get install <package a> <package b> -y`
-
-## Verify if firewall is active, if so, add required ports to support connectivity inbound from Telegraf agents
-
-`firewall-cmd --state`
-
-`firewall-cmd --zone=public --list-services`
-
-### firewall setup script
-
-copy contents to server, modify as-needed to match the environment and then run
-
-```
-
-#!/bin/sh
-# firewalld service definition for Consul connectivity
-# cd /tmp
-# nano firewallsetup.sh
-# chmod +x firewallsetup.sh
-# ./firewallsetup.sh
-
-
-cat << EOF > /etc/firewalld/services/consul.xml
-<?xml version="1.0" encoding="utf-8"?>
-<service>
-  <short>Consul</short>
-  <description>TCP connectivity required for HashiCorp Consul cluster communication.</description>
-  <port protocol="tcp" port="8300"/>
-  <port protocol="tcp" port="8301"/>
-  <port protocol="udp" port="8301"/>  
-  <port protocol="tcp" port="8302"/>
-  <port protocol="udp" port="8302"/>  
-  <port protocol="tcp" port="8500"/>
-  <port protocol="tcp" port="8600"/>
-  <port protocol="udp" port="8600"/>
-</service>
-EOF
-
-cat << EOF > /etc/firewalld/services/vault.xml
-<?xml version="1.0" encoding="utf-8"?>
-<service>
-  <short>Vault</short>
-  <description>TCP connectivity required for HashiCorp Vault cluster communication.</description>
-  <port protocol="tcp" port="8200"/>
-  <port protocol="tcp" port="8201"/>
-</service>
-EOF
-
-cat << EOF > /etc/firewalld/services/telegraf.xml
-<?xml version="1.0" encoding="utf-8"?>
-<service>
-  <short>telegraf</short>
-  <description>TCP connectivity required for outbound Telegraf agent.</description>
-  <port protocol="tcp" port="8086"/>
-</service>
-EOF
-
-# identify default zone
-firewall-cmd --get-default-zone # identify the default zone
-
-# add custom services to default zone
-# assumes public zone
-
-firewall-cmd --zone=public --add-service=consul --permanent
-firewall-cmd --zone=public --add-service=vault --permanent
-firewall-cmd --zone=public --add-service=https --permanent
-firewall-cmd --zone=public --add-service=http --permanent
-firewall-cmd --zone=public --add-service=telegraf --permanent
-firewall-cmd --complete-reload
-
-# troubleshooting commands
-# https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7
-# 
-# firewall-cmd --state # verify service is running and reachable
-# systemctl restart network
-# systemctl reload firewalld
-# firewall-cmd --zone=public --list-all
-# firewall-cmd --zone=public --list-services
-# firewall-cmd --get-services
-
-```
+- install nano, unzip, wget as needed
 
 ## Install InfluxDB, guide [HERE](https://computingforgeeks.com/install-influxdb-on-ubuntu-18-04-and-debian-9/)
 
 ```
-
 echo "deb https://repos.influxdata.com/ubuntu bionic stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
 
 sudo curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
 
 sudo apt-get update
-
-sudo apt-get install -y influxdb
+sudo apt-get install influxdb
 
 sudo systemctl enable --now influxdb
 
-sudo systemctl is-enabled influxdb
-
-systemctl status influxdb
-
+sudo systemctl influxdb
 ```
-
-## Install Grafana
-
-```
-
-curl -s https://packagecloud.io/install/repositories/grafana/stable/script.deb.sh | sudo bash
-
-sudo apt-get update -y
-
-sudo apt-get install grafana -y
-
-sudo systemctl daemon-reload
-
-sudo systemctl enable grafana-server
-
-sudo systemctl start grafana-server
-
-sudo systemctl status grafana-server
-
-```
-
-### Access Grafana
-
-http://your-server-ip:3000
-
-Default username/password: admin/admin
 
 #### Create InfluxDB user for Telegraf agents
 
@@ -171,6 +62,28 @@ show users
 exit
 
 ```
+## Install Grafana, guide [HERE](https://grafana.com/docs/grafana/latest/installation/debian/)
+
+```
+sudo apt-get install -y apt-transport-https
+sudo apt-get install -y software-properties-common wget
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+
+echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+
+sudo apt-get update
+sudo apt-get install grafana -y
+
+sudo systemctl enable --now grafana-server
+
+sudo systemctl grafana-server
+```
+
+### Access Grafana
+
+http://your-server-ip:3000
+
+Default username/password: admin/admin
 
 # Move to the Vault/Consul servers
 
@@ -184,37 +97,55 @@ sudo systemctl stop consul
 
 ```
 
-## Install Telegraf on Vault/Consul servers
-
-`nano /etc/yum.repos.d/influxdata.repo`
+## Install Telegraf on Vault/Consul servers, guide [HERE](https://docs.influxdata.com/telegraf/v1.16/introduction/installation/)
 
 ```
+wget -qO- https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+source /etc/lsb-release
+echo "deb https://repos.influxdata.com/${DISTRIB_ID,,} ${DISTRIB_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
 
-[influxdb]
-name = InfluxDB Repository - RHEL \$releasever
-baseurl = https://repos.influxdata.com/rhel/\$releasever/\$basearch/stable
-enabled = 1
-gpgcheck = 1
-gpgkey = https://repos.influxdata.com/influxdb.key
+# Before adding Influx repository, run this so that apt will be able to read the repository.
+
+sudo apt-get update && sudo apt-get install apt-transport-https
+
+# Add the InfluxData key
+
+wget -qO- https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+source /etc/os-release
+test $VERSION_ID = "7" && echo "deb https://repos.influxdata.com/debian wheezy stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+test $VERSION_ID = "8" && echo "deb https://repos.influxdata.com/debian jessie stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+test $VERSION_ID = "9" && echo "deb https://repos.influxdata.com/debian stretch stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+test $VERSION_ID = "10" && echo "deb https://repos.influxdata.com/debian buster stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+
+sudo apt-get update && sudo apt-get install telegraf
+sudo systemctl start telegraf
 
 ```
-
-`yum install telegraf -y`
-
 ### Modify Telegraf config file on Vault/Consul servers
 
-Suggest using scp to copy template up to each server rather than hand-editing, grab a copy [HERE](https://github.com/raygj/vault-content/blob/master/telemetry/misc_configs_snippets/telegraf.conf)
+Grab a copy of the Telegraf config [HERE](https://raw.githubusercontent.com/raygj/vault-content/master/telemetry/misc_configs_snippets/telegraf.conf)
+
+**Update relevant config items:**
+
+Global Tags
+Outputs.influxdb > urls should be updated to point to the InfluxDB/Granfana host, for example urls = ["http://vault-telem-server:8086"] # required''
+
+- if you are using Integrated Storage, remove the [inputs.consul] block...unless you are running Consul for service registry/discovery
+
+urls = ["http://192.168.1.69:8086"] # required
 
 
 ```
+sudo cp /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.orig
 
-rm -rf /etc/telegraf/telegraf.conf
+sudo rm -rf /etc/telegraf/telegraf.conf
 
-nano /etc/telegraf/telegraf.conf
+sudo nano /etc/telegraf/telegraf.conf
 
-systemctl restart telegraf
+sudo systemctl  restart telegraf
 
-systemctl status telegraf
+sudo systemctl  status telegraf
+
 
 ```
 
@@ -241,9 +172,9 @@ EOF
 
 ```
 
-cp /etc/vault.d/vault-no-tls.hcl cp /etc/vault.d/vault-no-tls.hcl.orig
+cp /etc/vault.d/vault-tls.hcl cp /etc/vault.d/vault-tls.hcl.orig
 
-nano /etc/vault.d/vault-no-tls.hcl
+sudo nano /etc/vault.d/vault-tls.hcl
 
 telemetry {
   dogstatsd_addr   = "localhost:8125"
@@ -270,11 +201,33 @@ show databases
 
 use telegraf
 
-show measurements 
+show measurements
 
 ```
 
 **NOTE** at this point you should see consul, OS (CPU/disk/process) and Vault KPIs
+
+```
+...
+datadog.dogstatsd.client.packets_dropped_writer
+datadog.dogstatsd.client.packets_sent
+disk
+diskio
+kernel
+linux_sysctl_fs
+mem
+net
+netstat
+processes
+procstat
+procstat_lookup
+swap
+system
+vault.runtime.alloc_bytes
+vault.runtime.free_count
+vault.runtime.gc_pause_ns
+...
+```
 
 `exit`
 
@@ -282,30 +235,33 @@ show measurements
 
 ### Configuring the data source
 
-Before we can create dashboards, we need to tell Grafana where to get data from. From the Grafana home screen, click "Create your first data source", or go to the sidebar menu and choose Configuration > Data Sources and then click "Add a data source".
+Before we can create dashboards, we need to tell Grafana where to get data from. From the Grafana home screen, click "Create your first data source", select InfluxDB
 
 Fill in the settings as follows:
 
 ```
 
 Name: any name you like. Default: checked.
-Type: InfluxDB.
+Type: InfluxQL
 
 HTTP:
 URL: http://localhost:8086
-Access: direct
+Access: default/direct
 
 Auth: leave all options unchecked.
 
 Advanced HTTP Settings: leave options at defaults. InfluxDB Details:
 
-Database: telegraf User: telegraf Password: telegraf
+Database: telegraf
+User: telegraf
+Password: telegraf
+HTTP Method: get
 
 Min time interval: 10s (matches the Telegraf agent interval setting)
 
 ```
 
-Make sure your screen looks like this screenshot, ![image](/telemetry/images/configure_data_source.png) 
+Make sure your screen looks like this screenshot, ![image](/telemetry/images/configure_data_source.png)
 
 
 ...then click "Save & Test". You should see messages indicating that "Data source is working" and "Data source saved". If not, double check your entries.
@@ -328,7 +284,7 @@ GOTCHA: make sure the values of the datacenter= and role= tags match the values 
 
 ![image](/telemetry/images/dc_tag_gotcha.png)
 
-Now you should be able to see beautiful dashboards full of Vault and Consul metrics. If there are errors, you might need to customize each dashboard slightly. Depending on the versions of Vault and Consul you have, some metrics may not be available or may have been renamed.
+Now you should be able to see beautiful dashboards full of Vault (and Consul) metrics. If there are errors, you might need to customize each dashboard slightly - use the inpsect feature of Graphana to look at the query string, validate the data is being tracked and taged by Telegraf by running queries against InfluxDB directly...or use a SQL explorer of some kind.
 
 # Vault Dashboard
 

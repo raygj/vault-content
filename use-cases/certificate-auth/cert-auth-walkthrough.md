@@ -128,3 +128,100 @@ Code: 403. Errors:
 * 1 error occurred:
 	* permission denied
 ```
+
+###Vault Agent Auto-Auth
+
+- Vault Agent configuration
+`exit_after_auth` is used for testing or calling Vault Agent in a script; Vault Agent can be run as a daemon if desired mark this as `false`
+within the sink config, **config path** is the complete path and filename
+
+```
+tee ~/auto-auth-conf.hcl <<EOF
+exit_after_auth = true #run once, then exit
+pid_file = "./pidfile"
+
+auto_auth {
+    method "cert" {
+        mount_path = "auth/cert"
+        config = {
+            name = "web"
+            ca_cert = "/home/jray/lab_ca.crt"
+            client_cert = "/home/jray/vault-client.crt"
+            client_key = "/home/jray/vault-client.key"
+        }
+    }
+
+    vault {
+      address = "https://vault-ent-node-1:8200"
+    }
+
+    sink "file" {
+        config = {
+            path = "/home/jray/vault-token-via-agent/here_is_your_token"
+        }
+    }
+}
+EOF
+```
+
+- make sure VAULT_ADDR is set with HTTPS if TLS is enabled on the cluster:
+
+`export VAULT_ADDR=https://vault-ent-node-1:8200`
+
+- run Vault Agent manually:
+
+`vault agent -config=/home/jray/auto-auth-conf.hcl -log-level=debug`
+
+- view the token from the file sink:
+
+`cat /home/jray/vault-token-via-agent/here_is_your_token`
+
+- Vault Agent configuration with Seal Wrapping
+
+```
+tee ~/auto-auth-conf.hcl <<EOF
+exit_after_auth = true #run once, then exit
+pid_file = "./pidfile"
+
+auto_auth {
+    method "cert" {
+        mount_path = "auth/cert"
+        config = {
+            name = "web"
+            ca_cert = "/home/jray/lab_ca.crt"
+            client_cert = "/home/jray/vault-client.crt"
+            client_key = "/home/jray/vault-client.key"
+        }
+    }
+    vault {
+      address = "https://vault-ent-node-1:8200"
+    }
+
+    sink "file" {
+      wrap_ttl = "10m"
+        config = {
+            path = "/home/jray/vault-token-via-agent/here_is_your_token"
+        }
+    }
+}
+EOF
+```
+- view wrapped data:
+
+`tail /home/jray/vault-token-via-agent/here_is_your_token | jq`
+
+- unwrap data
+
+`export VAULT_TOKEN=$(vault unwrap -field=token $(jq -r '.token' /home/jray/vault-token-via-agent/here_is_your_token))`
+
+- check for valid token:
+
+`echo $VAULT_TOKEN`
+
+- use this token to log into Vault:
+
+`vault login $VAULT_TOKEN`
+
+- read the KV path
+
+`vault kv get demo/myapp/config`

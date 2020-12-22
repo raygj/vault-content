@@ -233,7 +233,7 @@ In this section we'll take everything we've done so far and apply it to the Vaul
 1. [From the Vault **Client**] First, we'll create a configuration file for the Vault Agent to use:
 
 ```
-tee /home/ubuntu/auto-auth-conf.hcl <<EOF
+tee ~/auto-auth-conf.hcl <<EOF
 exit_after_auth = true
 pid_file = "./pidfile"
 
@@ -248,7 +248,7 @@ auto_auth {
 
 sink "file" {
 	config = {
-		path = "/home/ubuntu/vault-token-via-agent"
+		path = "~/vault-token-via-agent"
             }
         }
     }
@@ -262,7 +262,7 @@ We're also identifying a location on disk where we want to place this token. The
 
 2. [From the Vault **Client**] Now we'll run the Vault Agent with the above config:
 
-`vault agent -config=/home/ubuntu/auto-auth-conf.hcl -log-level=debug`
+`vault agent -config=~/auto-auth-conf.hcl -log-level=debug`
 
 ***NOTES:***
 
@@ -275,7 +275,7 @@ Vault Agent can also run in daemon mode where it will continuously renew the ret
 
 ```
 curl \
---header "X-Vault-Token: $(cat /home/ubuntu/vault-token-via-agent)" \
+--header "X-Vault-Token: $(cat ~/vault-token-via-agent)" \
 $VAULT_ADDR/v1/demo/myapp/config | jq
 
 ```
@@ -287,7 +287,7 @@ $VAULT_ADDR/v1/demo/myapp/config | jq
 Let's update our `auto-auth-conf.hcl` file to indicate that we want the Vault token to be response-wrapped when written to the defined sink:
 
 ```
-tee /home/ubuntu/auto-auth-conf.hcl <<EOF
+tee ~/auto-auth-conf.hcl <<EOF
 exit_after_auth = true
 pid_file = "./pidfile"
 
@@ -303,7 +303,7 @@ auto_auth {
 sink "file" {
 	wrap_ttl = "10m"
 		config = {
-			path = "/home/ubuntu/vault-token-via-agent"
+			path = "~/vault-token-via-agent"
             }
         }
     }
@@ -313,23 +313,23 @@ EOF
 
 5. [From the Vault **Client**] Let's run the Vault Agent and inspect the output:
 
-`vault agent -config=/home/ubuntu/auto-auth-conf.hcl -log-level=debug`
+`vault agent -config=~/auto-auth-conf.hcl -log-level=debug`
 
 5a. Inspect the contents of the file written to the sink:
 
-`cat /home/ubuntu/vault-token-via-agent | jq`
+`cat ~/vault-token-via-agent | jq`
 
 Here we see that instead of a simple token value, we have a JSON object containing a response-wrapped token as well as some additional metadata. In order to get to the true token, we need to first perform an unwrap operation.
 
 6. [From the Vault **Client**] Let's unwrap the response-wrapped token and save it to a `VAULT_TOKEN` env var that other applications can use:
 
-`export VAULT_TOKEN=$(vault unwrap -field=token $(jq -r '.token' /home/ubuntu/vault-token-via-agent))`
+`export VAULT_TOKEN=$(vault unwrap -field=token $(jq -r '.token' ~/vault-token-via-agent))`
 
 `echo $VAULT_TOKEN`
 
-Notice that the value saved to the `VAULT_TOKEN` is not the same as the `token` value in the file `/home/ubuntu/vault-token-via-agent`. The value in `VAULT_TOKEN` is the unwrapped token retrieved by Vault Agent. Additionally, note that if we try to unwrap that same value again, we get an error:
+Notice that the value saved to the `VAULT_TOKEN` is not the same as the `token` value in the file `~/vault-token-via-agent`. The value in `VAULT_TOKEN` is the unwrapped token retrieved by Vault Agent. Additionally, note that if we try to unwrap that same value again, we get an error:
 
-`export VAULT_TOKEN=$(vault unwrap -field=token $(jq -r '.token' /home/ubuntu/vault-token-via-agent))`
+`export VAULT_TOKEN=$(vault unwrap -field=token $(jq -r '.token' ~/vault-token-via-agent))`
 
 ```
 Error unwrapping: Error making API request.

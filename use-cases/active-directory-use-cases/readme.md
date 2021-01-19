@@ -1,17 +1,19 @@
-#Vault Active Directory Check In | Check Out, Service Account Managment, and AD Auth Walkthrough
+# Vault Active Directory Check In | Check Out, Service Account Managment, and AD Auth Walkthrough
+
 - both Check-In and Auth require a working Active Directory configuration, so both workflows are presented since end users will auth to Vault with AD, then access Service Accounts managed by Vault
 - the Check-In | Check-Out workflow is based on a target set of accounts that Vault will manage (rotate password based on admin-define TTLs)
 - the Auth workflow is for authenticating to Vault, via Active Directory
 
-##background and assumptions
+## background and assumptions
+
 - Windows Server 2016, Forest Win2016 Functional Level
 - Vault 1.6 OSS or ENT
 - Vault TLS Listener from separate CA than Windows Domain
-##references
+## references
 
-##build: Windows Prep
+## build: Windows Prep
 
-###create a "bind" user in AD
+### create a "bind" user in AD
 
 vaultbind
 
@@ -21,7 +23,7 @@ vaultbind
 
 `"CN=vaultbind,CN=Users,DC=vault-lab,DC=home,DC=org"`
 
-###create target service accounts that Vault will manage
+### create target service accounts that Vault will manage
 
 sa00@vault-lab.home.org
 
@@ -34,7 +36,7 @@ sa01@vault-lab.home.org
 
 - verify with dsquery (and capture connection string for Vault config)
 
-###create a group to target for auth (optional)
+### create a group to target for auth (optional)
 
 vault-auth-group
 
@@ -44,11 +46,11 @@ vault-auth-group
 
 `"CN=vault-auth-group,CN=Users,DC=vault-lab,DC=home,DC=org"`
 
-####create a test user and add them to the group
+#### create a test user and add them to the group
 
 Jim Ray (jray@vault-lab.home.org)
 
-###prepare domain controller for LDAPS
+### prepare domain controller for LDAPS
 
 **this is a required step to use LDAPS and all Active Directory functionality in your lab**
 
@@ -82,7 +84,7 @@ Step 7. move to a stable directory where Vault will consume the cert
 
 `openssl x509 -in ~/win-domain-cert/win-domain-ca-cert.pem -text -noout`
 
-##build: Vault Check-In | Check-Out Config
+## build: Vault Check-In | Check-Out Config
 
 1. enable AD secret engine
 
@@ -121,7 +123,7 @@ vault write ad/library/ops-team \
 
 https://www.vaultproject.io/docs/secrets/ad#service-account-check-out
 
-##build: service account rotation
+## build: service account rotation
 
 1. gather/create AD user that will be managed by Vault
 
@@ -177,7 +179,7 @@ curl \
     --data @payload.json \
     $VAULT_ADDR/v1/sa-rotate/creds/app00 | jq
 
-##build: enable LDAP auth
+## build: enable LDAP auth
 
 1. enable LDAP auth at default mount
 

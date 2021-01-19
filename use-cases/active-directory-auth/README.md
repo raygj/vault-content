@@ -21,7 +21,7 @@ walkthrough configuring AD as an authentication source for Vault
 
 #### Active Directory Setup
 
-- create Vault Bind user (with minium RO access) that will be used by Vault to communicate to Windows AD
+- create Vault Bind user (with minimum RO access) that will be used by Vault to communicate to Windows AD
 
 `vaultadm`
 
@@ -230,7 +230,7 @@ token_meta_username    jim ray
 
 ![diagram](/images/wireshark_failed_auth.png)
 
-^^ this is a failed login attempt that ended with a `Code: 400. Errors: * ldap operation failed` error from Vault. the bind connection and initiatial search was successful, but then the flow stops.
+^^ this is a failed login attempt that ended with a `Code: 400. Errors: * ldap operation failed` error from Vault. the bind connection and initial search was successful, but then the flow stops.
 
 ![diagram](/images/wireshark_success_auth.png)
 

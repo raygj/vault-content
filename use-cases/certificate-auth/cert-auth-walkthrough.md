@@ -21,65 +21,74 @@ last_password=Sup3rSecret
 
 Create a read-only policy for our clients:
 
+```
 cat << EOF > myapp-kv-ro.hcl
-
 path "demo/*" {
 capabilities = ["read", "list"]
 }
 EOF
+```
 
 write the policy:
 
-vault policy write myapp-kv-ro myapp-kv-ro.hcl
+`vault policy write myapp-kv-ro myapp-kv-ro.hcl`
 
 view active policies and their contents:
 
-vault policy list
+`vault policy list`
 
-vault policy read myapp-kv-ro
+`vault policy read myapp-kv-ro`
 
 Enable the certificate auth method:
 
-vault auth enable cert
+`vault auth enable cert`
 
 Upload or copy the client's certificate to the Vault server:
 
-scp -i .ssh/jgrdubc /Users/jray/vault-client.crt jray@vault-ent-node-1:~/
+`scp -i .ssh/jgrdubc /Users/jray/vault-client.crt jray@vault-ent-node-1:~/`
 
 Configure the cert mount with trusted certificates that are allowed to authenticate:
 
+```
 vault write auth/cert/certs/web \
     display_name=web \
     policies=myapp-kv-ro \
     certificate=@vault-client.crt
+```
 
 #Authenticate from a Client
 
 ##Setup Vault
 
+```
 export VAULT_VERSION=1.6.0
 export VAULT_ADDR=https://vault-ent-node-1:8200
+```
 
-wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip
+`wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip`
 
-unzip vault_${VAULT_VERSION}_linux_amd64.zip
+`unzip vault_${VAULT_VERSION}_linux_amd64.zip`
 
-sudo cp -rp vault /usr/local/bin/vault
+`sudo cp -rp vault /usr/local/bin/vault`
 
+```
 sudo tee -a /etc/environment <<EOF
 export VAULT_ADDR=$VAULT_ADDR
 EOF
+```
 
-source /etc/environment
+`source /etc/environment`
 
 ##Authenticate
 
+```
 vault login \
     -method=cert \
     -ca-cert=lab_ca.crt \
     -client-cert=vault-client.crt \
     -client-key=vault-client.key \
     name=web
+```
 
 ```
 Success! You are now authenticated. The token information displayed below
@@ -104,7 +113,7 @@ token_meta_subject_key_id      3b:e7:10:73:2b:50:75:11:5a:a9:c6:7c:0a:de
 
 Validate policy is granting read-only access to the KV path:
 
-vault kv get demo/myapp/config
+`vault kv get demo/myapp/config`
 
 ```
 ========== Data ==========
@@ -116,8 +125,10 @@ last_password       Sup3rSecret
 
 - attempt to write data
 
+```
 vault kv put demo/myapp/config \
 current_password=pwnthis
+```
 
 ```
 Error writing data to demo/myapp/config: Error making API request.

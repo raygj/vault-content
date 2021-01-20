@@ -2,17 +2,18 @@
 # sudo chmod +x bootstrap.sh
 # run with sudo
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-apt-get update
-apt-get install -y unzip nano net-tools nmap socat conntrack docker
-
 # docker install on Amazon Ubuntu
 # https://geekylane.com/install-docker-on-aws-ec2-ubuntu-18-04-script-method/
 #curl -fsSL https://get.docker.com -o get-docker.sh
 #sudo sh get-docker.sh
+
+# ubuntu docker install
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io
+apt-get update
+apt-get install -y unzip nano net-tools nmap socat conntrack docker
 
 # minikube installation
 # https://github.com/raygj/vault-content/tree/master/use-cases/vault-agent-kubernetes#install-minikube

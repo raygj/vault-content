@@ -22,6 +22,12 @@ injector:
         cpu: 250m
 
 server:
+
+  # Affinity Settings
+  # Commenting out or setting as empty the affinity variable, will allow
+  # deployment to single node services such as Minikube
+  #affinity:
+
   # Use the Enterprise Image
   image:
     repository: "hashicorp/vault-enterprise"
@@ -31,11 +37,22 @@ server:
   # Vault Reference Architecture for a Small Cluster
   resources:
     requests:
-      memory: 2Gi
-      cpu: 2000m
+      memory: 1Gi
+      cpu: 1000m
     limits:
-      memory: 2Gi
-      cpu: 2000m
+      memory: 1Gi
+      cpu: 1000m
+  # This configures the Vault Statefulset to create a PVC for raft storage and audit logs.
+  # See https://learn.hashicorp.com/tutorials/vault/kubernetes-raft-deployment-guide?in=vault/kubernetes#stateful-storage to know more
+  dataStorage:
+    enable: true
+    size: 5Gi
+  auditStorage:
+    enabled: true
+    size: 1Gi
+  # true to enable the default, single node deployment
+  standalone:
+    enabled: false
 
   # For HA configuration and because we need to manually init the vault,
   # we need to define custom readiness/liveness Probe settings
@@ -53,28 +70,18 @@ server:
   # extraEnvironmentVars is a list of extra environment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
   extraEnvironmentVars:
-    VAULT_CACERT: /vault/userconfig/tls-ca/lab_ca.crt
+    VAULT_CACERT: /vault/userconfig/vault-tls-server/lab_ca.crt
 
   # extraVolumes is a list of extra volumes to mount. These will be exposed
   # to Vault in the path `/vault/userconfig/<name>/`.
   extraVolumes:
     - type: secret
-      name: tls-server
-    - type: secret
-      name: tls-ca
-
-  # This configures the Vault Statefulset to create a PVC for audit logs.
-  # See https://www.vaultproject.io/docs/audit/index.html to know more
-  auditStorage:
-    enabled: true
-
-  standalone:
-    enabled: false
+      name: vault-tls-server
 
   # Run Vault in "HA" mode.
   ha:
     enabled: true
-    replicas: 5
+    replicas: 3
     raft:
       enabled: true
       setNodeId: true
@@ -84,8 +91,8 @@ server:
         listener "tcp" {
           address = "[::]:8200"
           cluster_address = "[::]:8201"
-          tls_cert_file = "/vault/userconfig/tls-server/vault-k8s.crt"
-          tls_key_file = "/vault/userconfig/tls-server/vault-k8s.key"
+          tls_cert_file = "/vault/userconfig/vault-tls-server/vault-k8s.crt"
+          tls_key_file = "/vault/userconfig/vault-tls-server/vault-k8s.key"
           tls_ca_cert_file = "/vault/userconfig/tls-ca/lab_ca.crt"
         }
 
@@ -93,33 +100,21 @@ server:
           path = "/vault/data"
             retry_join {
             leader_api_addr = "https://vault-0.vault-internal:8200"
-            leader_ca_cert_file = "/vault/userconfig/tls-ca/lab_ca.crt"
-            leader_client_cert_file = "/vault/userconfig/tls-server/vault-k8s.crt"
-            leader_client_key_file = "/vault/userconfig/tls-server/vault-k8s.key"
+            leader_ca_cert_file = "/vault/userconfig/vault-tls-server/lab_ca.crt"
+            leader_client_cert_file = "/vault/userconfig/vault-tls-server/vault-k8s.crt"
+            leader_client_key_file = "/vault/userconfig/vault-tls-server/vault-k8s.key"
           }
           retry_join {
             leader_api_addr = "https://vault-1.vault-internal:8200"
-            leader_ca_cert_file = "/vault/userconfig/tls-ca/lab_ca.crt"
-            leader_client_cert_file = "/vault/userconfig/tls-server/vault-k8s.crt"
-            leader_client_key_file = "/vault/userconfig/tls-server/vault-k8s.key"
+            leader_ca_cert_file = "/vault/userconfig/vault-tls-server/lab_ca.crt"
+            leader_client_cert_file = "/vault/userconfig/vault-tls-server/vault-k8s.crt"
+            leader_client_key_file = "/vault/userconfig/vault-tls-server/vault-k8s.key"
           }
           retry_join {
             leader_api_addr = "https://vault-2.vault-internal:8200"
-            leader_ca_cert_file = "/vault/userconfig/tls-ca/lab_ca.crt"
-            leader_client_cert_file = "/vault/userconfig/tls-server/vault-k8s.crt"
-            leader_client_key_file = "/vault/userconfig/tls-server/vault-k8s.key"
-          }
-          retry_join {
-              leader_api_addr = "https://vault-3.vault-internal:8200"
-              leader_ca_cert_file = "/vault/userconfig/tls-ca/lab_ca.crt"
-              leader_client_cert_file = "/vault/userconfig/tls-server/vault-k8s.crt"
-              leader_client_key_file = "/vault/userconfig/tls-server/vault-k8s.key"
-          }
-          retry_join {
-              leader_api_addr = "https://vault-4.vault-internal:8200"
-              leader_ca_cert_file = "/vault/userconfig/tls-ca/lab_ca.crt"
-              leader_client_cert_file = "/vault/userconfig/tls-server/vault-k8s.crt"
-              leader_client_key_file = "/vault/userconfig/tls-server/vault-k8s.key"
+            leader_ca_cert_file = "/vault/userconfig/vault-tls-server/lab_ca.crt"
+            leader_client_cert_file = "/vault/userconfig/vault-tls-server/vault-k8s.crt"
+            leader_client_key_file = "/vault/userconfig/vault-tls-server/vault-k8s.key"
           }
         }
 
@@ -128,7 +123,7 @@ server:
 # Vault UI
 ui:
   enabled: true
-  serviceType: "LoadBalancer"
+  serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
 

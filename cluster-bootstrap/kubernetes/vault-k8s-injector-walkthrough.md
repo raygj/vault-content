@@ -1,6 +1,6 @@
-###Configure Kubernetes
+### Configure Kubernetes
 
-####service accounts
+#### service accounts
 
 1. define a unique service account `internal-app` that was used for the app deployments
 
@@ -57,7 +57,7 @@ EOF
 
 `kubectl -n vault get serviceaccounts`
 
-##Vault Agent Injector Auto-Auth
+## Vault Agent Injector Auto-Auth
 
 _bulding off the previous K8S auth method configuration and testing, use Vault Agent Injector pod as an intermediary between Vault server and a consuming service in another pod that will have no knowledge of Vault_
 
@@ -73,7 +73,7 @@ _bulding off the previous K8S auth method configuration and testing, use Vault A
 - this walkthrough assumes Vault, the Injector, and workload are in the same Namespace for simplicity
   - a more real world deployment would have Vault on a dedicated cluster, and the Injector in a shared service or dedicated pod
 
-###Prepare Vault
+### Prepare Vault
 
 0. ensure connectivity between a vault client host or the access vault directly through an exec session
 
@@ -120,7 +120,7 @@ EOF
 
 `vault policy read int-app-ro`
 
-####K8S configurations
+#### K8S configurations
 
 1. set the SA_JWT_TOKEN environment variable value to the service account JWT used to access the TokenReview API **note** update `-n` to the target namespace
 
@@ -195,7 +195,7 @@ vault write auth/k8s_injector/role/int-app-v_role \
 4a. exit exec shell/move on
 ^^^
 
-###deploy demo app and test
+### deploy demo app and test
 
 1. create the sample app definition
 
@@ -284,8 +284,8 @@ kubectl -n vault exec \
 ```
 
 kubectl exec \
-    $(kubectl get pod -l app=orgchart -o jsonpath="{.items[0].metadata.name}") \
-    --container orgchart -- ls /vault/secrets
+    $(kubectl get pod -l app=app -o jsonpath="{.items[0].metadata.name}") \
+    --container dev-fin-service -- ls /vault/secrets
 
 - success/expected output
 
@@ -396,23 +396,17 @@ kubectl -n vault logs \
     $(kubectl -n vault get pod -l app=dev-fin-service -o jsonpath="{.items[0].metadata.name}") \
     --container app
 
-5b. display the secret written to `orgchart` container
+5b. display the secret written to `dev-fin-service` container
 
-kubectl exec \
-    $(kubectl get pod -l app=dev-fin-service -o jsonpath="{.items[0].metadata.name}") \
-    --container app -- cat /vault/secrets/database-config.txt
 
-**Troubleshooting**
-
-kubectl -n vault exec -it orgchart-7457f8489d-62xlm -- /bin/sh
 
 6. Vault Agent Injector Examples
 
 https://www.vaultproject.io/docs/platform/k8s/injector/examples
 
-##Injector Walkthrough
+**Troubleshooting**
 
-[link]()
+kubectl -n vault exec -it dev-fin-service-7457f8489d-62xlm -- /bin/sh
 
 
 - install test tools to an Alpine or other compatible image

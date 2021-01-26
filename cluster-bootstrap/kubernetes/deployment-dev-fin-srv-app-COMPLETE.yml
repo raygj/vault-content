@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-fin-service
+  labels:
+    app: vault-inject-secrets-demo
+spec:
+  selector:
+    matchLabels:
+      app: vault-inject-secrets-demo
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        # AGENT INJECTOR SETTINGS
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-database-config.txt: "injector-demo/secret"
+        vault.hashicorp.com/role: "int-app-v_role"
+        vault.hashicorp.com/log-level: "debug"
+      labels:
+        app: vault-inject-secrets-demo
+    spec:
+      shareProcessNamespace: true
+      serviceAccountName: int-app-sa
+      containers:
+        - name: app
+          image: jweissig/app:0.0.1
+          env:
+          - name: APP_SECRET_PATH
+            value: "/vault/secrets/database-config.txt"
+          - name: VAULT_ADDR
+            value: "http://172.17.0.3:8200"

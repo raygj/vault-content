@@ -228,7 +228,7 @@ spec:
           - name: APP_SECRET_PATH
             value: "/vault/secrets/database-config.txt"
           - name: VAULT_ADDR
-            value: "http://$(minikube ip):8200"
+            value: "http://172.17.0.3:8200"
 EOF
 ```
 
@@ -237,7 +237,7 @@ alternative image: paulbouwer/hello-kubernetes:1.8
 **notes**
 - `shareProcessNamespace` [cross-NS support, see docs](https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/) can be used to inject secrets across NS or to attach a troubleshooting container
 - `serviceAccountName` as defined in step 0 of the Kubernetes > Service Account section above
-- `VAULT_ADDR` is a K8S service director/gw/loadbalancer that is accessible from containers in the target pod
+- `VAULT_ADDR` is a K8S service director/gw/loadbalancer that is accessible from containers in the target pod; this var can be referenced in the pod, but more importantly for the Injector workflow is the use of the
 - `APP_SECRET_PATH` is a target path where secret "database-config.txt" will be written by the Vault Agent Injector; there is a corresponding annotation in the ``
 
 
@@ -297,7 +297,7 @@ command terminated with exit code 1
 
 get the conainter name from "get pods" and exec in
 
-`kubectl -n vault exec -it dev-fin-service-d555555db-7ghtv -- /bin/sh`
+`kubectl -n vault exec -it dev-fin-service-7fb57ccbfb-ptxb9 -- /bin/sh`
 
 `ls /vault/secrets`
 
@@ -337,23 +337,20 @@ spec:
       annotations:
         # AGENT INJECTOR SETTINGS
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-status: "update"
         vault.hashicorp.com/agent-inject-secret-database-config.txt: "injector-demo/secret"
-        # VAULT SETTINGS
         vault.hashicorp.com/role: "int-app-v_role"
-        # VAULT SETTINGS - If Vault is running in secure mode
-        # vault.hashicorp.com/tls-secret: "tls-test-client"
-        # vault.hashicorp.com/ca-cert: "vault/tls/ca.crt"
+        vault.hashicorp.com/auth-path: "auth/k8s_injector"
+        vault.hashicorp.com/log-level: "debug"
 EOF
 ```
 
 **notes**
 
+- include the annotation `vault.hashicorp.com/auth-path: "auth/k8s_injector"` if you mounted your Kubernetes auth method to a custom path; by default the injector will look to `auth/kubernetes`
 - include the annotation `vault.hashicorp.com/agent-inject-status: "update"` and patch the deployment to trigger a re-injection of values; helpful when including templating
-
 - this configuration tells the injector service to retrieve the KV `config` secret from ` internal/data/database/config`, write it to `database-config`, bound to the Vault role `internal-app` that we created om the Vault server
-
 - agent-inject-secret-FILEPATH prefixes the path of the file, database-config.txt written to the /vault/secrets directory on the container. The value is the path to the secret defined in Vault, which should match the KV path we have used in this walkthrough
+- the annotation `vault.hashicorp.com/log-level` defaults to `info` logs can be viewed by access target pod and either `vault-agent-init` if there is an init problem or `vault-agent` if init completes and you need to troubleshoot the app container
 
 4b. patch the existing deployment of the sample app
 
@@ -376,6 +373,11 @@ vault-2                                 1/1     Running    0          10h
 vault-agent-injector-685f8f78db-rgntg   1/1     Running    0          10h
 
 ```
+if the init process does not complete, start troubleshooting there with a focus on connectivity to vault and logs from the init container - look for values being set by the injector that may be wrong or contain a typo
+
+
+
+
 5a. check pod details
 
 `kubectl -n vault describe pods dev-fin-service`
@@ -390,26 +392,179 @@ vault-agent-injector-685f8f78db-rgntg   1/1     Running    0          10h
 ```
 **note** if the patched deployment and secret injection completes, the original container should be removed
 
-5a. display the logs of the `vault-agent` container in the new `dev-fin-service` pod
+5a. display the logs of the `vault-agent` container (that exists after the init completes) in the new `dev-fin-service` pod
 
 kubectl -n vault logs \
     $(kubectl -n vault get pod -l app=dev-fin-service -o jsonpath="{.items[0].metadata.name}") \
-    --container app
+    --container vault-agent
 
 5b. display the secret written to `dev-fin-service` container
 
+`kubectl -n vault exec -it dev-fin-service-7457f8489d-62xlm -- /bin/sh`
 
+`cat /vault/secrets/database-config.txt`
 
 6. Vault Agent Injector Examples
 
 https://www.vaultproject.io/docs/platform/k8s/injector/examples
 
-**Troubleshooting**
+## Troubleshooting
 
-kubectl -n vault exec -it dev-fin-service-7457f8489d-62xlm -- /bin/sh
+### init failures, proving the components of the workflow
 
+1. assuming your init is failing, exec into an "unpatched" pod
 
-- install test tools to an Alpine or other compatible image
+`kubectl -n vault exec -it dev-fin-service-7457f8489d-62xlm -- /bin/sh`
+
+2. install test tools to an Alpine or other compatible image
 
 apk update
 apk add curl jq
+
+3. validate connectivity to Vault based on the environment (K8S service selector, Consul service sync, etc.)
+
+- get active services
+
+`kubectl -n vault get services`
+
+```
+NAME                       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+vault                      ClusterIP   10.103.16.9     <none>        8200/TCP,8201/TCP   23h
+vault-active               ClusterIP   10.103.56.118   <none>        8200/TCP,8201/TCP   23h
+vault-agent-injector-svc   ClusterIP   10.105.73.132   <none>        443/TCP             23h
+vault-internal             ClusterIP   None            <none>        8200/TCP,8201/TCP   23h
+vault-standby              ClusterIP   10.110.161.71   <none>        8200/TCP,8201/TCP   23h
+```
+
+- curl to Vault's unauthenticated "status" endpoint via K8S service discovery
+
+`export VAULT_ADDR=http://vault-internal:8200`
+
+`curl $VAULT_ADDR/v1/sys/seal-status | jq`
+
+
+### test K8S auth from an "unpatched" app container or VM outside of K8S
+
+- fetch the SA JWT token for the SA bound to the "app" pod
+
+`export JWT=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
+
+- convert the above into curl commands; update Vault role and auth path
+
+`curl --request POST --data "{\"jwt\": \"$JWT\", \"role\": \"< vault role >\"}" -s -k $VAULT_ADDR/v1/auth/< mount point >/login | jq`
+
+  - example
+
+`curl --request POST --data "{\"jwt\": \"$JWT\", \"role\": \"int-app-v_role\"}" -s -k $VAULT_ADDR/v1/auth/k8s_injector/login | jq`
+
+- read the KV path
+
+```
+curl \
+--header "X-Vault-Token: $VAULT_TOKEN" \
+$VAULT_ADDR/v1/injector-demo/secret | jq
+```
+
+### test from a VM outside of K8S
+
+_assumes Vault binary is available and in the path_
+
+- fetch the app's SA JWT from the container
+
+`cat /var/run/secrets/kubernetes.io/serviceaccount/token`
+
+- set an env vars
+
+`export JWT=< token >`
+
+`export VAULT_ADDR=`
+
+`vault status`
+
+- test auth
+
+`vault write auth/k8s_injector/login role=int-app-v_role jwt=$JWT`
+
+- test access to KV using token from successful K8S auth
+
+`export VAULT_TOKEN=`
+
+vault kv get injector-demo/secret
+
+### Vault Specific
+
+- validate key configuration items where `auth/kubernetes` is the mount point of your K8S auth method
+
+```
+vault read auth/kubernetes/config
+
+vault list auth/kubernetes/role
+
+vault read auth/kubernetes/role/internal-app
+```
+
+### K8S Specific
+
+- exec into the vault-agent-init container to troubleshoot connectivity to the vault address, etc.
+
+`kubectl -n vault exec -ti dev-fin-service-548956c846-2hbjd -c vault-agent-init  -- /bin/sh`
+
+- pull logs from vault init container
+
+`kubectl -n vault logs dev-fin-service-8dbd868d8-42kzg -c vault-agent-init  --tail 1 --follow`
+
+- sample output with errors:
+
+```
+URL: PUT http://vault.vault.svc:8200/v1/auth/kubernetes/login
+Code: 400. Errors:
+
+* invalid role name "int-app-v_role"" backoff=1.88824477
+2021-01-26T16:57:54.896Z [INFO]  auth.handler: authenticating
+2021-01-26T16:57:54.900Z [ERROR] auth.handler: error authenticating: error="Error making API request.
+
+URL: PUT http://vault.vault.svc:8200/v1/auth/kubernetes/login
+```
+
+**note** the resolution to this error was a bit of a red herring; the role name was actually correct, the Vault URL is correct (relying on K8S service discovery), the actual issue was the auth path; the method was not mounted on the default /auth/kubernetes path, but on /auth/k8s-injector (vault injector annotation value `vault.hashicorp.com/auth-path: "auth/k8s_injector"`)
+
+### app deployment that includes injector annotations
+
+_no patch deployment step required_
+
+```
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-fin-service
+  labels:
+    app: vault-inject-secrets-demo
+spec:
+  selector:
+    matchLabels:
+      app: vault-inject-secrets-demo
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        # AGENT INJECTOR SETTINGS
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-database-config.txt: "injector-demo/secret"
+        vault.hashicorp.com/role: "int-app-v_role"
+        vault.hashicorp.com/auth-path: "auth/k8s_injector"
+        vault.hashicorp.com/log-level: "debug"
+      labels:
+        app: vault-inject-secrets-demo
+    spec:
+      shareProcessNamespace: true
+      serviceAccountName: int-app-sa
+      containers:
+        - name: app
+          image: jweissig/app:0.0.1
+          env:
+          - name: APP_SECRET_PATH
+            value: "/vault/secrets/database-config.txt"
+          - name: VAULT_ADDR
+            value: "http://172.17.0.3:8200"
+```

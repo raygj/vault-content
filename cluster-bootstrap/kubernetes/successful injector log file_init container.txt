@@ -1,0 +1,60 @@
+jray@vault-ent-k8s:~$ kubectl -n vault logs dev-fin-service-8dbd868d8-42kzg -c vault-agent-init
+==> Vault agent started! Log data will stream in below:
+
+==> Vault agent configuration:
+
+                     Cgo: disabled
+               Log Level: debug
+                 Version: Vault v1.6.1
+             Version Sha: 6d2db3f033e02e70202bef9ec896360062b88b03
+
+2021-01-26T17:16:48.501Z [INFO]  sink.file: creating file sink
+2021-01-26T17:16:48.502Z [INFO]  sink.file: file sink configured: path=/home/vault/.vault-token mode=-rw-r-----
+2021-01-26T17:16:48.502Z [INFO]  template.server: starting template server
+2021-01-26T17:16:48.502Z [INFO]  sink.server: starting sink server
+2021/01/26 17:16:48.502450 [INFO] (runner) creating new runner (dry: false, once: false)
+2021-01-26T17:16:48.502Z [INFO]  auth.handler: starting auth handler
+2021-01-26T17:16:48.502Z [INFO]  auth.handler: authenticating
+2021/01/26 17:16:48.502800 [DEBUG] (runner) final config: {"Consul":{"Address":"","Namespace":"","Auth":{"Enabled":false,"Username":"","Password":""},"Retry":{"Attempts":12,"Backoff":250000000,"MaxBackoff":60000000000,"Enabled":true},"SSL":{"CaCert":"","CaPath":"","Cert":"","Enabled":false,"Key":"","ServerName":"","Verify":true},"Token":"","Transport":{"DialKeepAlive":30000000000,"DialTimeout":30000000000,"DisableKeepAlives":false,"IdleConnTimeout":90000000000,"MaxIdleConns":100,"MaxIdleConnsPerHost":5,"TLSHandshakeTimeout":10000000000}},"Dedup":{"Enabled":false,"MaxStale":2000000000,"Prefix":"consul-template/dedup/","TTL":15000000000,"BlockQueryWaitTime":60000000000},"DefaultDelims":{"Left":null,"Right":null},"Exec":{"Command":"","Enabled":false,"Env":{"Denylist":[],"Custom":[],"Pristine":false,"Allowlist":[]},"KillSignal":2,"KillTimeout":30000000000,"ReloadSignal":null,"Splay":0,"Timeout":0},"KillSignal":2,"LogLevel":"DEBUG","MaxStale":2000000000,"PidFile":"","ReloadSignal":1,"Syslog":{"Enabled":false,"Facility":"LOCAL0","Name":""},"Templates":[{"Backup":false,"Command":"","CommandTimeout":30000000000,"Contents":"{{ with secret \"injector-demo/secret\" }}{{ range $k, $v := .Data }}{{ $k }}: {{ $v }}\n{{ end }}{{ end }}","CreateDestDirs":true,"Destination":"/vault/secrets/database-config.txt","ErrMissingKey":false,"Exec":{"Command":"","Enabled":false,"Env":{"Denylist":[],"Custom":[],"Pristine":false,"Allowlist":[]},"KillSignal":2,"KillTimeout":30000000000,"ReloadSignal":null,"Splay":0,"Timeout":30000000000},"Perms":0,"Source":"","Wait":{"Enabled":false,"Min":0,"Max":0},"LeftDelim":"{{","RightDelim":"}}","FunctionDenylist":[],"SandboxPath":""}],"Vault":{"Address":"http://vault.vault.svc:8200","Enabled":true,"Namespace":"","RenewToken":false,"Retry":{"Attempts":12,"Backoff":250000000,"MaxBackoff":60000000000,"Enabled":true},"SSL":{"CaCert":"","CaPath":"","Cert":"","Enabled":false,"Key":"","ServerName":"","Verify":false},"Transport":{"DialKeepAlive":30000000000,"DialTimeout":30000000000,"DisableKeepAlives":false,"IdleConnTimeout":90000000000,"MaxIdleConns":100,"MaxIdleConnsPerHost":5,"TLSHandshakeTimeout":10000000000},"UnwrapToken":false},"Wait":{"Enabled":false,"Min":0,"Max":0},"Once":false,"BlockQueryWaitTime":60000000000}
+2021/01/26 17:16:48.502830 [INFO] (runner) creating watcher
+2021-01-26T17:16:48.604Z [INFO]  auth.handler: authentication successful, sending token to sinks
+2021-01-26T17:16:48.604Z [INFO]  auth.handler: starting renewal process
+2021-01-26T17:16:48.604Z [INFO]  template.server: template server received new token
+2021/01/26 17:16:48.604344 [INFO] (runner) stopping
+2021/01/26 17:16:48.604351 [DEBUG] (runner) stopping watcher
+2021/01/26 17:16:48.604354 [DEBUG] (watcher) stopping all views
+2021/01/26 17:16:48.604382 [INFO] (runner) creating new runner (dry: false, once: false)
+2021-01-26T17:16:48.604Z [INFO]  sink.file: token written: path=/home/vault/.vault-token
+2021-01-26T17:16:48.604Z [INFO]  sink.server: sink server stopped
+2021-01-26T17:16:48.604Z [INFO]  sinks finished, exiting
+2021/01/26 17:16:48.604455 [DEBUG] (runner) final config: {"Consul":{"Address":"","Namespace":"","Auth":{"Enabled":false,"Username":"","Password":""},"Retry":{"Attempts":12,"Backoff":250000000,"MaxBackoff":60000000000,"Enabled":true},"SSL":{"CaCert":"","CaPath":"","Cert":"","Enabled":false,"Key":"","ServerName":"","Verify":true},"Token":"","Transport":{"DialKeepAlive":30000000000,"DialTimeout":30000000000,"DisableKeepAlives":false,"IdleConnTimeout":90000000000,"MaxIdleConns":100,"MaxIdleConnsPerHost":5,"TLSHandshakeTimeout":10000000000}},"Dedup":{"Enabled":false,"MaxStale":2000000000,"Prefix":"consul-template/dedup/","TTL":15000000000,"BlockQueryWaitTime":60000000000},"DefaultDelims":{"Left":null,"Right":null},"Exec":{"Command":"","Enabled":false,"Env":{"Denylist":[],"Custom":[],"Pristine":false,"Allowlist":[]},"KillSignal":2,"KillTimeout":30000000000,"ReloadSignal":null,"Splay":0,"Timeout":0},"KillSignal":2,"LogLevel":"DEBUG","MaxStale":2000000000,"PidFile":"","ReloadSignal":1,"Syslog":{"Enabled":false,"Facility":"LOCAL0","Name":""},"Templates":[{"Backup":false,"Command":"","CommandTimeout":30000000000,"Contents":"{{ with secret \"injector-demo/secret\" }}{{ range $k, $v := .Data }}{{ $k }}: {{ $v }}\n{{ end }}{{ end }}","CreateDestDirs":true,"Destination":"/vault/secrets/database-config.txt","ErrMissingKey":false,"Exec":{"Command":"","Enabled":false,"Env":{"Denylist":[],"Custom":[],"Pristine":false,"Allowlist":[]},"KillSignal":2,"KillTimeout":30000000000,"ReloadSignal":null,"Splay":0,"Timeout":30000000000},"Perms":0,"Source":"","Wait":{"Enabled":false,"Min":0,"Max":0},"LeftDelim":"{{","RightDelim":"}}","FunctionDenylist":[],"SandboxPath":""}],"Vault":{"Address":"http://vault.vault.svc:8200","Enabled":true,"Namespace":"","RenewToken":false,"Retry":{"Attempts":12,"Backoff":250000000,"MaxBackoff":60000000000,"Enabled":true},"SSL":{"CaCert":"","CaPath":"","Cert":"","Enabled":false,"Key":"","ServerName":"","Verify":false},"Transport":{"DialKeepAlive":30000000000,"DialTimeout":30000000000,"DisableKeepAlives":false,"IdleConnTimeout":90000000000,"MaxIdleConns":100,"MaxIdleConnsPerHost":5,"TLSHandshakeTimeout":10000000000},"UnwrapToken":false},"Wait":{"Enabled":false,"Min":0,"Max":0},"Once":false,"BlockQueryWaitTime":60000000000}
+2021/01/26 17:16:48.604507 [INFO] (runner) creating watcher
+2021/01/26 17:16:48.604547 [INFO] (runner) starting
+2021/01/26 17:16:48.604551 [DEBUG] (runner) running initial templates
+2021/01/26 17:16:48.604553 [DEBUG] (runner) initiating run
+2021/01/26 17:16:48.604556 [DEBUG] (runner) checking template ac4d2c1b708912240602c77a75e6378c
+2021/01/26 17:16:48.604763 [DEBUG] (runner) missing data for 1 dependencies
+2021/01/26 17:16:48.604783 [DEBUG] (runner) missing dependency: vault.read(injector-demo/secret)
+2021/01/26 17:16:48.604788 [DEBUG] (runner) add used dependency vault.read(injector-demo/secret) to missing since isLeader but do not have a watcher
+2021/01/26 17:16:48.604793 [DEBUG] (runner) was not watching 1 dependencies
+2021/01/26 17:16:48.604796 [DEBUG] (watcher) adding vault.read(injector-demo/secret)
+2021/01/26 17:16:48.604805 [DEBUG] (runner) diffing and updating dependencies
+2021/01/26 17:16:48.604808 [DEBUG] (runner) watching 1 dependencies
+2021-01-26T17:16:48.648Z [INFO]  auth.handler: renewed auth token
+2021/01/26 17:16:48.709475 [DEBUG] (runner) receiving dependency vault.read(injector-demo/secret)
+2021/01/26 17:16:48.709491 [DEBUG] (runner) initiating run
+2021/01/26 17:16:48.709496 [DEBUG] (runner) checking template ac4d2c1b708912240602c77a75e6378c
+2021/01/26 17:16:48.709716 [DEBUG] (runner) rendering "(dynamic)" => "/vault/secrets/database-config.txt"
+2021/01/26 17:16:48.709816 [INFO] (runner) rendered "(dynamic)" => "/vault/secrets/database-config.txt"
+2021/01/26 17:16:48.709823 [DEBUG] (runner) diffing and updating dependencies
+2021/01/26 17:16:48.709827 [DEBUG] (runner) vault.read(injector-demo/secret) is still needed
+2021/01/26 17:16:48.709835 [DEBUG] (runner) watching 1 dependencies
+2021/01/26 17:16:48.709838 [DEBUG] (runner) all templates rendered
+2021/01/26 17:16:48.709845 [INFO] (runner) stopping
+2021/01/26 17:16:48.709849 [DEBUG] (runner) stopping watcher
+2021/01/26 17:16:48.709851 [DEBUG] (watcher) stopping all views
+2021-01-26T17:16:48.709Z [INFO]  template.server: template server stopped
+2021/01/26 17:16:48.709995 [INFO] (runner) received finish
+2021-01-26T17:16:48.710Z [INFO]  auth.handler: shutdown triggered, stopping lifetime watcher
+2021-01-26T17:16:48.710Z [INFO]  auth.handler: auth handler stopped
+jray@vault-ent-k8s:~$

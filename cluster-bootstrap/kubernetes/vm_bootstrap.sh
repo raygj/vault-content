@@ -11,7 +11,7 @@
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 apt-get update
-apt-get install -y unzip nano net-tools nmap socat conntrack docker-ce docker-ce-cli containerd.io
+apt-get install -y unzip nano net-tools jq nmap socat conntrack docker-ce docker-ce-cli containerd.io
 
 # minikube installation
 # https://github.com/raygj/vault-content/tree/master/use-cases/vault-agent-kubernetes#install-minikube

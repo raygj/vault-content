@@ -139,7 +139,7 @@ the guide would like secrets engine KV version 1, to make sure this is setup cor
 
 vault secrets disable secret
 
-vault secrets enable -path=secret -version=1 kv
+vault secrets enable -path=secret kv
 
 ```
 
@@ -200,7 +200,7 @@ EOF
 vault kv put secret/myapp/config username='appuser' \
         password='suP3rsec(et!' \
         ttl='30s'
-        
+
 ```
 
 4. Create a Test Read-Only User
@@ -251,7 +251,7 @@ then, set an environment variable so you can call this value in the next couple 
 
 `sudo kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data['ca\.crt']}" | base64 --decode; echo`
 
-- collect the private IP address of the minikube VM accessible by the Vault server (Vault will hit the 
+- collect the private IP address of the minikube VM accessible by the Vault server (Vault will hit the
 
 `ip addr`
 
@@ -357,7 +357,7 @@ apk update
 apk add curl jq
 
 ```
- 
+
 3. set environment variable for VAULT_ADDR:
 
 `VAULT_ADDR=http://< IP of your Vault server or localhost >:8200`
@@ -452,7 +452,7 @@ take note of the `auto_auth` method and role being used...also, the sink path
 
 3. create a config map
 
-In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from image content to keep containerized applications portable. 
+In Kubernetes, ConfigMaps allow you to decouple configuration artifacts from image content to keep containerized applications portable.
 
 - edit the provided pod spec file `example-k8s-spec.yml` to reflect the location of your Vault server
 
@@ -519,7 +519,7 @@ root@vault-agent-example:/# curl http://localhost
 
   </body>
   </html>
-  
+
 
 ```
 
@@ -585,7 +585,7 @@ root@vault-agent-example:/# curl http://localhost
 
 ```
 
-if you saw this response, then things are working corectly within the container and you need to move out a layer.
+if you saw this response, then things are working correctly within the container and you need to move out a layer.
 
 exit the container
 

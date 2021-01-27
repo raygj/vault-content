@@ -1,6 +1,19 @@
-### Configure Kubernetes
+# Vault Kubernetes Auth and Sidecar Injector Walkthrough
 
-#### service accounts
+_bulding off the previous K8S auth method configuration and testing, use Vault Agent Injector pod as an intermediary between Vault server and a consuming service in another pod that will have no knowledge of Vault_
+
+[reference](https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar?in=vault/kubernetes)
+
+**notes**
+
+- the default injector definition in the Helm chart grants access to all namespaces by default
+  - use the `injector.namespaceSelector.matchLabels.injection:"enabled"` attribute to match namespaces with the tab **injection**
+- in an injector-only config, the Service Account can be automatically created
+- this walkthrough assumes Vault, the Injector, and workload are in the same Namespace for simplicity
+
+## 1. Configure Kubernetes
+
+### 1a: service accounts
 
 1. define a unique service account `internal-app` that was used for the app deployments
 
@@ -44,8 +57,9 @@ EOF
 **notes**
 
 - ClusterRoleBinding is cluster-wide and does not respect namespaces, so one SA with this role is sufficient per cluster.
-
 - each app or client container/pod can be deployed in the same or a different namespace, each app deployment will have a distinct SA asssigned and tagged to that app, that SA role is basic and does not need special privileges
+
+2a. create the Token Review SA
 
 `kubectl -n vault apply --filename service-account-vault-auth.yml
 `
@@ -57,23 +71,7 @@ EOF
 
 `kubectl -n vault get serviceaccounts`
 
-## Vault Agent Injector Auto-Auth
-
-_bulding off the previous K8S auth method configuration and testing, use Vault Agent Injector pod as an intermediary between Vault server and a consuming service in another pod that will have no knowledge of Vault_
-
-[reference](https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar?in=vault/kubernetes)
-
-**notes**
-
-- the default injector definition in the Helm chart grants access to all namespaces by default
-  - use the `injector.namespaceSelector.matchLabels.injection:"enabled"` attribute to match namespaces with the tab **injection**
-
-- in an injector-only config, the Service Account can be automatically created
-
-- this walkthrough assumes Vault, the Injector, and workload are in the same Namespace for simplicity
-  - a more real world deployment would have Vault on a dedicated cluster, and the Injector in a shared service or dedicated pod
-
-### Prepare Vault
+## 2. Prepare Vault
 
 0. ensure connectivity between a vault client host or the access vault directly through an exec session
 
@@ -120,7 +118,7 @@ EOF
 
 `vault policy read int-app-ro`
 
-#### K8S configurations
+#### 2a. K8S configurations
 
 1. set the SA_JWT_TOKEN environment variable value to the service account JWT used to access the TokenReview API **note** update `-n` to the target namespace
 
@@ -138,22 +136,24 @@ export SA_CA_CRT=$(kubectl -n vault get secret $VAULT_SA_NAME \
 
 6. set the K8S_HOST environment variable value to the public IP address of K8S/minikube.
 
-- minikube example; or specify IP address
+- use kubectl to grab cluster address
 
-export K8S_HOST=$(minikube ip)
+`kubectl config view --minify | grep server | cut -f 2- -d ":" | tr -d " "`
 
-export K8S_HOST=< address that is accessible to Vault nodes >
+`export K8S_HOST=$kubectl config view --minify | grep server | cut -f 2- -d ":" | tr -d " "`
 
 2. enable and mount k8s auth engine on a different mount point
 
-vault auth enable -path=k8s_injector kubernetes
+`vault auth enable -path=k8s_injector kubernetes`
 
 3. Vault configuration pulling in details from the env vars we just set
 
+```
 vault write auth/k8s_injector/config \
 token_reviewer_jwt="$SA_JWT_TOKEN" \
 kubernetes_host="https://$K8S_HOST:8443" \
 kubernetes_ca_cert="$SA_CA_CRT"
+```
 
 - success
 
@@ -161,7 +161,7 @@ kubernetes_ca_cert="$SA_CA_CRT"
 
 - view config
 
-vault read auth/k8s_injector/config
+`vault read auth/k8s_injector/config`
 
 - example
 
@@ -193,9 +193,8 @@ vault write auth/k8s_injector/role/int-app-v_role \
 **note** the role defined here in Vault `int-app-v_role` is used when defining the Vault annotations of the Injector "patch" file listed below
 
 4a. exit exec shell/move on
-^^^
 
-### deploy demo app and test
+## 3. deploy demo app and test
 
 1. create the sample app definition
 

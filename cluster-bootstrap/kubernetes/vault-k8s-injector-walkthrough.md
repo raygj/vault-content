@@ -191,6 +191,10 @@ vault write auth/k8s_injector/role/int-app-v_role \
     policies=int-app-ro \
     ttl=24h
 ```
+- view config
+
+`vault read auth/k8s_injector/role/int-app-v_role`
+
 
 **note** the role defined here in Vault `int-app-v_role` is used when defining the Vault annotations of the Injector "patch" file listed below
 

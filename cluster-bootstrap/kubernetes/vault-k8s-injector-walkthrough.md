@@ -474,9 +474,38 @@ $VAULT_ADDR/v1/injector-demo/secret | jq
 
 _assumes Vault binary is available and in the path_
 
-- fetch the app's SA JWT from the container
+- fetch the JWT of the SA bound to the **application** container (to ensure we are grabbing the right SA JWT!)
 
 `cat /var/run/secrets/kubernetes.io/serviceaccount/token`
+
+- or fetch it from the controller
+
+1. `kubectl -n vault describe serviceaccount int-app-sa`
+
+```
+Name:                int-app-sa
+Namespace:           vault
+Labels:              app=internal-app
+Annotations:         <none>
+Image pull secrets:  <none>
+Mountable secrets:   int-app-sa-token-9822g
+Tokens:              int-app-sa-token-9822g
+Events:              <none>
+```
+
+2. `kubectl -n vault get secret int-app-sa-token-9822g  -o jsonpath='{.data.token}'`
+
+```
+ZXlKaGJHY2lPaUpTVXpJ...lEclhmUXllNU5B
+```
+
+3. `kubectl -n vault get secret int-app-sa-token-9822g -o jsonpath='{.data.token}' | base64 --decode`
+
+_ output is Base64-encoded, so just pipe the output_
+
+```
+eyJhbGciOiJSUzI1NiIsImtp...v6xweFV9DrXfQye5NA
+```
 
 - set an env vars
 

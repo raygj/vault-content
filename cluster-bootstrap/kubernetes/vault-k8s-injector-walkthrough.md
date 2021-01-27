@@ -503,9 +503,9 @@ Events:              <none>
 ZXlKaGJHY2lPaUpTVXpJ...lEclhmUXllNU5B
 ```
 
-3. `kubectl -n vault get secret int-app-sa-token-9822g -o jsonpath='{.data.token}' | base64 --decode`
+2a. `kubectl -n vault get secret int-app-sa-token-9822g -o jsonpath='{.data.token}' | base64 --decode`
 
-_ output is Base64-encoded, so just pipe the output_
+_ I don't believe this is a required step, it's here for reference_
 
 ```
 eyJhbGciOiJSUzI1NiIsImtp...v6xweFV9DrXfQye5NA

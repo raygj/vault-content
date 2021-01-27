@@ -94,9 +94,11 @@ vault login s.2qKJYnV8mAczIuDgcF2B8Vsd
 
 1. setup Vault demo data
 
+```
 vault secrets enable -path=injector-demo kv
 
 vault kv put injector-demo/secret vault=rocks
+```
 
 - verify
 
@@ -393,9 +395,11 @@ if the init process does not complete, start troubleshooting there with a focus 
 
 5a. display the logs of the `vault-agent` container (that exists after the init completes) in the new `dev-fin-service` pod
 
+```
 kubectl -n vault logs \
     $(kubectl -n vault get pod -l app=dev-fin-service -o jsonpath="{.items[0].metadata.name}") \
     --container vault-agent
+```
 
 5b. display the secret written to `dev-fin-service` container
 
@@ -417,8 +421,10 @@ https://www.vaultproject.io/docs/platform/k8s/injector/examples
 
 2. install test tools to an Alpine or other compatible image
 
+```
 apk update
 apk add curl jq
+```
 
 3. validate connectivity to Vault based on the environment (K8S service selector, Consul service sync, etc.)
 
@@ -488,7 +494,7 @@ _assumes Vault binary is available and in the path_
 
 `export VAULT_TOKEN=`
 
-vault kv get injector-demo/secret
+`vault kv get injector-demo/secret`
 
 ### Vault Specific
 

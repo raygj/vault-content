@@ -50,6 +50,10 @@ curl \
 ### exmaple of a successful K8S login via Injector Sidecar
 
 ```
-"hmac-sha256:2dfca6f426f38"},"remote_address":"172.17.0.1"},"response":{"auth":{"client_token":"hmac-sha256:fe8070d6ea474e","accessor":"hmac-sha256:3b103132",
-"display_name":"k8s_injector-vault-int-app-sa","policies":["default","int-app-ro"],"token_policies":["default","int-app-ro"],"metadata":{"role":"int-app-v_role","service_account_name":"int-app-sa","service_account_namespace":"vault","service_account_secret_name":"int-app-sa-token-9822g","service_account_uid":"8709bd47-bc51-41ba-aa92-53f87bf5fa99"},"entity_id":"e4b08af3-2e72-7caa-d1ec-8045b877a675","token_type":"service","token_ttl":86400,"token_issue_time":"2021-01-26T17:16:49Z"},"mount_type":"token"}}
+"hmac-sha256:2dfca6f426f38"},"remote_address":"172.17.0.1"},"response":{"auth":{"client_token":"hmac-sha256:fe8070d6ea474e",
+"accessor":"hmac-sha256:3b103132","display_name":"k8s_injector-vault-int-app-sa","policies":["default","int-app-ro"],
+"token_policies":["default","int-app-ro"],"metadata":{"role":"int-app-v_role","service_account_name":"int-app-sa",
+"service_account_namespace":"vault","service_account_secret_name":"int-app-sa-token-9822g","service_account_uid":
+"8709bd47-bc51-41ba-aa92-53f87bf5fa99"},"entity_id":"e4b08af3-2e72-7caa-d1ec-8045b877a675",
+"token_type":"service","token_ttl":86400,"token_issue_time":"2021-01-26T17:16:49Z"},"mount_type":"token"}}
 ```

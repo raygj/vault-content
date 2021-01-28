@@ -1,4 +1,4 @@
-enable Vault audit logging:
+### enable Vault audit logging:
 
 1. setup dirs
 

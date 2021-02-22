@@ -144,7 +144,7 @@ $VAULT_ADDR/v1/ad/library/ops-team/check-out | jq
 
 ```
 curl --header "X-Vault-Token: $VAULT_TOKEN" \
---request POST \
+--request GET \
 $VAULT_ADDR/v1/ad/library/ops-team/status | jq
 ```
 

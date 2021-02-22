@@ -107,7 +107,7 @@ insecure_tls=false
 vault write ad/library/ops-team \
         service_account_names="sa00@vault-lab.home.org, sa01@vault-lab.home.org" \
         ttl=1h \
-        max_ttl=2h
+        max_ttl=2h \
         disable_check_in_enforcement=true
 ```
 
@@ -127,8 +127,10 @@ https://www.vaultproject.io/docs/secrets/ad#service-account-check-out
 
 - prepare vault client
 
+```
 export VAULT_ADDR=
 export VAULT_TOKEN=
+```
 
 - check out account:
 

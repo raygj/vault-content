@@ -159,15 +159,15 @@ kubectl -n vault exec -ti vault-0 -- vault operator init -key-shares=1 -key-thre
 - capture unseal key and initial root token
 
 ```
-Unseal Key 1: .../8z4skYXy9UsNGT0=
+Unseal Key 1: 23h2k34...
 
-Initial Root Token: s.2qK....
+Initial Root Token: s.YkRyPlFVGuwePKsXgiby78CU
 ```
 
 ###set environment vars
 
-export VAULT_UNSEAL_KEY=
-export VAULT_TOKEN=
+export VAULT_UNSEAL_KEY=D3O2vkRWcoEklJ8r8ZfUBLCpy6pC+3FbVEuTPNKMqwM=
+export VAULT_TOKEN=s.YkRyPlFVGuwePKsXgiby78CU
 
 ###unseal vault on node-0
 
@@ -199,9 +199,7 @@ kubectl -n vault exec -ti vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY
 
 ##log in to vault on node-0 with default root token
 
-kubectl -n vault exec -ti vault-0 -- vault login < root token >
-
-export VAULT_TOKEN= < root token >
+kubectl -n vault exec -ti vault-0 -- vault login $VAULT_TOKEN
 
 - verify all 3 nodes are healthy Raft peers
 
@@ -297,15 +295,18 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: vault-auth
-  namespace: vault //update to reflect the namespace where Vault was deployed
+  namespace: default
 EOF
 ```
 
 **notes**
 
-- ClusterRoleBinding is cluster-wide and does not respect namespaces, so one SA with this role is sufficient per cluster.
+- ClusterRoleBinding is cluster-wide and does not respect namespaces
+  - there is a default role, it can be used, or you can create one as described since this SA identity will be incorporated into the Vault configuration
+  - tagging the SA the Vault namespace enables tracking of the dependent resources
+  - one SA with this role is sufficient per cluster or identity domain
 
-- each app or client container/pod can be deployed in the same or a different namespace, each app deployment will have a distinct SA asssigned and tagged to that app, that SA role is basic and does not need special privileges
+- each app or client container/pod can be deployed in the same or a different namespace, each app deployment will have a distinct SA assigned and tagged to that app, that SA role is basic and does not need special privileges
 
 kubectl -n vault apply --filename service-account-vault-auth.yml
 
@@ -314,6 +315,8 @@ kubectl -n vault apply --filename service-account-vault-auth.yml
 `clusterrolebinding.rbac.authorization.k8s.io/role-tokenreview-binding configured`
 
 - verify
+
+kubectl -n vault describe sa vault-auth
 
 kubectl -n vault get serviceaccounts
 
@@ -371,7 +374,9 @@ export K8S_HOST=$(minikube ip)
 
 export K8S_HOST=< address that is accessible to Vault nodes >
 
-###k8s auth config
+**note** minikube defaults to TCP 8443 for the API server endpoint; non-minikube K8S deployment typically use standard TCP 443 (HTTPS)
+
+### k8s auth config
 
 _prep from a host with access to Vault_
 

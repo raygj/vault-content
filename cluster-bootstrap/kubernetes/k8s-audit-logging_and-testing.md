@@ -57,3 +57,25 @@ curl \
 "8709bd47-bc51-41ba-aa92-53f87bf5fa99"},"entity_id":"e4b08af3-2e72-7caa-d1ec-8045b877a675",
 "token_type":"service","token_ttl":86400,"token_issue_time":"2021-01-26T17:16:49Z"},"mount_type":"token"}}
 ```
+
+### raw audit logs
+[ref](https://learn.hashicorp.com/tutorials/vault/troubleshooting-vault#source-of-the-error)
+
+1. enable auditing with raw format on a different mount point
+
+`vault audit enable -path=raw-file file file_path=/vault/vault-audit-raw.log log_raw=true`
+
+2. list audit devices
+
+`vault audit list`
+
+3. view log data
+
+`tail -f /vault/vault-audit-raw.log`
+
+
+**need to validate**
+
+container, use stdout (assuming kubectl -log can then be used?)
+
+`vault audit enable file file_path=stdout log_raw=true`

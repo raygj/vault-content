@@ -50,7 +50,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: vault-auth
-  namespace: vault //update to reflect the namespace where Vault was deployed
+  namespace: vault
 EOF
 ```
 
@@ -61,8 +61,7 @@ EOF
 
 2a. create the Token Review SA
 
-`kubectl -n vault apply --filename service-account-vault-auth.yml
-`
+`kubectl -n vault apply --filename service-account-vault-auth.yml`
 - success
 
 `clusterrolebinding.rbac.authorization.k8s.io/role-tokenreview-binding configured`
@@ -124,38 +123,59 @@ EOF
 
 1. set the SA_JWT_TOKEN environment variable value to the service account JWT used to access the TokenReview API **note** update `-n` to the target namespace
 
+
+1a. using vault-auth SA
 ```
-export VAULT_SA_NAME=$(kubectl -n vault get sa vault-auth \
+export VAULT_SA_NAME=$(kubectl -n vault get sa vault-auth
     -o jsonpath="{.secrets[*]['name']}")
 ```
 
-5. set the SA_CA_CRT environment variable value to the PEM encoded CA cert used to talk to Kubernetes API **note** update `-n` to the target namespace
+```
+export SA_JWT_TOKEN=$(kubectl -n vault get secret $VAULT_SA_NAME \
+    -o jsonpath="{.data.token}" | base64 --decode; echo)
+```
+
+1b. using default SA
 
 ```
-export SA_CA_CRT=$(kubectl -n vault get secret $VAULT_SA_NAME \
+export VAULT_SA_NAME=$(kubectl -n kube-system get sa default  \
+    -o jsonpath="{.secrets[*]['name']}")
+```
+
+```
+export SA_JWT_TOKEN=$(kubectl -n kube-system get secret $VAULT_SA_NAME \
+    -o jsonpath="{.data.token}" | base64 --decode; echo)
+```
+
+2. set the SA_CA_CRT environment variable value to the PEM encoded CA cert used to talk to Kubernetes API **note** update `-n` to the target namespace
+
+```
+export SA_CA_CRT=$(kubectl -n kube-system get secret $VAULT_SA_NAME \
     -o jsonpath="{.data['ca\.crt']}" | base64 --decode; echo)
 ```
 
-6. set the K8S_HOST environment variable value to the public IP address of K8S/minikube.
+3. set the K8S_HOST environment variable value to the public IP address of K8S/minikube.
 
 - use kubectl to grab cluster address
 
 `kubectl config view --minify | grep server | cut -f 2- -d ":" | tr -d " "`
 
-`export K8S_HOST=$kubectl config view --minify | grep server | cut -f 2- -d ":" | tr -d " "`
+`export K8S_HOST=$(kubectl config view --minify | grep server | cut -f 2- -d ":" | tr -d " ")`
 
-2. enable and mount k8s auth engine on a different mount point
+4. enable and mount k8s auth engine on a different mount point
 
 `vault auth enable -path=k8s_injector kubernetes`
 
-3. Vault configuration pulling in details from the env vars we just set
+5. Vault configuration pulling in details from the env vars we just set
 
 ```
 vault write auth/k8s_injector/config \
 token_reviewer_jwt="$SA_JWT_TOKEN" \
-kubernetes_host="https://$K8S_HOST:8443" \
+kubernetes_host="https://$K8S_HOST" \
 kubernetes_ca_cert="$SA_CA_CRT"
 ```
+
+**note** for `kubernetes_host` non-minikube K8S deployment typically use standard TCP 443 (HTTPS) and minikube defaults to TCP 8443 for the API server
 
 - success
 
@@ -233,7 +253,7 @@ spec:
           - name: APP_SECRET_PATH
             value: "/vault/secrets/database-config.txt"
           - name: VAULT_ADDR
-            value: "http://172.17.0.3:8200"
+            value: "http://vault-int:8200"
 EOF
 ```
 
@@ -283,14 +303,9 @@ _The Vault-Agent injector looks for deployments that define specific annotations
 
 - this command is supposed to read the value at /vault/secrets in the newly created container. it is not working at the moment.
 ```
-kubectl -n vault exec \
-    $(kubectl -n vault get pod -l app=dev-fin-service -o jsonpath="{.items[0].metadata.name}") \
+kubectl -n vault exec $(kubectl -n vault get pod -l app=vault-inject-secrets-demo -o jsonpath="{.items[0].metadata.name}") \
     --container app -- ls /vault/secrets
 ```
-
-kubectl exec \
-    $(kubectl get pod -l app=app -o jsonpath="{.items[0].metadata.name}") \
-    --container dev-fin-service -- ls /vault/secrets
 
 - success/expected output
 
@@ -497,31 +512,35 @@ Tokens:              int-app-sa-token-9822g
 Events:              <none>
 ```
 
-2. `kubectl -n vault get secret int-app-sa-token-9822g  -o jsonpath='{.data.token}'`
-
-```
-ZXlKaGJHY2lPaUpTVXpJ...lEclhmUXllNU5B
-```
-
-2a. `kubectl -n vault get secret int-app-sa-token-9822g -o jsonpath='{.data.token}' | base64 --decode`
-
-_ I don't believe this is a required step, it's here for reference_
+2. `kubectl -n vault get secret int-app-sa-token-9822g -o jsonpath='{.data.token}' | base64 --decode`
 
 ```
 eyJhbGciOiJSUzI1NiIsImtp...v6xweFV9DrXfQye5NA
 ```
 
-- set an env vars
+2b. verify JWT payload with this [site](https://www.jsonwebtoken.io)
 
-`export JWT=< token >`
+- if payload is accurate, then proceed
 
-`export VAULT_ADDR=`
+export JWT=(kubectl -n vault get secret int-app-sa-token-9822g -o jsonpath='{.data.token}' | base64 --decode")
+
+```
+export APP_SA_NAME=$(kubectl -n vault get sa int-app-sa  \
+    -o jsonpath="{.secrets[*]['name']}")
+```
+
+```
+export APP_SA_JWT=$(kubectl -n vault get secret $APP_SA_NAME \
+    -o jsonpath="{.data.token}" | base64 --decode; echo)
+```
+
+`export VAULT_ADDR=http://localhost:8200`
 
 `vault status`
 
 - test auth
 
-`vault write auth/k8s_injector/login role=int-app-v_role jwt=$JWT`
+`vault write auth/k8s_injector/login role=int-app-v_role jwt=$APP_SA_JWT`
 
 - test access to KV using token from successful K8S auth
 
@@ -529,7 +548,126 @@ eyJhbGciOiJSUzI1NiIsImtp...v6xweFV9DrXfQye5NA
 
 `vault kv get injector-demo/secret`
 
+#### API login
+
+- using env variables set in the previous section, login with curl
+
+1. set payload
+
+`jwt = $APP_SA_JWT`
+
+```
+cat << EOF > ./k8s-auth-test-login-payload.json
+---
+{
+  "role": "int-app-v_role",
+  "jwt": ""
+}
+EOF
+```
+
+**note** for one reason or another using "jwt" : "$APP_SA_JWT" resulted in a bad format, need to look into that. for now just manually paste the JWT into the file.
+
+```
+curl \
+    --request POST \
+    --data @k8s-auth-test-login-payload.json \
+    $VAULT_ADDR/v1/auth/k8s_injector/login | jq
+```
+
+- success
+
+```
+jray@vault-ent-k8s:~$ curl     --request POST     --data @k8s-auth-test-login-payload.json     $VAULT_ADDR/v1/auth/k8s_injector/login | jq
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1618  100   672  100   946   7724  10873 --:--:-- --:--:-- --:--:-- 18597
+{
+  "request_id": "a9b6a5fd-d27e-091e-9952-f1ad8efcb946",
+  "lease_id": "",
+  "renewable": false,
+  "lease_duration": 0,
+  "data": null,
+  "wrap_info": null,
+  "warnings": null,
+  "auth": {
+    "client_token": "s.u8lqBXZFORNGHqmFUhhOF4HQ",
+    "accessor": "P4LGikPwb6a7i0E3VELkqafk",
+    "policies": [
+      "default",
+      "int-app-ro"
+    ],
+    "token_policies": [
+      "default",
+      "int-app-ro"
+    ],
+    "metadata": {
+      "role": "int-app-v_role",
+      "service_account_name": "int-app-sa",
+      "service_account_namespace": "vault",
+      "service_account_secret_name": "int-app-sa-token-9822g",
+...
+```
+
 ### Vault Specific
+
+- view system logs [ref](https://learn.hashicorp.com/tutorials/vault/kubernetes-troubleshooting?in=vault/monitoring#server-operational-logs)
+
+`kubectl -n vault logs vault-0 | head -n 100`
+
+#### enable Vault audit logging:
+
+1. setup dirs
+
+```
+kubectl -n vault exec -it vault-0 -- /bin/sh
+
+touch /vault/vault_audit.log
+```
+
+2. enable audit
+
+```
+vault login < root token >
+
+vault audit enable file file_path=/vault/vault-audit.log
+```
+
+3. start a tail in the exec session and then open another terminal window
+
+`tail -f /vault/vault-audit.log`
+
+- or from outside the pod
+
+`kubectl -n vault exec vault-0 -- tail -n 1 /vault/vault-audit.log | jq`
+
+#### exmaple of a successful K8S login via Injector Sidecar
+
+```
+"hmac-sha256:2dfca6f426f38"},"remote_address":"172.17.0.1"},"response":{"auth":{"client_token":"hmac-sha256:fe8070d6ea474e",
+"accessor":"hmac-sha256:3b103132","display_name":"k8s_injector-vault-int-app-sa","policies":["default","int-app-ro"],
+"token_policies":["default","int-app-ro"],"metadata":{"role":"int-app-v_role","service_account_name":"int-app-sa",
+"service_account_namespace":"vault","service_account_secret_name":"int-app-sa-token-9822g","service_account_uid":
+"8709bd47-bc51-41ba-aa92-53f87bf5fa99"},"entity_id":"e4b08af3-2e72-7caa-d1ec-8045b877a675",
+"token_type":"service","token_ttl":86400,"token_issue_time":"2021-01-26T17:16:49Z"},"mount_type":"token"}}
+```
+
+### raw audit logs
+[ref](https://learn.hashicorp.com/tutorials/vault/troubleshooting-vault#source-of-the-error)
+
+1. enable auditing with raw format on a different mount point
+
+`vault audit enable -path=raw-file file file_path=/vault/vault-audit-raw.log log_raw=true`
+
+2. list audit devices
+
+`vault audit list`
+
+3. view log data
+
+`tail -f /vault/vault-audit-raw.log`
+
+`kubectl -n vault exec vault-0 -- tail -n 1 /vault/vault-audit-raw.log | jq`
 
 - validate key configuration items where `auth/kubernetes` is the mount point of your K8S auth method
 

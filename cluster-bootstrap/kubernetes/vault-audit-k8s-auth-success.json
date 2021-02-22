@@ -1,0 +1,82 @@
+{
+  "time": "2021-01-28T20:36:16.748659678Z",
+  "type": "response",
+  "auth": {
+    "client_token": "s.2qKJYnV8mAczIuDgcF2B8Vsd",
+    "accessor": "bzwBPHbdSmPISqABzfsWuuXE",
+    "display_name": "root",
+    "policies": [
+      "root"
+    ],
+    "token_policies": [
+      "root"
+    ],
+    "token_type": "service",
+    "token_issue_time": "2021-01-25T17:49:37Z"
+  },
+  "request": {
+    "id": "b29bf6d0-e6f9-7ddf-4c34-326593dac3da",
+    "operation": "read",
+    "mount_type": "system",
+    "client_token": "s.2qKJYnV8mAczIuDgcF2B8Vsd",
+    "client_token_accessor": "bzwBPHbdSmPISqABzfsWuuXE",
+    "namespace": {
+      "id": "root"
+    },
+    "path": "sys/auth",
+    "remote_address": "127.0.0.1"
+  },
+  "response": {
+    "mount_type": "system",
+    "data": {
+      "k8s_injector/": {
+        "accessor": "auth_kubernetes_57925986",
+        "config": {
+          "default_lease_ttl": 0,
+          "force_no_cache": false,
+          "max_lease_ttl": 0,
+          "token_type": "default-service"
+        },
+        "description": "",
+        "external_entropy_access": false,
+        "local": false,
+        "options": null,
+        "seal_wrap": false,
+        "type": "kubernetes",
+        "uuid": "06247fd9-3e89-70c9-e440-c01c6b0623d4"
+      },
+      "kubernetes/": {
+        "accessor": "auth_kubernetes_4f7c7292",
+        "config": {
+          "default_lease_ttl": 0,
+          "force_no_cache": false,
+          "max_lease_ttl": 0,
+          "token_type": "default-service"
+        },
+        "description": "",
+        "external_entropy_access": false,
+        "local": false,
+        "options": null,
+        "seal_wrap": false,
+        "type": "kubernetes",
+        "uuid": "a3c566f5-761e-f1ce-982a-10e2c8ae4fea"
+      },
+      "token/": {
+        "accessor": "auth_token_ddf807dc",
+        "config": {
+          "default_lease_ttl": 0,
+          "force_no_cache": false,
+          "max_lease_ttl": 0,
+          "token_type": "default-service"
+        },
+        "description": "token based credentials",
+        "external_entropy_access": false,
+        "local": false,
+        "options": null,
+        "seal_wrap": false,
+        "type": "token",
+        "uuid": "c8b20355-dbe0-0a8e-8018-e764e2914683"
+      }
+    }
+  }
+}

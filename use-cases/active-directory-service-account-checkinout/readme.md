@@ -105,7 +105,7 @@ insecure_tls=false
 
 ```
 vault write ad/library/ops-team \
-        service_account_names="sa00@vault-lab.home.org, sa01@vault-lab.home.org" \
+        service_account_names="sa00@vault-lab.home.org, sa01@vault-lab.home.org, sa02@vault-lab.home.org" \
         ttl=1h \
         max_ttl=2h \
         disable_check_in_enforcement=true
@@ -156,7 +156,7 @@ curl --header "X-Vault-Token: $VAULT_TOKEN" \
 $VAULT_ADDR/v1/ad/library/ops-team/check-in | jq
 ```
 
-  - if "disable_check_in_enforcement" was set to active on the library, then an operator can "force" check-in accounts even though that client did not check-out the account(s)
+  - if "disable_check_in_enforcement" was set to "true" on the library config, then an operator can "force" check-in accounts even though that client did not check-out the account(s)
 
 ```
 curl --header "X-Vault-Token: $VAULT_TOKEN" \
@@ -169,7 +169,7 @@ $VAULT_ADDR/v1/ad/library/manage/ops-team/check-in | jq
 ```
 cat << EOF > sa_list.json
 {
-  "service_account_names": ["as00@vault-lab.home.org","as01@vault-lab.home.org",]
+  "service_account_names":"sa00@vault-lab.home.org"
 }
 EOF
 ```

@@ -1,17 +1,17 @@
-#Vault Audit Logging and Correlation with ELK Stack
+# Vault Audit Logging and Correlation with ELK Stack
 
-##Deploy an ELK target
+## Deploy an ELK target
 
 [elastic install reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html)
 [elsastic beats reference](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-installation-configuration.html)
 
-###install Java 8 SDK
+### install Java 8 SDK
 
 sudo apt remove openjdk-8-jdk
 
 java -version
 
-###install Elastic
+### install Elastic
 
 sudo wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 
@@ -25,7 +25,7 @@ sudo /bin/systemctl daemon-reload
 
 sudo /bin/systemctl enable elasticsearch.service
 
-####configure elastic using elasticsearch.yml
+#### configure elastic using elasticsearch.yml
 
 sudo cp /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml.orig
 
@@ -50,7 +50,7 @@ sudo systemctl status elasticsearch
 
 curl -X GET "localhost:9200/?pretty"
 
-###install Kibana
+### install Kibana
 
 sudo wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 
@@ -64,7 +64,7 @@ sudo systemctl start kibana.service
 
 sudo systemctl status kibana.service
 
-####configure kibana using kibana.yml
+#### configure kibana using kibana.yml
 
 sudo cp /etc/kibana/kibana.yml /etc/kibana/kibana.yml.orig
 
@@ -95,14 +95,14 @@ http://YOURDOMAIN.com:5601
 
 http://192.168.1.69:5601
 
-####troubleshooting
+#### troubleshooting
 
 - [yaml linter](http://www.yamllint.com)for those hard-to-find spaces
 
-##Vault Node Configuration
+## Vault Node Configuration
 Your logging strategy should include more than one audit target as Vault will not process transactions if audit is enabled, but non of the configured audit targets are available.
 
-###enable Vault audit logging
+### enable Vault audit logging
 - enable audit with a root or admin-policy backed token in Vault
 
 vault audit enable file file_path=/var/log/vault_audit.log
@@ -116,13 +116,23 @@ sudo chown vault:vault /var/log/vault_audit.log
 
 ...configure your log rotation software to send the vault process a signal hang up `/ SIGHUP` after each rotation of the log file.
 
-###install and configure Filebeat
+### using files for manual troubleshooting locally
 
-####install
+- tail audit log with JQ for real time debugging
+
+`sudo tail -f /var/log/vault_audit.log | jq`
+
+- real time view of "non-empty" errors
+
+`sudo tail -f /var/log/vault_audit.log | jq 'select(.error != null) | select(.error != "") | [.time,.error] | @sh' $AUDIT_LOG_FILE`
+
+### install and configure Filebeat
+
+#### install
 sudo curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.10.1-amd64.deb
 sudo dpkg -i filebeat-7.10.1-amd64.deb
 
-####configure
+#### configure
 [reference filebeat config options](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-log.html#filebeat-input-log-config-json)
 
 sudo cp /etc/filebeat/filebeat.yml /etc/filebeat/filebeat.yml.orig
@@ -160,7 +170,7 @@ vault-ent-node-2 filebeat[22164]: 2020-12-21T00:47:18.305Z        INFO        [m
 ```
 
 
-##Validate data in Kibana
+## Validate data in Kibana
 
 - create an index, used the suggested Filebeat index
 - validate time format

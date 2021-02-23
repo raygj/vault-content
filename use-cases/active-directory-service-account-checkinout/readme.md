@@ -222,7 +222,7 @@ export VAULT_TOKEN=s.tZ0kI2vW38fb5KzUMyDvnevQ
 
 export VAULT_ADDR=https://vault-ent-node-1:8200
 
-cat << EOF > ~/payload.json
+cat << EOF > ~/sa-rotate-target.json
 {
   "service_account_name": "as00@vault-lab.home.org",
   "ttl": 1
@@ -234,7 +234,7 @@ EOF
 curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request GET \
-    --data @payload.json \
+    --data @sa-rotate-target.json \
     $VAULT_ADDR/v1/sa-rotate/creds/app00 | jq
 
 ## build: enable LDAP auth

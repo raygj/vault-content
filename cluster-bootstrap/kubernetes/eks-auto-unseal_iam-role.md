@@ -43,6 +43,10 @@ _assumption is that Terraform code is used to create the IAM role and KMS key, b
 
 - Attach the `VaultKMSUnsealPolicy` to the existing role used by the EKS instance supporting Vault
 
+### IRSA config
+
+_config is outside the scope of this document, but essentially you are mapping the role created above to the policy bound to the Vault instance_
+
 ## Vault Helm Modications
 
 - set an `awskms` seal config block for the Vault confiuguration file:

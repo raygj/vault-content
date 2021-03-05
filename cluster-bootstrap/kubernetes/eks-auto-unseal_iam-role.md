@@ -5,7 +5,7 @@ _the goal of this walkthrough is to provide code snippets for key configuration 
 - this configuration assumes AWS IRSA is working in the EKS environment to provide pod-level IAM access
 - existing deployments will require a seal migration noted in the appendix
 - new or existing KMS key can be used
-## Vault AWS Dependencies
+## Vault AWS Dependancies
 
 - Vault [needs](https://www.vaultproject.io/docs/configuration/seal/awskms#authentication) the following permissions on the KMS key:
 
@@ -49,7 +49,7 @@ _config is outside the scope of this document, but essentially you are mapping t
 
 ## Vault Helm Modications
 
-- set an `awskms` seal config block for the Vault confiuguration file:
+- set an `awskms` seal config block for the Vault configuration file:
 
 ```
 seal "awskms" {
@@ -80,7 +80,7 @@ server:
     name: vault
 ```
 
-- Summary
+## Solution Summary
 
 EKS will set `AWS_ROLE_ARN` and `AWS_WEB_IDENTITY_TOKEN_FILE` environment variables in the pod if [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/) is setup correctly, and the `awskms` logic will attempt to use those credentials for accessing the KMS (turn on Vault debug logging for more info in that part of the process). Then run `vault operator init` for a default of 5 _recovery key_ shards.
 
@@ -88,4 +88,4 @@ EKS will set `AWS_ROLE_ARN` and `AWS_WEB_IDENTITY_TOKEN_FILE` environment variab
 
 # appendix
 
-- Vault [seal migrationi](https://www.vaultproject.io/docs/concepts/seal#seal-migration) can be used to migrate an existing Vault from Shamirs Key Shards to Auto-Unseal
+- Vault [seal migration](https://www.vaultproject.io/docs/concepts/seal#seal-migration) can be used to migrate an existing Vault from Shamirs Key Shards to Auto-Unseal

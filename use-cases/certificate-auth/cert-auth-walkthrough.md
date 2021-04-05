@@ -56,6 +56,30 @@ vault write auth/cert/certs/web \
     certificate=@vault-client.crt
 ```
 
+## update policy to add TFC secret engine access
+
+- add read access to the policy
+
+```
+cat << EOF > myapp-kv-ro.hcl
+path "demo/*" {
+capabilities = ["read", "list"]
+}
+path "terraform/creds/tfcuser" {
+capabilities = ["read", "list"]
+}
+EOF
+```
+
+- re-write policy config
+
+```
+vault write auth/cert/certs/web \
+    display_name=web \
+    policies=myapp-kv-ro \
+    certificate=@vault-client.crt
+```
+
 #Authenticate from a Client
 
 ##Setup Vault

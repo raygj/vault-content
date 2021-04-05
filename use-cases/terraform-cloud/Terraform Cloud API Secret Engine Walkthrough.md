@@ -6,9 +6,9 @@
 
 **definitions**:
 
-TFC = Terraform Cloud platform, HashiCorp-hosted
-TFE = Terraform Enterprise, self-hosted version of TFC
-Vault = Vault Enterprise or OSS 1.7.0 or later
+- TFC = Terraform Cloud platform, HashiCorp-hosted
+- TFE = Terraform Enterprise, self-hosted version of TFC
+- Vault = Vault Enterprise or OSS 1.7.0 or later
 
 ## scope and prep
 
@@ -202,34 +202,37 @@ EOF
 
 - set Vault server address
 
-export VAULT_ADDR=https://vault-ent-node-1:8200
+`export VAULT_ADDR=https://vault-ent-node-1:8200`
 
 - use Vault Agent to login into Vault
 
+```
 vault login \
     -method=cert \
     -ca-cert=lab_ca.crt \
     -client-cert=vault-client.crt \
     -client-key=vault-client.key \
     name=web
+```
 
 - pull a TFC token for the "workflow" user
 
-vault read terraform/creds/tfcuser
+`vault read terraform/creds/tfcuser`
 
 - set TFE_TOKEN value
 
-export TFE_TOKEN=oWaLT3e4h0HUQg.atlasv1.RmwybGa...
+`export TFE_TOKEN=oWaLT3e4h0HUQg.atlasv1.RmwybGa...`
 
 - use token to lock TFE-DEMO workspace
 
+```
 curl \
   --header "Authorization: Bearer $TFE_TOKEN" \
   --header "Content-Type: application/vnd.api+json" \
   --request POST \
   --data @payload.json \
   https://app.terraform.io/api/v2/workspaces/ws-haK1341dEDGUJnqm/actions/lock | jq
-
+```
 
 # Notes
 

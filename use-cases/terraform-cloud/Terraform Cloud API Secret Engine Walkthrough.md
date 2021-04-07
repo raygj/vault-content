@@ -1,4 +1,4 @@
-# Terraform Cloud API Secret Engine Walkthrough
+# Terraform Cloud Secret Engine Walkthrough
 
 [Reference Doc](https://www.vaultproject.io/docs/secrets/terraform)
 
@@ -198,7 +198,9 @@ EOF
 
 `vault policy read myapp-kv-ro`
 
-### use TFC API to validate access
+### demo
+
+_use the TFC API to validate access_
 
 - set Vault server address
 
@@ -233,6 +235,8 @@ curl \
   --data @payload.json \
   https://app.terraform.io/api/v2/workspaces/ws-haK1341dEDGUJnqm/actions/lock | jq
 ```
+
+- revoke lease in Vault, verify in TFC consul and test revoked token to confirm it is invalid
 
 # Notes
 

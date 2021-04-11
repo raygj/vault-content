@@ -1,6 +1,6 @@
 # Vault Kubernetes Auth and Sidecar Injector Walkthrough
 
-_bulding off the previous K8S auth method configuration and testing, use Vault Agent Injector pod as an intermediary between Vault server and a consuming service in another pod that will have no knowledge of Vault_
+_building off the previous K8S auth method configuration and testing, use Vault Agent Injector pod as an intermediary between Vault server and a consuming service in another pod that will have no knowledge of Vault_
 
 [reference](https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar?in=vault/kubernetes)
 
@@ -33,7 +33,7 @@ EOF
 
 `kubectl -n vault apply --filename ./service-account-internal-app.yml`
 
-2. if it does not already exist, create a service account to be used to bind Vault and Kubernetes with the role-tokenreview-binding that will allow this SA to validate other SAs (JWTs) that are used to auth to Vault
+2. if it does not already exist, create a service account to be used to bind Vault and Kubernetes with the `role-tokenreview-binding` that will allow this SA to validate other SAs (JWTs) that are used to auth to Vault
 
 ```
 cat << EOF > ./service-account-vault-auth.yml
@@ -57,11 +57,12 @@ EOF
 **notes**
 
 - ClusterRoleBinding is cluster-wide and does not respect namespaces, so one SA with this role is sufficient per cluster.
-- each app or client container/pod can be deployed in the same or a different namespace, each app deployment will have a distinct SA asssigned and tagged to that app, that SA role is basic and does not need special privileges
+- each app or client container/pod can be deployed in the same or a different namespace, each app deployment will have a distinct SA assigned and tagged to that app, that SA role is basic and does not need special privileges
 
 2a. create the Token Review SA
 
 `kubectl -n vault apply --filename service-account-vault-auth.yml`
+
 - success
 
 `clusterrolebinding.rbac.authorization.k8s.io/role-tokenreview-binding configured`
@@ -76,11 +77,12 @@ EOF
 
 `curl http://localhost:8200/healthz`
 
-- status `* Connected to localhost (127.0.0.1) port 8200 (#0)`
+- status
+
+`* Connected to localhost (127.0.0.1) port 8200 (#0)`
 
 - connectivity
   - terminal 2: `kubectl -n vault  port-forward vault-0 8200:8200`
-  - terminal 1:
 
 ```
 export VAULT_ADDR=http://localhost:8200
@@ -125,6 +127,7 @@ EOF
 
 
 1a. using vault-auth SA
+
 ```
 export VAULT_SA_NAME=$(kubectl -n vault get sa vault-auth
     -o jsonpath="{.secrets[*]['name']}")
@@ -522,7 +525,9 @@ eyJhbGciOiJSUzI1NiIsImtp...v6xweFV9DrXfQye5NA
 
 - if payload is accurate, then proceed
 
+```
 export JWT=(kubectl -n vault get secret int-app-sa-token-9822g -o jsonpath='{.data.token}' | base64 --decode")
+```
 
 ```
 export APP_SA_NAME=$(kubectl -n vault get sa int-app-sa  \

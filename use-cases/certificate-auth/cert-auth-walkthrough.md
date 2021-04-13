@@ -1,4 +1,4 @@
-#Environment
+# Environment
 
 Requires a Vault server
 Client workstation or VM where the Vault binary has been unzipped and added to the path statement.
@@ -7,7 +7,7 @@ A signed certificate and public key for the client that includes `extendedKeyUsa
 CA cert for the CA that signed the client’s cert if that CA is not available on the Vault server’s CA store
 Valid DNS record for the client as presented in the signed certificate
 
-#Prepare Vault
+# Prepare Vault
 
 Enable KV at path /demo:
 
@@ -80,9 +80,9 @@ vault write auth/cert/certs/web \
     certificate=@vault-client.crt
 ```
 
-#Authenticate from a Client
+# Authenticate from a Client
 
-##Setup Vault
+## Setup Vault
 
 ```
 export VAULT_VERSION=1.6.0
@@ -103,7 +103,7 @@ EOF
 
 `source /etc/environment`
 
-##Authenticate
+## Authenticate
 
 ```
 vault login \
@@ -164,7 +164,7 @@ Code: 403. Errors:
 	* permission denied
 ```
 
-###Vault Agent Auto-Auth
+### Vault Agent Auto-Auth
 
 - Vault Agent configuration
 `exit_after_auth` is used for testing or calling Vault Agent in a script; Vault Agent can be run as a daemon if desired mark this as `false`

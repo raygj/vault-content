@@ -1,4 +1,0 @@
-Vault AppRole Walkthrough
-https://learn.hashicorp.com/vault/identity-access-management/iam-approle-trusted-entities
-https://docs.google.com/document/d/1FYEihAhXOlP1bgYGQ1nSBIqbGteQ6S9nc6ACjxq4WSQ/edit
-

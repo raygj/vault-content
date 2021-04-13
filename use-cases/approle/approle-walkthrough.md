@@ -207,3 +207,66 @@ curl \
 ```
 
 **fail?**
+
+## Vault Agent
+
+this is a working config, but needs to be tuned to remove manual steps...
+
+vault auth enable approle
+
+vault write auth/approle/role/role1 bind_secret_id=true token_policies=app-1-read-only token_ttl=30m token_max_ttl=60m
+
+vault read auth/approle/role/role1/role-id
+
+vault write -f auth/approle/role/role1/secret-id
+
+tee /tmp/roleid <<EOF
+5e8c2f83-6d0c-d548-c01a-b8a7152ca793
+EOF
+
+tee /tmp/secretid <<EOF
+46ee2d12-d745-187b-eb72-466495cf8002
+EOF
+
+- write vault agent config
+
+tee ~/auto-auth-conf.hcl <<EOF
+exit_after_auth = true #run once, then exit
+pid_file = "./pidfile"
+
+auto_auth {
+    method {
+        mount_path = "auth/approle"
+        type = "approle"
+        config = {
+            role_id_file_path = "/tmp/roleid"
+            secret_id_file_path = "/tmp/secretid"
+        }
+    }
+
+    sink "file" {
+        config = {
+            path = "/tmp/token"
+        }
+    }
+}
+
+vault {
+  address = "https://vault-ent-node-1:8200"
+}
+
+template {
+destination = "/home/jray/secret.txt"
+contents = <<EOT
+
+{{ with secret "demo/app-1/" }}
+{{ .Data.current_password }}
+{{ end }}
+
+EOT
+}
+EOF
+
+- login manually
+
+vault agent -config=/home/jray/auto-auth-conf.hcl -log-level=debug

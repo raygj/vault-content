@@ -1,11 +1,11 @@
-#Vault Kubernetes Scenarios and Walkthroughs
+# Vault Kubernetes Scenarios and Walkthroughs
 - lab environment: Ubuntu 18.04, minikube 1.17 , helm 3.5.0
 - target environment: Vault OSS 3-node Raft cluster, no TLS Walkthrough
 - Vault Server and Client co-located on a single cluster, single namespace
 - Vault Agent Injector Service with Kubernetes Auth-Authentication and "hello world" service
 - [reference](https://www.vaultproject.io/docs/platform/k8s/helm/examples/ha-with-raft)
 
-##prepare Kubernetes
+## prepare Kubernetes
 
 - [minikube ubunut bootstrap](https://github.com/raygj/vault-content/blob/master/cluster-bootstrap/kubernetes/vm_bootstrap.sh)
 
@@ -27,7 +27,7 @@ helm repo update
 
 helm search repo vault --versions
 
-##deploy Vault
+## deploy Vault
 
 [documentation with examples and all configuration values](https://www.vaultproject.io/docs/platform/k8s/helm/configuration)
 - use Helm `--dry-run` option and verify computed annotations before committing
@@ -124,13 +124,13 @@ helm uninstall vault-enterprise -n vault-enterprise
 --set='ui.serviceNodePort=192.168.1.xxx:8200'
 ```
 
-**WIP note**
+** WIP note**
 use "use service entry" in K8S to direct internal and external traffic to Vault?
 https://learn.hashicorp.com/tutorials/vault/kubernetes-external-vault?in=vault/kubernetes#deploy-service-and-endpoints-to-address-an-external-vault
 
 _always run Helm with --dry-run before any install or upgrade to verify changes_
 
-###validate deployment
+### validate deployment
 
 - check the status of the Helm deployment
 
@@ -144,13 +144,13 @@ kubectl -n vault get pods
 
 kubectl -n vault describe pods vault-0
 
-###cleanup deployment
+### cleanup deployment
 
 helm uninstall vault -n vault
 
 kubectl delete ns vault
 
-##initialize Vault on node-0
+## initialize Vault on node-0
 
 kubectl -n vault exec -ti vault-0 -- vault operator init -key-shares=1 -key-threshold=1
 
@@ -164,12 +164,12 @@ Unseal Key 1: 23h2k34...
 Initial Root Token: s.YkRyPlFVGuwePKsXgiby78CU
 ```
 
-###set environment vars
+### set environment vars
 
 export VAULT_UNSEAL_KEY=D3O2vkRWcoEklJ8r8ZfUBLCpy6pC+3FbVEuTPNKMqwM=
 export VAULT_TOKEN=s.YkRyPlFVGuwePKsXgiby78CU
 
-###unseal vault on node-0
+### unseal vault on node-0
 
 kubectl -n vault exec -ti vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
 
@@ -177,7 +177,7 @@ kubectl -n vault exec -ti vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
 - at this point you initialized Vault on Node 0 and have the start of a functional cluster, next steps are to join the other two nodes to this one using the `raft join` command and then unseal that node using the same unseal key from Node 0
 - depending on your target environment and its resources, spinning up all pods may take 1-5 mins to complete
 
-##join node-1 to node-0, then unseal
+## join node-1 to node-0, then unseal
 
 kubectl -n vault exec -ti vault-1 -- vault operator raft join http://vault-0.vault-internal:8200
 
@@ -191,13 +191,13 @@ Joined    true
 
 kubectl -n vault exec -ti vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY
 
-##join node-2 to node-0, then unseal
+## join node-2 to node-0, then unseal
 
 kubectl -n vault exec -ti vault-2 -- vault operator raft join http://vault-0.vault-internal:8200
 
 kubectl -n vault exec -ti vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY
 
-##log in to vault on node-0 with default root token
+## log in to vault on node-0 with default root token
 
 kubectl -n vault exec -ti vault-0 -- vault login $VAULT_TOKEN
 
@@ -238,13 +238,13 @@ Raft Committed Index    36
 Raft Applied Index      36
 ```
 
-##apply enterprise license
+## apply enterprise license
 
 kubectl -n vault exec -ti vault-enterprise -- vault login < root token >
 
 kubectl -n vault exec -ti -- < primary node > vault write sys/license text=02M...
 
-##port-forward Vault UI and API traffic
+## port-forward Vault UI and API traffic
 
 - this forwards traffic from the Vault pod to the localhost, additional forwarding or techniques may be required to reach "public" clients
 
@@ -256,9 +256,9 @@ kubectl -n vault  port-forward vault-0 8200:8200
 
 export VAULT_ADDR=http://localhost:8200
 
-#Kubernetes Auth Test Cases
+# Kubernetes Auth Test Cases
 
-##prepare an Ubuntu Vault client
+## prepare an Ubuntu Vault client
 
 ```
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
@@ -268,7 +268,7 @@ sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(l
 sudo apt-get update && sudo apt-get install vault
 ```
 
-##Kubernetes prep
+## Kubernetes prep
 
 - create service account used to bind Vault and Kubernetes
 
@@ -320,11 +320,11 @@ kubectl -n vault describe sa vault-auth
 
 kubectl -n vault get serviceaccounts
 
-##configure K8S auth method
+## configure K8S auth method
 
 [reference](https://learn.hashicorp.com/tutorials/vault/agent-kubernetes?in=vault/kubernetes#step-1-create-a-service-account)
 
-###prep Vault
+### prep Vault
 
 _host with access to K8S control plane; requires the ability to execute `kubectl` commands and set environment variables_
 
@@ -407,7 +407,7 @@ policies=myapp-kv-ro \
 ttl=24h
 ```
 
-###determine Vault public address
+### determine Vault public address
 
 A service bound to all networks on the host (how Vault is deployed by default) is addressable by pods within the cluster by sending requests to the gateway address of the Kubernetes cluster.
 
@@ -445,7 +445,7 @@ set EXTERNAL_VAULT_ADDR="http://10.103.56.118"
 
 - at this point any client that needs to access Vault on this cluster should use $EXTERNAL_VAULT_ADDR to route requests to the active_node
 
-####validate k8s auth
+#### validate k8s auth
 
 1. run Alpine pod and exec into it
 
@@ -567,7 +567,7 @@ kubectl -n vault delete pod < pod name >
 
 kubectl describe pods < pod name >
 
-##Connectivity test from a Vault node
+## Connectivity test from a Vault node
 
 - exec into the vault
 
@@ -607,7 +607,7 @@ curl --request POST --data "{\"jwt\": \"$JWT\", \"role\": \"webapp\"}" -s -k $VA
 note- we are ignoring the secure connection using "-k" option above
 
 
-##helm
+## helm
 
 - view helm releases, per namespace
 
@@ -621,7 +621,7 @@ helm ls -A
 
 helm uninstall release_name -n release_namespace
 
-##vault policy
+## vault policy
 
 - when testing a restrictive policy it is helpful to have two sessions to the Vault server open, this allows a RW/admin session to configure and validate settings, while logging into Vault in the other terminal as the restricted client.
 - in the case of the K8S auth, fetch the `auth.client_token` value from a success auth within the K8S pod and issue a `vault login < token value >` command from that second terminal - you are now logged into Vault with the same authorization policy as the K8S client.

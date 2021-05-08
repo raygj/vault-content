@@ -158,7 +158,7 @@ kubectl delete ns vault
 
 ## initialize Vault on node-0
 
-kubectl -n vault exec -ti vault-0 -- vault operator init -key-shares=1 -key-threshold=1
+`kubectl -n vault exec -ti vault-0 -- vault operator init -key-shares=1 -key-threshold=1`
 
 **note** this is a non-prod approach of using a single key share to ease unsealing operations in a sandbox
 
@@ -172,20 +172,21 @@ Initial Root Token: s.YkRyPlFVGuwePKsXgiby78CU
 
 ### set environment vars
 
+```
 export VAULT_UNSEAL_KEY=D3O2vkRWcoEklJ8r8ZfUBLCpy6pC+3FbVEuTPNKMqwM=
 export VAULT_TOKEN=s.YkRyPlFVGuwePKsXgiby78CU
+```
 
 ### unseal vault on node-0
 
-kubectl -n vault exec -ti vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
-
+`kubectl -n vault exec -ti vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY`
 
 - at this point you initialized Vault on Node 0 and have the start of a functional cluster, next steps are to join the other two nodes to this one using the `raft join` command and then unseal that node using the same unseal key from Node 0
 - depending on your target environment and its resources, spinning up all pods may take 1-5 mins to complete
 
 ## join node-1 to node-0, then unseal
 
-kubectl -n vault exec -ti vault-1 -- vault operator raft join http://vault-0.vault-internal:8200
+`kubectl -n vault exec -ti vault-1 -- vault operator raft join http://vault-0.vault-internal:8200`
 
 - output
 
@@ -195,21 +196,23 @@ Key       Value
 Joined    true
 ```
 
-kubectl -n vault exec -ti vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY
+`kubectl -n vault exec -ti vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY`
 
 ## join node-2 to node-0, then unseal
 
+```
 kubectl -n vault exec -ti vault-2 -- vault operator raft join http://vault-0.vault-internal:8200
 
 kubectl -n vault exec -ti vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY
+```
 
 ## log in to vault on node-0 with default root token
 
-kubectl -n vault exec -ti vault-0 -- vault login $VAULT_TOKEN
+`kubectl -n vault exec -ti vault-0 -- vault login $VAULT_TOKEN`
 
 - verify all 3 nodes are healthy Raft peers
 
-kubectl -n vault exec -ti vault-0 -- vault operator raft list-peers
+`kubectl -n vault exec -ti vault-0 -- vault operator raft list-peers`
 
 - output
 
@@ -223,7 +226,7 @@ Node                                    Address                        State    
 
 ###at this point you should have a functional 3-node Vault cluster
 
-kubectl -n vault exec -ti vault-0 -- vault status
+`kubectl -n vault exec -ti vault-0 -- vault status`
 
 ```
 Key                     Value
@@ -246,21 +249,21 @@ Raft Applied Index      36
 
 ## apply enterprise license
 
-kubectl -n vault exec -ti vault-enterprise -- vault login < root token >
+`kubectl -n vault exec -ti vault-enterprise -- vault login < root token >`
 
-kubectl -n vault exec -ti -- < primary node > vault write sys/license text=02M...
+`kubectl -n vault exec -ti -- < primary node > vault write sys/license text=02M...`
 
 ## port-forward Vault UI and API traffic
 
 - this forwards traffic from the Vault pod to the localhost, additional forwarding or techniques may be required to reach "public" clients
 
-kubectl -n vault port-forward < primary pod > 8200:8200
+`kubectl -n vault port-forward < primary pod > 8200:8200`
 
 e.g.,
 
-kubectl -n vault  port-forward vault-0 8200:8200
+`kubectl -n vault  port-forward vault-0 8200:8200`
 
-export VAULT_ADDR=http://localhost:8200
+`export VAULT_ADDR=http://localhost:8200`
 
 # Kubernetes Auth Test Cases
 
@@ -278,11 +281,11 @@ sudo apt-get update && sudo apt-get install vault
 
 - create service account used to bind Vault and Kubernetes
 
-kubectl -n vault create serviceaccount vault-auth
+`kubectl -n vault create serviceaccount vault-auth`
 
   - validate
 
-kubectl -n vault get serviceaccounts
+`kubectl -n vault get serviceaccounts`
 
 - create and assign custom policy to the service account
 
@@ -314,7 +317,7 @@ EOF
 
 - each app or client container/pod can be deployed in the same or a different namespace, each app deployment will have a distinct SA assigned and tagged to that app, that SA role is basic and does not need special privileges
 
-kubectl -n vault apply --filename service-account-vault-auth.yml
+`kubectl -n vault apply --filename service-account-vault-auth.yml`
 
 - success
 
@@ -322,9 +325,9 @@ kubectl -n vault apply --filename service-account-vault-auth.yml
 
 - verify
 
-kubectl -n vault describe sa vault-auth
+`kubectl -n vault describe sa vault-auth`
 
-kubectl -n vault get serviceaccounts
+`kubectl -n vault get serviceaccounts`
 
 ## configure K8S auth method
 
@@ -336,7 +339,7 @@ _host with access to K8S control plane; requires the ability to execute `kubectl
 
 0. login with root token or user with sudo and "admin policy"
 
-vault login < token >
+`vault login < token >`
 
 1. create RO policy to bind to K8S authenticated clients
 
@@ -350,13 +353,15 @@ EOF
 
 2. create test data
 
+```
 vault secrets enable -path=secret kv
 
 vault kv put secret/data/myapp/config username='appuser' password='suP3rsecret'
+```
 
 - validate
 
-vault kv get secret/data/myapp/config/
+`vault kv get secret/data/myapp/config/`
 
 4. set the SA_JWT_TOKEN environment variable value to the service account JWT used to access the TokenReview API **note** update `-n` to the target namespace
 
@@ -376,11 +381,13 @@ export SA_CA_CRT=$(kubectl -n vault get secret $VAULT_SA_NAME \
 
 - minikube example; or specify IP address
 
+```
 export K8S_HOST=$(minikube ip)
 
 export K8S_HOST=< address that is accessible to Vault nodes >
+```
 
-**note** minikube defaults to TCP 8443 for the API server endpoint; non-minikube K8S deployment typically use standard TCP 443 (HTTPS)
+**note** minikube defaults to TCP 8443 for the API server endpoint; non-minikube K8S deployment typically use standard TCP 443 (HTTPS) **note**
 
 ### k8s auth config
 
@@ -388,11 +395,11 @@ _prep from a host with access to Vault_
 
 0. login with root token or user with sudo and "admin policy"
 
-vault login < token >
+`vault login < token >`
 
 1. enable the Kubernetes auth method at the default path ("auth/kubernetes")
 
-vault auth enable kubernetes
+`vault auth enable kubernetes`
 
 2. tell Vault how to communicate with the Kubernetes (Minikube) cluster
 
@@ -419,16 +426,17 @@ A service bound to all networks on the host (how Vault is deployed by default) i
 
 1. view pod service information
 
-kubectl -n vault get service | grep "vault-active"
+`kubectl -n vault get service | grep "vault-active"`
 
 - output
 
 ```
 vault-active               ClusterIP   10.103.56.118     <none>        8200/TCP,8201/TCP   139m
 ```
+
 2. verify ClusterIP is accessible from the host you are on
 
-curl -s http://10.103.56.118:8200/v1/sys/seal-status | jq
+`curl -s http://10.103.56.118:8200/v1/sys/seal-status | jq`
 
 - output
 
@@ -447,7 +455,7 @@ curl -s http://10.103.56.118:8200/v1/sys/seal-status | jq
 
 3. set environment variable with public "external" Vault address from the previous step
 
-set EXTERNAL_VAULT_ADDR="http://10.103.56.118"
+`set EXTERNAL_VAULT_ADDR="http://10.103.56.118"`
 
 - at this point any client that needs to access Vault on this cluster should use $EXTERNAL_VAULT_ADDR to route requests to the active_node
 
@@ -455,27 +463,35 @@ set EXTERNAL_VAULT_ADDR="http://10.103.56.118"
 
 1. run Alpine pod and exec into it
 
+```
 kubectl -n vault run --generator=run-pod/v1 tmp --rm -i --tty \
       --serviceaccount=vault-auth --image alpine:3.7
+```
 
 **note**
 
 2. install test tools
 
+```
 apk update
 apk add curl jq
+```
 
 3. set KUBE_TOEN env var to the serviceaccount token value and EXTERNAL_VAULT_ADDR
 
+```
 KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 
 EXTERNAL_VAULT_ADDR="http://10.103.56.118"
+```
 
 4. verify token was set
 
+```
 echo $KUBE_TOKEN
 
 echo $EXTERNAL_VAULT_ADDR
+```
 
 5. auth to Vault
 

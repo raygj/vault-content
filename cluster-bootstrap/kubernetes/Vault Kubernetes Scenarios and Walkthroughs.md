@@ -46,10 +46,12 @@ helm install vault hashicorp/vault \
   --set='server.ha.raft.enabled=true'
 ```
 
+```
 helm install --dry-run vault hashicorp/vault \
   --namespace vault \
   --set='server.ha.enabled=true' \
   --set='server.ha.raft.enabled=true'
+```
 
 1a. minikube; affinity=null for single node cluster
 
@@ -63,7 +65,7 @@ helm install vault hashicorp/vault \
 
 3. minikube; affinity=null for single node cluster; Enterprise install **server only**, enable HA and required Raft
 
-kubectl create namespace vault-enterprise
+`kubectl create namespace vault-enterprise`
 
 ```
 helm install vault-enterprise hashicorp/vault \
@@ -78,6 +80,7 @@ helm install vault-enterprise hashicorp/vault \
 
 4. minikube; affinity=null for single node cluster **server only**
 
+```
 helm install vault hashicorp/vault \
   --namespace vault \
   --set='server.ha.enabled=true' \
@@ -88,24 +91,27 @@ helm install vault hashicorp/vault \
 
 5. Any k8s platform; Vault Agent injector only
 
+```
 helm install vault hashicorp/vault \
   --namespace vault \
   --set='server.ha.enabled=true' \
   --set='server.ha.raft.enabled=true' \
   --set='server.affinity=null' \
   --set='injector.enabled=false'
+```
 
 5a. Any k8s platform; Vault Agent injector only, external Vault server
 
 **WIP** injector options: https://www.vaultproject.io/docs/platform/k8s/helm/configuration#externalvaultaddr
 
-
+```
 helm install vault hashicorp/vault \
   --namespace vault \
   --set='injector.externalVaultAddr="http://some.fqdn.com:8200"'
   --set='injector.server.serviceAccount.create="true"'
   --set='server.affinity=null' \
   --set='injector.enabled=false'
+```
 
 **note** setting "externalVaultAddr" disables server deployment and makes this an agent injector only deploy
 

@@ -233,7 +233,7 @@ curl \
   --header "Content-Type: application/vnd.api+json" \
   --request POST \
   --data @payload.json \
-  https://app.terraform.io/api/v2/workspaces/ws-haK1341dEDGUJnqm/actions/lock | jq
+  https://app.terraform.io/api/v2/workspaces/ws-haK1VpFdEDGUJnqm/actions/lock | jq
 ```
 
 - revoke lease in Vault, verify in TFC consul and test revoked token to confirm it is invalid

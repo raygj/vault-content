@@ -1,4 +1,4 @@
-# Vault Active Directory Check In | Check Out, Service Account Managment, and AD Auth Walkthrough
+# Vault Active Directory Check In | Check Out, Service Account Management, and AD Auth Walkthrough
 
 - both Check-In and Auth require a working Active Directory configuration, so both workflows are presented since end users will auth to Vault with AD, then access Service Accounts managed by Vault
 - the Check-In | Check-Out workflow is based on a target set of accounts that Vault will manage (rotate password based on admin-define TTLs)

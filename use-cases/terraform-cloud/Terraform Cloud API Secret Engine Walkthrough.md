@@ -236,7 +236,7 @@ curl \
   https://app.terraform.io/api/v2/workspaces/ws-haK1VpFdEDGUJnqm/actions/lock | jq
 ```
 
-- revoke lease in Vault, verify in TFC consul and test revoked token to confirm it is invalid
+- revoke lease in Vault, verify in TFC UI and test revoked token to confirm it is invalid
 
 # Notes
 

@@ -1,10 +1,10 @@
-# Vault Load Generation
+# Vault Load Generation Walkthrough
 
-# Background and Goals
+## Background and Goals
 
 Stress-testing Vault is the goal. This guide is a walkthrough meant as a minimal viable installation of OSS tools and refers to telemetry visualization using Grafana templates from this [guide](https://github.com/raygj/vault-content/tree/master/telemetry).
 
-# Pre-Reqs and References:
+## Pre-Reqs and References:
 
 Setup a Vault-Consul cluster cohabitated install:
 
@@ -20,176 +20,121 @@ Info:
 
 [Vault Monitoring Guide...source for this walkthrough](https://s3-us-west-2.amazonaws.com/hashicorp-education/whitepapers/Vault/Vault-Consul-Monitoring-Guide.pdf)
 
-# Architecture Used
-
-The [HashiCorp guide](https://s3-us-west-2.amazonaws.com/hashicorp-education/whitepapers/Vault/Vault-Consul-Monitoring-Guide.pdf) is written for Ubuntu Vault/Consul servers, but at this time my Vault/Consul cluster is CentOS 7, so the guide will be written with that in mind. This is the architecture the guide will be based on:
+## Architecture Used
 
 ![image](/telemetry/images/lab_env.png)
 
-For this guide, you will need an additional Ubuntu host OR you could use the Grafana host if you have the telemetry infrastructure built.
+you will need an additional Ubuntu host OR you could use the Grafana host if you have the telemetry infrastructure built.
 
-# Deploy Ubuntu 18 instance that will serve as the load generation host
+- use Terraform to deploy an Ubuntu 18 load generation host, then follow steps below
 
-## Bootstrap
+# load gen host bootstrap
 
-### Install unzip, pip3, and optionally open-vm-tools
-
-```
-
-sudo apt-get update
-
-sudo apt-get install unzip -y
-
-sudo apt install python3-pip -y
-
-sudo apt-get install open-vm-tools -y
+### install unzip, python3, and pip
 
 ```
+sudo apt update
 
-### Verify if firewall is active
-
+sudo apt install unzip python3 python3-pip -y
 ```
 
-sudo ufw status (used to manage iptables)
+- validated package install is completed successfully
 
-sudo iptables -L
+- python3
+
+`python3 --version`
+
+- pip
+
+`python3 -m pip --version`
+
+## prepare test engine
+
+### clone repo
 
 ```
+mkdir ~/githome
 
-## Clone repo
-
-```
-
-mkdir /home/<user name>/githome
-
-cd /<user-name>/githome 
+cd ~/githome
 
 git clone https://github.com/tradel/vault-load-testing.git
 
-cd /home/<user name>/githome/vault-load-testing
+cd ~/githome/vault-load-testing
 
 ```
 
-### Install requirements
+### install required modules
+
+pip3 install --upgrade pip3
 
 `pip3 install -r requirements.txt`
 
-Dynamic Secrets requires MongoDB or MySQL backend connected and available
+pip3 install gevent
 
-Set environment vars for DB:
+## configure tests
 
-```
+- the load generator supports:
+  - KV, Transit, PKI, Dynamic DB creds, and TOTP secret engine tests
+  - UserPass and AppRole auth tests
+- the tests are selected by modifying the `locust.py` file
 
-export MONGODB_URL="mongodb://localhost:27017/admin"
+- backup original file
 
-export MYSQL_URL="root:password@tcp(127.0.0.1:3306)/mysql"
+`cp locustfile.py locustfile.py.orig`
 
-```
+- modify
 
-If you do not have a DB available, copy the original locustfile.py and then remove the database lines and DB references in the __dynamic__ line
+`nano locustfile.py`
 
-![image](/load-gen/images/locust_config.png)
+### example configurations
 
-## Set VAULT_TOKEN environment variable
-
-`export VAULT_TOKEN=< some token with appropriate policy>`
-
-### Run Prepare script with target of Vault cluster (IP or DNS name)
-
-#### OPTIONAL: Consul DNS on the load-gen host
-
-go [here](https://github.com/raygj/consul-content) for more info on Consul DNS used for service discovery
-
-unzip /tmp/consul_1.4.3_linux_amd64.zip -d /home/<user name>/consul/
-
-# setup log dir
+- KV secret engine, Userpass and AppRole auth method
 
 ```
+from locusts.key_value import KeyValueLocust
+from locusts.auth_userpass import UserPassAuthLocust
+from locusts.auth_approle import AppRoleLocust
 
-mkdir -p /home/<user>/consul/log
+__static__ = [KeyValueLocust]
+__auth__ = [UserPassAuthLocust, AppRoleLocust]
 
-touch /home/<user>/consul/log/output.log
-
-mkdir /tmp/consul
-
+__all__ = __static__ + __dynamic__ + __auth__
 ```
 
-##### Start consul, running in background
+## prepare data
 
-`sudo /home/<user>/consul/consul agent -data-dir="/tmp/consul" -bind=<local IP> -client=<local IP> >> /home/<user>/consul/log/output.log &`
-
-
-check log for startup result
-
-`tail -20 /home/<user>/consul/log/output.log`
-
-join agent client to existing server cluster
-`/home/<user>/consul/consul join -http-addr=<ip of this machine>:8500 <ip of the consul server agent>`
-
-verify join on consul cluster
-
-`consul members`
-
-validate consul DNS from client
-
-`dig @< IP of local Consul agent in client mode> -p 8600 vault.service.dc1.consul. ANY`
-
-## NEXT STEP - create test data locally
-
-This step will generate a “testdata.json” file that can be reused on other load-gen servers
+- this step will generate a “testdata.json” file
+- use a Vault token with sufficient privileges to mount new paths and write data
 
 `VAULT_TOKEN="<vault token>" ./prepare.py  --host="http://<IP or DNS name of Vault Cluster:8200"`
 
-Modify PATH variable to point to Python3.6
-
-```
-
-nano ~/.profile
-
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin/python3.6:$PATH"
-fi
-
-```
-
-reload profile
-
-`source ~/.profile`
-
-# Execute locust
+# execute locust test
 
 Choose headless CLI or web GUI mode
 
-## headless CLI only
+## headless CLI
 
-```
+`cd ~/githome/vault-load-testing`
 
-cd /home/<user name>/githome/vault-load-testing
+`locust -H http://<Vault IP or DNS name>:8200 -c 25 -r 5 --no-web`
 
-locust -H http://<Vault IP or DNS name>:8200 -c 25 -r 5 --no-web
+# UI
 
-```
+`cd ~/githome/vault-load-testing`
 
-# Web GUI
+`locust -H http://<Vault IP or DNS name>:8200 -c 25 -r 5`
 
-```
+- log into the GUI
 
-cd /home/<user name>/githome/vault-load-testing
+`http://<IP of the locust server>:8089`
 
-locust -H http://<Vault IP or DNS name>:8200 -c 25 -r 5
-
-```
-
-Log into the GUI: http://<IP of the locust server>:8089
-
-Enter the number of users and hits, then start swarming
+- enter the number of users and hits, then start swarming
 
 ![image](/load-gen/images/locust_ui.png)
 
 # Visualize the Chaos
 
-Go to Grafana Vault and Consul Cluster Health dashboards, set time table to “last 5 mins” and watch KPIs as load hits cluster
+go to Grafana Vault and Consul Cluster Health dashboards, set time table to “last 5 mins” and watch KPIs as load hits cluster
 
 **Vault Dashboard**
 
@@ -200,3 +145,22 @@ Go to Grafana Vault and Consul Cluster Health dashboards, set time table to “l
 
 
 ![image](/load-gen/images/consul_dashboard_stress.png)
+
+
+# appendix
+
+## configure DB for dynamic creds if desired
+
+Dynamic Secrets requires MongoDB or MySQL backend connected and available
+
+Set environment vars for DB:
+
+`export MONGODB_URL="mongodb://localhost:27017/admin"`
+
+or
+
+`export MYSQL_URL="root:password@tcp(127.0.0.1:3306)/mysql"`
+
+**note** If you do not have a DB available, copy the original `locustfile.py` and then remove the database lines and DB references in the __dynamic__ line
+
+![image](/load-gen/images/locust_config.png)

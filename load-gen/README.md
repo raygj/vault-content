@@ -65,11 +65,17 @@ cd ~/githome/vault-load-testing
 
 ### install required modules
 
-pip3 install --upgrade pip3
+- review `requirements.txt` and update as needed
+
+```
+locustio==0.14.6
+click
+requests
+```
+
+- install dependancies
 
 `pip3 install -r requirements.txt`
-
-pip3 install gevent
 
 ## configure tests
 

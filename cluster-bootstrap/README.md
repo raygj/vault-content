@@ -1,6 +1,3 @@
-# the original source of these scripts is: 
-https://github.com/amcbarnett/hashicorp-demos
-
 ## server-setup-scripts
 - setup.sh script that provisioning 1 or 3 node Vault on Consul cluster for Ubuntu or CentOS7
 - firewall-setup.sh used to provision firewalld to support Vault and Consul traffic

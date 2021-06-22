@@ -68,7 +68,7 @@ cd ~/githome/vault-load-testing
 - review `requirements.txt` and update as needed
 
 ```
-locustio==0.14.6
+locust==0.14.6
 click
 requests
 ```
@@ -94,25 +94,42 @@ requests
 
 ### example configurations
 
-- KV secret engine, Userpass and AppRole auth method
+- KV and TOTP secret engine, Userpass and AppRole auth method
 
 ```
 from locusts.key_value import KeyValueLocust
+from locusts.totp import TotpLocust
 from locusts.auth_userpass import UserPassAuthLocust
 from locusts.auth_approle import AppRoleLocust
 
 __static__ = [KeyValueLocust]
+__dynamic__ = [TotpLocust]
 __auth__ = [UserPassAuthLocust, AppRoleLocust]
 
 __all__ = __static__ + __dynamic__ + __auth__
 ```
+
+#### if you Vault cluster is using TLS (work in progress)
+
+- add the following to the `commmon.py`
+
+`response = requests.get('https://<your FQDN or IP>/', verify=False)``
 
 ## prepare data
 
 - this step will generate a “testdata.json” file
 - use a Vault token with sufficient privileges to mount new paths and write data
 
-`VAULT_TOKEN="<vault token>" ./prepare.py  --host="http://<IP or DNS name of Vault Cluster:8200"`
+### set env vars
+
+```
+export VAULT_TOKEN="s.tZ0kI2..."
+export VAULT_ADDR="http:/127.0.0.1:8200"
+```
+
+### create prepare.py
+
+`./prepare.py --secrets=100 --host="http:/127.0.0.1:8200"`
 
 # execute locust test
 

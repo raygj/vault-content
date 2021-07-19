@@ -103,6 +103,10 @@ starttls=true \
 insecure_tls=false
 ```
 
+- rotate the password used by `binddn` user so that only "Vault" [knows the password](https://www.vaultproject.io/api/secret/ad#rotate-root-credentials):
+
+`vault write -force ad/rotate-root/`
+
 3. create a library
 
 ```
@@ -151,6 +155,11 @@ userdn="DC=vault-lab,DC=home,DC=org" \
 starttls=true \
 insecure_tls=false
 ```
+
+- rotate the password used by `binddn` user:
+
+`vault write -force sa-rotate/rotate-root/`
+
 - validate config
 
 `vault read sa-rotate/config`

@@ -15,7 +15,7 @@
 
 ### create a "bind" user in AD
 
-vaultbind
+user `vaultbind` will be configured as the account that Vault will use to interact with Active Directory
 
 - verify with dsquery (and capture connection string for Vault config)
 
@@ -66,15 +66,15 @@ Step 3. Export the Windows CA certificate
 
 http://192.168.1.21/certsrv/certcarc.asp
 
-Step 5. copy cert to the Vault server
+Step 4. copy cert to the Vault server
 
 `scp -i .ssh/jgrdubc /Users/jray/win-domain-ca-cert.cer jray@vault-ent-node-1:/home/jray/win-domain-ca-cert.cer`
 
-Step 6. use openssl to convert from DER to PEM format
+Step 5. use openssl to convert from DER to PEM format
 
 `openssl x509 -inform der -in /home/jray/win-domain-ca-cert.cer -out  /home/jray/win-domain-ca-cert.pem`
 
-Step 7. move to a stable directory where Vault will consume the cert
+Step 6. move to a stable directory where Vault will consume the cert
 
 `mkdir ~/win-domain-cert/`
 
@@ -139,7 +139,7 @@ as00@vault-lab.home.org
 
 `vault secrets enable -path sa-rotate ad`
 
-3. configure AD secret engine
+4. configure AD secret engine
 
 ```
 vault write sa-rotate/config \
@@ -151,16 +151,19 @@ userdn="DC=vault-lab,DC=home,DC=org" \
 starttls=true \
 insecure_tls=false
 ```
+- validate config
 
-4. map a Vault role (rotation policy) to the Windows Service Account
+`vault read sa-rotate/config`
+
+5. map a Vault role (rotation policy) to the Windows Service Account
 
 `vault write sa-rotate/roles/app00 service_account_name="as00@vault-lab.home.org"`
 
-5. validate/fetch service account info
+6. validate/fetch service account info
 
 `vault read sa-rotate/roles/app00`
 
-6. API test
+7. API test
 
 export VAULT_TOKEN=s.tZ0kI2vW38fb5KzUMyDvnevQ
 
@@ -210,7 +213,7 @@ groupdn="CN=vault-auth-group,CN=Users,DC=vault-lab,DC=home,DC=org" \
 use_token_groups=true \
 case_sensitive_names=true
 ```
-4. create RO policy
+3. create RO policy
 
 ```
 cat << EOF > myapp-kv-ro.hcl
@@ -220,10 +223,10 @@ capabilities = ["read", "list"]
 EOF
 ```
 
-5. assign RO policy
+4. assign RO policy
 
 `vault write auth/ldap/groups/vault-auth-group policies=windows-kv-ro`
 
-6. login
+5. login
 
 `vault login -method=ldap username="jray" password=m8M34v-343v`

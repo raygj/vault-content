@@ -175,11 +175,13 @@ EOF
 
 - fetch password
 
+```
 curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request GET \
     --data @payload.json \
     $VAULT_ADDR/v1/sa-rotate/creds/app00 | jq
+```
 
 ## build: enable LDAP auth
 

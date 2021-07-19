@@ -214,6 +214,7 @@ path "demo/*" {
 capabilities = ["read", "list"]
 }
 EOF
+```
 
 5. assign RO policy
 

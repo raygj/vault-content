@@ -94,7 +94,7 @@ Step 6. move to a stable directory where Vault will consume the cert
 
 ```
 vault write ad/config \
-binddn='vaultbind@vault-lab.home.org' \
+binddn='CN=vaultbind,CN=Users,DC=vault-lab,DC=home,DC=org' \
 bindpass='m8M34v-343v' \
 url="ldaps://WIN-E4SBU33RUPV.vault-lab.home.org" \
 certificate=@/home/jray/win-domain-cert/win-domain-ca-cert.pem \
@@ -143,7 +143,7 @@ as00@vault-lab.home.org
 
 ```
 vault write sa-rotate/config \
-binddn='vaultbind@vault-lab.home.org' \
+binddn='CN=vaultbind,CN=Users,DC=vault-lab,DC=home,DC=org' \
 bindpass='m8M34v-343v' \
 url="ldaps://WIN-E4SBU33RUPV.vault-lab.home.org" \
 certificate=@/home/jray/win-domain-cert/win-domain-ca-cert.pem \

@@ -97,6 +97,7 @@ vault write ad/config \
 binddn='vaultbind@vault-lab.home.org' \
 bindpass='m8M34v-343v' \
 url="ldaps://WIN-E4SBU33RUPV.vault-lab.home.org" \
+certificate=@/home/jray/win-domain-cert/win-domain-ca-cert.pem \
 userdn='CN=Users,DC=vault-lab,DC=home,DC=org' \
 starttls=true \
 insecure_tls=false
@@ -145,6 +146,7 @@ vault write sa-rotate/config \
 binddn='vaultbind@vault-lab.home.org' \
 bindpass='m8M34v-343v' \
 url="ldaps://WIN-E4SBU33RUPV.vault-lab.home.org" \
+certificate=@/home/jray/win-domain-cert/win-domain-ca-cert.pem \
 userdn="DC=vault-lab,DC=home,DC=org" \
 starttls=true \
 insecure_tls=false

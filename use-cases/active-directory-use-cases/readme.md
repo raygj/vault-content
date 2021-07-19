@@ -1,8 +1,8 @@
-# Vault Active Directory Check In | Check Out, Service Account Management, and AD Auth Walkthrough
+# Vault Active Directory Check Out | Check In, Service Account Management, and AD Auth Walkthrough
 
-- both Check-In and Auth require a working Active Directory configuration, so both workflows are presented since end users will auth to Vault with AD, then access Service Accounts managed by Vault
-- the Check-In | Check-Out workflow is based on a target set of accounts that Vault will manage (rotate password based on admin-define TTLs)
-- the Auth workflow is for authenticating to Vault, via Active Directory
+- both Check-Out/In and Auth require a working Active Directory configuration
+- the Check-Out | Check-Out workflow is based on a target set of accounts (library) that Vault will manage (blind rotation when account is "checked in")
+- the Auth workflow is for authenticating to Vault using Active Directory accounts
 
 ## background and assumptions
 
@@ -84,7 +84,7 @@ Step 7. move to a stable directory where Vault will consume the cert
 
 `openssl x509 -in ~/win-domain-cert/win-domain-ca-cert.pem -text -noout`
 
-## build: Vault Check-In | Check-Out Config
+## build: Vault Check-Out | Check-In Config
 
 1. enable AD secret engine
 

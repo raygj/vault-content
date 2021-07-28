@@ -48,13 +48,13 @@ ldapsearch -H ldaps://vault-ad-test.vault-ad-test.net:636 -D \
 
 ## API call to verify configuration
 
-`export VAULT_TOKEN=<some token>`
+`export VAULT_TOKEN=< some token >`
+
+`export VAULT_ADDR=https://< some address/name >:8200`
 
 ```
-
 curl \
     --header "X-Vault-Token:${VAULT_TOKEN}" \
     --request LIST \
-    http://127.0.0.1:8200/v1/auth/ldap/groups | jq
-
+    ${VAULT_ADDR}/v1/auth/ldap/groups | jq
 ```

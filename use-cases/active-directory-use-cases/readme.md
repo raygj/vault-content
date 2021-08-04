@@ -100,7 +100,8 @@ url="ldaps://WIN-E4SBU33RUPV.vault-lab.home.org" \
 certificate=@/home/jray/win-domain-cert/win-domain-ca-cert.pem \
 userdn='CN=Users,DC=vault-lab,DC=home,DC=org' \
 starttls=true \
-insecure_tls=false
+insecure_tls=false \
+ttl=15m
 ```
 
 - rotate the password used by `binddn` user so that only "Vault" [knows the password](https://www.vaultproject.io/api/secret/ad#rotate-root-credentials):

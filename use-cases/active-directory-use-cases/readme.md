@@ -140,7 +140,7 @@ as00@vault-lab.home.org
 
 < $up3rSecRet >
 
-3. enable AD secret engine at path **sa-rotate**
+3. enable AD secret engine at path **sa-rotate** (be sure your client's Vault policy authorizes access to this path)
 
 `vault secrets enable -path sa-rotate ad`
 

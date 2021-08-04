@@ -169,7 +169,11 @@ insecure_tls=false
 
 `vault write sa-rotate/roles/app00 service_account_name="as00@vault-lab.home.org"`
 
-6. validate/fetch service account info
+6. fetch service account password
+
+`vault read sa-rotate/creds/app00`
+
+6a. validate rotation events
 
 `vault read sa-rotate/roles/app00`
 

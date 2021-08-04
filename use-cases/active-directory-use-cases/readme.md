@@ -154,7 +154,8 @@ url="ldaps://WIN-E4SBU33RUPV.vault-lab.home.org" \
 certificate=@/home/jray/win-domain-cert/win-domain-ca-cert.pem \
 userdn="DC=vault-lab,DC=home,DC=org" \
 starttls=true \
-insecure_tls=false
+insecure_tls=false \
+ttl=15m
 ```
 
 - rotate the password used by `binddn` user:

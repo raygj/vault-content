@@ -174,17 +174,18 @@ insecure_tls=false
 
 7. API test
 
-export VAULT_TOKEN=s.tZ0kI2vW38fb5KzUMyDvnevQ
+`export VAULT_TOKEN=s.tZ0kI2vW38fb5KzUMyDvnevQ`
 
-export VAULT_ADDR=https://vault-ent-node-1:8200
+`export VAULT_ADDR=https://vault-ent-node-1:8200`
 
+```
 cat << EOF > ~/payload.json
 {
   "service_account_name": "as00@vault-lab.home.org",
   "ttl": 1
 }
 EOF
-
+```
 - fetch password
 
 ```

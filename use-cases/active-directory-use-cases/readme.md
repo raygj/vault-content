@@ -15,8 +15,8 @@
 
 ### create a "bind" user in AD
 
-user `vaultbind` will be configured as the account that Vault will use to interact with Active Directory
-
+user `vaultbind` will be configured as the account that Vault will use to interact with Active Directory on behalf of Vault
+- Domain Admin privilege is not required; create a target group for vault-managed-service-accounts and grant password reset rights to the `vaultbind` account
 - verify with dsquery (and capture connection string for Vault config)
 
 `dsquery user -name vaultbind`

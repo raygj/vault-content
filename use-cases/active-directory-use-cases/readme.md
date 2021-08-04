@@ -230,7 +230,7 @@ groupdn="CN=vault-auth-group,CN=Users,DC=vault-lab,DC=home,DC=org" \
 use_token_groups=true \
 case_sensitive_names=true
 ```
-3. create RO policy
+3. create Vault policy
 
 ```
 cat << EOF > windows-srvacct.hcl
@@ -248,10 +248,10 @@ EOF
 
 `vault policy write windows-srvacct windows-srvacct.hcl
 
-4. assign RO policy
+4. assign Vault policy
 
 `vault write auth/ldap/groups/vault-auth-group policies=windows-srvacct`
 
-5. login
+5. attempt login
 
 `vault login -method=ldap username="jray" password=m8M34v-343v`

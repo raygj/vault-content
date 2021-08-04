@@ -211,6 +211,7 @@ curl \
 2. configure LDAP auth
 
 - this config supports `sAMAccountName` attribute mapped to **userattr**, the short-form of the username (jray versus Jim Ray)
+- note, the `binddn` is the same user being used in previous configurations of this guide; if you used the `rotate-root` function the password for this account will become unkonwn. Create another `binddn` account for auth specifically such as `vaultbindauth` and set the password independently or reuse the same `binddn` but know that the other workflows in this guide will stop working
 
 ```
 vault write auth/ldap/config \
@@ -232,16 +233,24 @@ case_sensitive_names=true
 3. create RO policy
 
 ```
-cat << EOF > myapp-kv-ro.hcl
+cat << EOF > windows-srvacct.hcl
 path "demo/*" {
 capabilities = ["read", "list"]
+}
+path "sa=rotate/*/app00" {
+capabilities = ["read", "write", "list"]
+}
+path "ad/library/ops-team/*" {
+capabilities = ["read", "write", "list"]
 }
 EOF
 ```
 
+`vault policy write windows-srvacct windows-srvacct.hcl
+
 4. assign RO policy
 
-`vault write auth/ldap/groups/vault-auth-group policies=windows-kv-ro`
+`vault write auth/ldap/groups/vault-auth-group policies=windows-srvacct`
 
 5. login
 

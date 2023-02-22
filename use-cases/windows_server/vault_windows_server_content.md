@@ -123,6 +123,9 @@ vault {
         }
     }
 }
+
+```
+
 ```
 ###Agent Template COMMAND use case
 

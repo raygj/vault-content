@@ -165,7 +165,7 @@ contents = <<EOT
 EOT
 command = "c:\\vault\agent\command_uc\\powershell_to_execute.ps"
 }
-
+```
 
 ####PowerShell and Windows Info
 
